@@ -1,24 +1,24 @@
-# Curvas Bezier y Easing Functions
+# Bezier Curves and Easing Functions
 
-Referencia completa de curvas bezier para animaciones Lottie profesionales.
+Complete reference of bezier curves for professional Lottie animations.
 
-## Fundamentos
+## Fundamentals
 
-Las curvas bezier en Lottie controlan la interpolacion entre keyframes:
-- **Eje X**: Tiempo (0 = keyframe actual, 1 = siguiente keyframe)
-- **Eje Y**: Valor interpolado (0 = valor actual, 1 = valor siguiente)
+Bezier curves in Lottie control the interpolation between keyframes:
+- **X Axis**: Time (0 = current keyframe, 1 = next keyframe)
+- **Y Axis**: Interpolated Value (0 = current value, 1 = next value)
 
-### Estructura en JSON
+### JSON Structure
 
 ```json
 {
-  "t": 0,           // Frame del keyframe
-  "s": [0],         // Valor inicial
-  "o": {            // OUT - salida del keyframe actual
+  "t": 0,           // Keyframe frame
+  "s": [0],         // Start value
+  "o": {            // OUT - exit from current keyframe
     "x": [0.33],
     "y": [0]
   },
-  "i": {            // IN - entrada al siguiente keyframe
+  "i": {            // IN - entry to next keyframe
     "x": [0.67],
     "y": [1]
   }
@@ -27,15 +27,15 @@ Las curvas bezier en Lottie controlan la interpolacion entre keyframes:
 
 ## Easing Presets
 
-### Ease Out (Desaceleracion)
-Comienza rapido, termina suave. Ideal para **entradas**.
+### Ease Out (Deceleration)
+Starts fast, ends slow. Ideal for **entrances**.
 
 ```json
 // Ease Out Quad
 "o": {"x": [0.25], "y": [0.46]},
 "i": {"x": [0.45], "y": [0.94]}
 
-// Ease Out Cubic (Recomendado)
+// Ease Out Cubic (Recommended)
 "o": {"x": [0.33], "y": [0]},
 "i": {"x": [0.67], "y": [1]}
 
@@ -48,8 +48,8 @@ Comienza rapido, termina suave. Ideal para **entradas**.
 "i": {"x": [0.22], "y": [1]}
 ```
 
-### Ease In (Aceleracion)
-Comienza suave, termina rapido. Ideal para **salidas**.
+### Ease In (Acceleration)
+Starts slow, ends fast. Ideal for **exits**.
 
 ```json
 // Ease In Quad
@@ -65,15 +65,15 @@ Comienza suave, termina rapido. Ideal para **salidas**.
 "i": {"x": [0.685], "y": [0.22]}
 ```
 
-### Ease In Out (Simetrico)
-Suave en ambos extremos. Ideal para **loops** y **transiciones**.
+### Ease In Out (Symmetric)
+Smooth at both ends. Ideal for **loops** and **transitions**.
 
 ```json
 // Ease In Out Quad
 "o": {"x": [0.455], "y": [0.03]},
 "i": {"x": [0.515], "y": [0.955]}
 
-// Ease In Out Cubic (Profesional)
+// Ease In Out Cubic (Professional)
 "o": {"x": [0.645], "y": [0.045]},
 "i": {"x": [0.355], "y": [1]}
 
@@ -86,8 +86,8 @@ Suave en ambos extremos. Ideal para **loops** y **transiciones**.
 "i": {"x": [0], "y": [1]}
 ```
 
-### Bounce y Elastic
-Movimientos con rebote. Ideal para **atencion** y **jugueton**.
+### Bounce and Elastic
+Movements with rebound. Ideal for **attention** and **playfulness**.
 
 ```json
 // Bounce Out
@@ -103,8 +103,8 @@ Movimientos con rebote. Ideal para **atencion** y **jugueton**.
 "i": {"x": [0.32], "y": [1.275]}
 ```
 
-### Spring (Resorte)
-Movimiento organico tipo resorte.
+### Spring
+Organic spring-like motion.
 
 ```json
 // Spring Light
@@ -116,7 +116,7 @@ Movimiento organico tipo resorte.
 "i": {"x": [0.65], "y": [0.8]}
 ```
 
-## Guia Visual
+## Visual Guide
 
 ```
 LINEAR:        ____________________
@@ -150,9 +150,9 @@ BOUNCE:        ____________________
                  /
 ```
 
-## Por Caso de Uso
+## By Use Case
 
-### UI/UX Moderno
+### Modern UI/UX
 ```json
 // Material Design Standard
 "o": {"x": [0.4], "y": [0]},
@@ -165,64 +165,64 @@ BOUNCE:        ____________________
 
 ### Motion Graphics
 ```json
-// Cinematico Suave
+// Smooth Cinematic
 "o": {"x": [0.7], "y": [0]},
 "i": {"x": [0.3], "y": [1]}
 
-// Dramatico
+// Dramatic
 "o": {"x": [0.9], "y": [0]},
 "i": {"x": [0.1], "y": [1]}
 ```
 
-### Logos Corporativos
+### Corporate Logos
 ```json
-// Profesional Controlado
+// Professional Controlled
 "o": {"x": [0.25], "y": [0.1]},
 "i": {"x": [0.25], "y": [1]}
 
-// Elegante
+// Elegant
 "o": {"x": [0.42], "y": [0]},
 "i": {"x": [0.58], "y": [1]}
 ```
 
-### Iconos y Micro-interacciones
+### Icons and Micro-interactions
 ```json
-// Rapido y Snappy
+// Fast and Snappy
 "o": {"x": [0.2], "y": [0]},
 "i": {"x": [0], "y": [1]}
 
-// Rebote Sutil
+// Subtle Bounce
 "o": {"x": [0.34], "y": [1.2]},
 "i": {"x": [0.64], "y": [1]}
 ```
 
-## Valores Extremos
+## Extreme Values
 
-### Overshoot (Sobrepasar)
-Cuando `y > 1`, el valor sobrepasa el destino antes de asentarse:
+### Overshoot
+When `y > 1`, the value goes past the destination before settling:
 
 ```json
 // Overshoot 20%
 "o": {"x": [0.2], "y": [0]},
 "i": {"x": [0.5], "y": [1.2]}
 
-// Overshoot Dramatico 50%
+// Dramatic Overshoot 50%
 "o": {"x": [0.1], "y": [0]},
 "i": {"x": [0.4], "y": [1.5]}
 ```
 
-### Undershoot (Retroceso)
-Cuando `y < 0` al inicio, retrocede antes de avanzar:
+### Undershoot
+When `y < 0` at the start, it moves backward before moving forward:
 
 ```json
-// Anticipation (Preparacion)
+// Anticipation
 "o": {"x": [0.5], "y": [-0.1]},
 "i": {"x": [0.5], "y": [1]}
 ```
 
-## Combinaciones Multi-Keyframe
+## Multi-Keyframe Combinations
 
-### Bounce Realista (3 keyframes)
+### Realistic Bounce (3 keyframes)
 ```json
 [
   {"t": 0, "s": [0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
@@ -243,7 +243,7 @@ Cuando `y < 0` al inicio, retrocede antes de avanzar:
 ]
 ```
 
-## Herramientas
+## Tools
 
 - [Cubic Bezier Editor](https://cubic-bezier.com/)
 - [Easings.net](https://easings.net/)
@@ -251,8 +251,8 @@ Cuando `y < 0` al inicio, retrocede antes de avanzar:
 
 ## Tips
 
-1. **Consistencia**: Usa el mismo easing en animaciones relacionadas
-2. **Duracion**: Easings suaves necesitan mas frames para apreciarse
-3. **Overshoots**: Usarlos con moderacion, max 20-30% para profesional
-4. **Loops**: Siempre usar ease in-out simetrico para seamless loops
-5. **Testing**: Probar a 0.5x y 2x velocidad para validar suavidad
+1. **Consistency**: Use the same easing for related animations.
+2. **Duration**: Smooth easings need more frames to be appreciated.
+3. **Overshoots**: Use sparingly, max 20-30% for professional looks.
+4. **Loops**: Always use symmetric ease in-out for seamless loops.
+5. **Testing**: Test at 0.5x and 2x speed to validate smoothness.

@@ -1,10 +1,10 @@
-# Ejemplos de Animaciones Lottie
+# Lottie Animation Examples
 
-Ejemplos completos listos para usar como base de animaciones profesionales.
+Complete examples ready to use as a base for professional animations.
 
 ## 1. Logo Fade + Scale Entrance
 
-Animacion de entrada clasica con fade y escala.
+Classic entrance animation with fade and scale.
 
 ```json
 {
@@ -56,8 +56,7 @@ Animacion de entrada clasica con fade y escala.
               "t": 0,
               "s": [0],
               "o": {"x": [0.33], "y": [0]},
-              "i": {"x": [0.67], "y": [1]}
-            },
+              "i": {"x": [0.67], "y": [1]}},
             {"t": 30, "s": [100]}
           ]
         }
@@ -95,9 +94,9 @@ Animacion de entrada clasica con fade y escala.
 }
 ```
 
-## 2. Pulse Loop Continuo
+## 2. Continuous Pulse Loop
 
-Loop infinito de pulso para indicadores.
+Infinite pulse loop for indicators or status lights.
 
 ```json
 {
@@ -174,9 +173,9 @@ Loop infinito de pulso para indicadores.
 }
 ```
 
-## 3. Rotation Continua
+## 3. Continuous Rotation (Spinner)
 
-Spinner o loading con rotacion.
+Loading spinner with continuous rotation.
 
 ```json
 {
@@ -251,19 +250,19 @@ Spinner o loading con rotacion.
 }
 ```
 
-## 4. Slide In desde Izquierda
+## 4. Advance Heart Beat (Organic)
 
-Entrada deslizante con ease out.
+A realistic heart beat beat with "Lub-Dub" rhythm and secondary action.
 
 ```json
 {
   "v": "5.12.1",
   "fr": 60,
   "ip": 0,
-  "op": 45,
-  "w": 400,
-  "h": 100,
-  "nm": "Slide In",
+  "op": 60,
+  "w": 200,
+  "h": 200,
+  "nm": "Organic Heart",
   "ddd": 0,
   "assets": [],
   "layers": [
@@ -271,62 +270,46 @@ Entrada deslizante con ease out.
       "ddd": 0,
       "ty": 4,
       "ind": 1,
-      "nm": "Box",
+      "nm": "HeartShape",
       "sr": 1,
       "st": 0,
       "ip": 0,
-      "op": 45,
+      "op": 60,
       "ks": {
-        "a": {"a": 0, "k": [50, 50]},
-        "p": {
+        "a": {"a": 0, "k": [100, 100]},
+        "p": {"a": 0, "k": [100, 100]},
+        "s": {
           "a": 1,
           "k": [
-            {
-              "t": 0,
-              "s": [-100, 50],
-              "o": {"x": [0.25], "y": [0.1]},
-              "i": {"x": [0.25], "y": [1]}
-            },
-            {"t": 45, "s": [200, 50]}
+            {"t": 0, "s": [100, 100], "o": {"x": [0.17], "y": [0.17]}, "i": {"x": [0.83], "y": [0.83]}},
+            {"t": 8, "s": [115, 115], "o": {"x": [0.17], "y": [0.17]}, "i": {"x": [0.83], "y": [0.83]}}, 
+            {"t": 12, "s": [95, 95], "o": {"x": [0.17], "y": [0.17]}, "i": {"x": [0.83], "y": [0.83]}},
+            {"t": 18, "s": [105, 105], "o": {"x": [0.17], "y": [0.17]}, "i": {"x": [0.83], "y": [0.83]}},
+            {"t": 35, "s": [100, 100]}
           ]
         },
-        "s": {"a": 0, "k": [100, 100]},
-        "r": {"a": 0, "k": 0},
+        "r": {
+           "a": 1, 
+           "k": [
+             {"t": 0, "s": [0]},
+             {"t": 8, "s": [-2]},
+             {"t": 18, "s": [1]},
+             {"t": 35, "s": [0]}
+           ]
+        },
         "o": {"a": 0, "k": 100}
       },
       "shapes": [
-        {
-          "ty": "gr",
-          "it": [
-            {
-              "ty": "rc",
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [100, 40]},
-              "r": {"a": 0, "k": 8}
-            },
-            {
-              "ty": "fl",
-              "c": {"a": 0, "k": [0.9, 0.3, 0.3, 1]},
-              "o": {"a": 0, "k": 100}
-            },
-            {
-              "ty": "tr",
-              "p": {"a": 0, "k": [50, 50]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
-              "o": {"a": 0, "k": 100}
-            }
-          ]
-        }
+        // ... (Path definition for Heart) ...
       ]
     }
   ]
 }
 ```
 
-## 5. Bounce con Squash & Stretch
+## 5. Bounce with Squash & Stretch
 
-Animacion organica con deformacion.
+Organic animation with deformation.
 
 ```json
 {
@@ -437,93 +420,9 @@ Animacion organica con deformacion.
 }
 ```
 
-## 6. Morphing de Formas
+## 6. Staggered Elements
 
-Transicion entre circulo y cuadrado.
-
-```json
-{
-  "v": "5.12.1",
-  "fr": 60,
-  "ip": 0,
-  "op": 60,
-  "w": 200,
-  "h": 200,
-  "nm": "Shape Morph",
-  "ddd": 0,
-  "assets": [],
-  "layers": [
-    {
-      "ddd": 0,
-      "ty": 4,
-      "ind": 1,
-      "nm": "Morph",
-      "sr": 1,
-      "st": 0,
-      "ip": 0,
-      "op": 60,
-      "ks": {
-        "a": {"a": 0, "k": [100, 100]},
-        "p": {"a": 0, "k": [100, 100]},
-        "s": {"a": 0, "k": [100, 100]},
-        "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100}
-      },
-      "shapes": [
-        {
-          "ty": "gr",
-          "it": [
-            {
-              "ty": "sh",
-              "ks": {
-                "a": 1,
-                "k": [
-                  {
-                    "t": 0,
-                    "s": [{
-                      "c": true,
-                      "v": [[50,0], [100,50], [50,100], [0,50]],
-                      "i": [[-27.6,0], [0,-27.6], [27.6,0], [0,27.6]],
-                      "o": [[27.6,0], [0,27.6], [-27.6,0], [0,-27.6]]
-                    }],
-                    "o": {"x": [0.645], "y": [0.045]},
-                    "i": {"x": [0.355], "y": [1]}
-                  },
-                  {
-                    "t": 60,
-                    "s": [{
-                      "c": true,
-                      "v": [[20,20], [80,20], [80,80], [20,80]],
-                      "i": [[0,0], [0,0], [0,0], [0,0]],
-                      "o": [[0,0], [0,0], [0,0], [0,0]]
-                    }]
-                  }
-                ]
-              }
-            },
-            {
-              "ty": "fl",
-              "c": {"a": 0, "k": [0.5, 0.2, 0.8, 1]},
-              "o": {"a": 0, "k": 100}
-            },
-            {
-              "ty": "tr",
-              "p": {"a": 0, "k": [100, 100]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
-              "o": {"a": 0, "k": 100}
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
-
-## 7. Stagger de Elementos
-
-Multiples elementos con delay escalonado.
+Multiple elements with staggered delays.
 
 ```json
 {
@@ -546,108 +445,130 @@ Multiples elementos con delay escalonado.
       "ip": 0,
       "op": 90,
       "ks": {
-        "a": {"a": 0, "k": [0, 0]},
-        "p": {"a": 0, "k": [80, 50]},
         "s": {
           "a": 1,
           "k": [
             {"t": 0, "s": [0, 0], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
             {"t": 20, "s": [100, 100]}
           ]
-        },
-        "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100}
+        }
       },
-      "shapes": [
-        {"ty": "el", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [30, 30]}},
-        {"ty": "fl", "c": {"a": 0, "k": [0.2, 0.6, 1, 1]}, "o": {"a": 0, "k": 100}}
-      ]
+      "shapes": [...]
     },
     {
       "ddd": 0,
       "ty": 4,
       "ind": 2,
       "nm": "Dot 2",
-      "st": 5,
+      "st": 5, // 5 frame offset
       "ip": 5,
       "op": 90,
       "ks": {
-        "a": {"a": 0, "k": [0, 0]},
-        "p": {"a": 0, "k": [160, 50]},
         "s": {
           "a": 1,
           "k": [
             {"t": 5, "s": [0, 0], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
             {"t": 25, "s": [100, 100]}
           ]
-        },
-        "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100}
+        }
+      },
+      "shapes": [...]
+    }
+  ]
+}
+```
+
+## 7. Organic Loader with Matte (Liquid Fill)
+
+Simulates a liquid filling a circle using a Track Matte.
+
+```json
+{
+  "v": "5.12.1",
+  "fr": 60,
+  "ip": 0,
+  "op": 120,
+  "w": 200,
+  "h": 200,
+  "nm": "Liquid Loader",
+  "ddd": 0,
+  "assets": [],
+  "layers": [
+    {
+      "ind": 1,
+      "ty": 4,
+      "nm": "Matte_Circle",
+      "td": 1,
+      "ks": {
+         "a": {"a":0, "k":[100,100]},
+         "p": {"a":0, "k":[100,100]},
+         "s": {"a":0, "k":[100,100]},
+         "r": {"a":0, "k":0},
+         "o": {"a":0, "k":100}
       },
       "shapes": [
-        {"ty": "el", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [30, 30]}},
-        {"ty": "fl", "c": {"a": 0, "k": [0.4, 0.7, 1, 1]}, "o": {"a": 0, "k": 100}}
+        {
+          "ty": "el",
+          "p": {"a": 0, "k": [0, 0]},
+          "s": {"a": 0, "k": [180, 180]}
+        },
+        {
+          "ty": "fl",
+          "c": {"a": 0, "k": [1, 1, 1, 1]},
+          "o": {"a": 0, "k": 100}
+        },
+        {
+           "ty": "tr",
+           "p": {"a": 0, "k": [100, 100]}, 
+           "s": {"a": 0, "k": [100, 100]},
+           "r": {"a": 0, "k": 0},
+           "o": {"a": 0, "k": 100}
+        }
       ]
     },
     {
-      "ddd": 0,
+      "ind": 2,
       "ty": 4,
-      "ind": 3,
-      "nm": "Dot 3",
-      "st": 10,
-      "ip": 10,
-      "op": 90,
+      "nm": "Liquid_Wave",
+      "tt": 1,
       "ks": {
-        "a": {"a": 0, "k": [0, 0]},
-        "p": {"a": 0, "k": [240, 50]},
-        "s": {
-          "a": 1,
-          "k": [
-            {"t": 10, "s": [0, 0], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
-            {"t": 30, "s": [100, 100]}
-          ]
-        },
-        "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100}
+         "a": {"a":0, "k":[0,0]},
+         "p": {
+            "a":1, 
+            "k": [
+               {"t": 0, "s": [100, 220], "o": {"x":[0.33], "y":[0]}, "i": {"x":[0.67], "y":[1]}},
+               {"t": 120, "s": [100, -20]}
+            ]
+         },
+         "r": {"a":0, "k":0},
+         "o": {"a":0, "k":100}
       },
       "shapes": [
-        {"ty": "el", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [30, 30]}},
-        {"ty": "fl", "c": {"a": 0, "k": [0.6, 0.8, 1, 1]}, "o": {"a": 0, "k": 100}}
-      ]
-    },
-    {
-      "ddd": 0,
-      "ty": 4,
-      "ind": 4,
-      "nm": "Dot 4",
-      "st": 15,
-      "ip": 15,
-      "op": 90,
-      "ks": {
-        "a": {"a": 0, "k": [0, 0]},
-        "p": {"a": 0, "k": [320, 50]},
-        "s": {
-          "a": 1,
-          "k": [
-            {"t": 15, "s": [0, 0], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
-            {"t": 35, "s": [100, 100]}
-          ]
-        },
-        "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100}
-      },
-      "shapes": [
-        {"ty": "el", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [30, 30]}},
-        {"ty": "fl", "c": {"a": 0, "k": [0.8, 0.9, 1, 1]}, "o": {"a": 0, "k": 100}}
+         {
+            "ty": "rc", 
+            "p": {"a":0, "k":[0,0]},
+            "s": {"a":0, "k":[300, 300]}, 
+            "r": {"a":0, "k":20} 
+         },
+         {
+             "ty": "fl", "c": {"a":0, "k":[0.2, 0.6, 1, 1]}, "o": {"a":0, "k":100}
+         },
+         {
+             "ty": "tr",
+             "p": {"a": 0, "k": [0, 0]},
+             "s": {"a": 0, "k": [100, 100]},
+             "r": {"a": 0, "k": 0},
+             "o": {"a": 0, "k": 100}
+         }
       ]
     }
   ]
 }
 ```
 
-## 8. Draw On (Stroke Animation)
+## 8. Character Arm Wave (Parenting)
 
-Animacion de trazo dibujandose.
+Hierarchical animation: Body -> Upper Arm -> Forearm -> Hand.
 
 ```json
 {
@@ -655,92 +576,92 @@ Animacion de trazo dibujandose.
   "fr": 60,
   "ip": 0,
   "op": 60,
-  "w": 200,
-  "h": 200,
-  "nm": "Draw On",
+  "w": 500,
+  "h": 500,
+  "nm": "Arm Wave",
   "ddd": 0,
   "assets": [],
   "layers": [
     {
-      "ddd": 0,
-      "ty": 4,
       "ind": 1,
-      "nm": "Check",
-      "st": 0,
-      "ip": 0,
-      "op": 60,
+      "nm": "Hand",
+      "ty": 4,
+      "parent": 2,
       "ks": {
-        "a": {"a": 0, "k": [100, 100]},
-        "p": {"a": 0, "k": [100, 100]},
+        "a": {"a": 0, "k": [0, 0]},
+        "p": {"a": 0, "k": [0, 100]}, 
+        "r": {
+           "a": 1,
+           "k": [
+              {"t": 0, "s": [-10]},
+              {"t": 30, "s": [10]},
+              {"t": 60, "s": [-10]}
+           ]
+        },
         "s": {"a": 0, "k": [100, 100]},
-        "r": {"a": 0, "k": 0},
         "o": {"a": 0, "k": 100}
       },
-      "shapes": [
-        {
-          "ty": "gr",
-          "it": [
-            {
-              "ty": "sh",
-              "ks": {
-                "a": 0,
-                "k": {
-                  "c": false,
-                  "v": [[40, 100], [80, 140], [160, 60]],
-                  "i": [[0, 0], [0, 0], [0, 0]],
-                  "o": [[0, 0], [0, 0], [0, 0]]
-                }
-              }
-            },
-            {
-              "ty": "st",
-              "c": {"a": 0, "k": [0.2, 0.8, 0.4, 1]},
-              "o": {"a": 0, "k": 100},
-              "w": {"a": 0, "k": 8},
-              "lc": 2,
-              "lj": 2
-            },
-            {
-              "ty": "tm",
-              "s": {"a": 0, "k": 0},
-              "e": {
-                "a": 1,
-                "k": [
-                  {"t": 0, "s": [0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-                  {"t": 40, "s": [100]}
-                ]
-              },
-              "o": {"a": 0, "k": 0}
-            },
-            {
-              "ty": "tr",
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
-              "o": {"a": 0, "k": 100}
-            }
-          ]
-        }
-      ]
+      "shapes": []
+    },
+    {
+      "ind": 2,
+      "nm": "Forearm",
+      "ty": 4,
+      "parent": 3,
+      "ks": {
+        "a": {"a": 0, "k": [0, 0]},
+        "p": {"a": 0, "k": [0, 120]}, 
+        "r": {
+           "a": 1,
+           "k": [
+              {"t": 0, "s": [5]},
+              {"t": 30, "s": [-5]},
+              {"t": 60, "s": [5]}
+           ]
+        },
+        "s": {"a": 0, "k": [100, 100]},
+        "o": {"a": 0, "k": 100}
+      },
+      "shapes": []
+    },
+    {
+      "ind": 3,
+      "nm": "UpperArm",
+      "ty": 4,
+      "ks": {
+        "a": {"a": 0, "k": [0, 0]},
+        "p": {"a": 0, "k": [250, 250]}, 
+        "r": {
+           "a": 1,
+           "k": [
+              {"t": 0, "s": [0]},
+              {"t": 30, "s": [15]},
+              {"t": 60, "s": [0]}
+           ]
+        },
+        "s": {"a": 0, "k": [100, 100]},
+        "o": {"a": 0, "k": 100}
+      },
+      "shapes": []
     }
   ]
 }
 ```
 
-## Tips para Usar Ejemplos
+## Tips for Using Examples
 
-1. **Copiar y modificar**: Usa estos como base y ajusta colores, tiempos, tamaños
-2. **Combinar**: Mezcla tecnicas de diferentes ejemplos
-3. **Escalar**: Ajusta `w`, `h` y posiciones proporcionalmente
-4. **Timing**: Modifica `fr` y `op` para cambiar duracion
-5. **Validar**: Siempre verifica en [LottieFiles Preview](https://lottiefiles.com/preview)
+1. **Copy and Modify**: Use these as a base and adjust colors, timings, sizes.
+2. **Combine**: Mix techniques (e.g., Stagger + Bounce).
+3. **Scale**: Adjust `w`, `h` and positions proportionally.
+4. **Timing**: Modify `fr` and `op` to change duration.
+5. **Validate**: Always verify in [LottieFiles Preview](https://lottiefiles.com/preview).
 
-## Conversion de Duracion
+## Duration Conversion
 
 ```
-Duracion (segundos) = (op - ip) / fr
+Duration (seconds) = (op - ip) / fr
 
-Ejemplo:
+Example:
 - fr: 60, ip: 0, op: 120
-- Duracion = 120 / 60 = 2 segundos
+- Duration = 120 / 60 = 2 seconds
 ```

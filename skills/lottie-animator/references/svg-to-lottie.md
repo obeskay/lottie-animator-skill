@@ -1,10 +1,10 @@
-# Conversion SVG a Lottie
+# SVG to Lottie Conversion
 
-Guia para convertir SVGs estaticos en animaciones Lottie.
+Guide to convert static SVGs into Lottie animations.
 
-## Proceso de Conversion
+## Conversion Process
 
-### Paso 1: Analizar el SVG
+### Step 1: Analyze the SVG
 
 ```xml
 <svg viewBox="0 0 100 100">
@@ -14,12 +14,12 @@ Guia para convertir SVGs estaticos en animaciones Lottie.
 </svg>
 ```
 
-Extraer:
+Extract:
 - **viewBox**: 0 0 100 100 → `w: 100, h: 100`
-- **Elementos**: circle, rect, path
-- **Atributos**: posiciones, colores, transformaciones
+- **Elements**: circle, rect, path
+- **Attributes**: positions, colors, transforms
 
-### Paso 2: Mapear Elementos
+### Step 2: Map Elements
 
 | SVG | Lottie Shape Type |
 |-----|-------------------|
@@ -32,11 +32,11 @@ Extraer:
 | `<line>` | `sh` |
 | `<g>` | `gr` (group) |
 
-### Paso 3: Convertir Colores
+### Step 3: Convert Colors
 
 ```javascript
-// SVG: fill="#3498db" o fill="rgb(52,152,219)"
-// Lottie: [R, G, B, A] donde cada valor es 0-1
+// SVG: fill="#3498db" or fill="rgb(52,152,219)"
+// Lottie: [R, G, B, A] where each value is 0-1
 
 "#3498db" → [0.204, 0.596, 0.859, 1]
 
@@ -46,7 +46,7 @@ Extraer:
 // 0xdb = 219 → 219/255 = 0.859
 ```
 
-## Conversion de Formas
+## Shape Conversion
 
 ### Circle → Ellipse
 
@@ -134,7 +134,7 @@ Extraer:
         "k": {
           "c": true,                      // Z = closed
           "v": [[10, 10], [50, 90], [90, 10]],  // Vertices (M, L, L)
-          "i": [[0, 0], [0, 0], [0, 0]],        // In tangents (lineas = 0)
+          "i": [[0, 0], [0, 0], [0, 0]],        // In tangents (lines = 0)
           "o": [[0, 0], [0, 0], [0, 0]]         // Out tangents
         }
       }
@@ -155,19 +155,19 @@ Extraer:
 }
 ```
 
-## Conversion de Paths Bezier
+## Bezier Path Conversion
 
 ### SVG Path Commands
 
 ```
-M x,y     = Move to (absoluto)
-m dx,dy   = Move to (relativo)
+M x,y     = Move to (absolute)
+m dx,dy   = Move to (relative)
 L x,y     = Line to
-l dx,dy   = Line to relativo
+l dx,dy   = Line to relative
 H x       = Horizontal line to
 V y       = Vertical line to
 C x1,y1 x2,y2 x,y = Cubic bezier
-c         = Cubic bezier relativo
+c         = Cubic bezier relative
 S x2,y2 x,y = Smooth cubic
 Q x1,y1 x,y = Quadratic bezier
 T x,y     = Smooth quadratic
@@ -175,17 +175,17 @@ A rx ry angle large-arc sweep x,y = Arc
 Z         = Close path
 ```
 
-### Ejemplo: Cubic Bezier
+### Example: Cubic Bezier
 
 ```xml
 <path d="M0,50 C25,0 75,100 100,50"/>
 ```
 
-Puntos:
-- P0: (0, 50) - inicio
+Points:
+- P0: (0, 50) - start
 - C1: (25, 0) - control 1
 - C2: (75, 100) - control 2
-- P1: (100, 50) - fin
+- P1: (100, 50) - end
 
 ```json
 {
@@ -202,240 +202,28 @@ Puntos:
 }
 ```
 
-### Formulas de Tangentes
-
-```
-// Para cada segmento bezier:
-// P0 → (C1, C2) → P1
-
-out_tangent[i] = C1 - P0   // Tangente de salida
-in_tangent[i+1] = C2 - P1  // Tangente de entrada al siguiente punto
-```
-
-## Transformaciones SVG
-
-### Transform: translate
-
-```xml
-<g transform="translate(50, 30)">
-```
-
-```json
-{
-  "ty": "tr",
-  "p": {"a": 0, "k": [50, 30]}
-}
-```
-
-### Transform: scale
-
-```xml
-<g transform="scale(2, 1.5)">
-```
-
-```json
-{
-  "ty": "tr",
-  "s": {"a": 0, "k": [200, 150]}  // * 100
-}
-```
-
-### Transform: rotate
-
-```xml
-<g transform="rotate(45, 50, 50)">
-```
-
-```json
-{
-  "ty": "tr",
-  "a": {"a": 0, "k": [50, 50]},   // Centro de rotacion
-  "r": {"a": 0, "k": 45}          // Grados
-}
-```
-
-### Transform combinado
-
-```xml
-<g transform="translate(100, 50) rotate(30) scale(0.5)">
-```
-
-```json
-{
-  "ty": "tr",
-  "p": {"a": 0, "k": [100, 50]},
-  "r": {"a": 0, "k": 30},
-  "s": {"a": 0, "k": [50, 50]}
-}
-```
-
-## Gradientes
-
-### Linear Gradient
-
-```xml
-<linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-  <stop offset="0%" style="stop-color:#ff0000"/>
-  <stop offset="100%" style="stop-color:#0000ff"/>
-</linearGradient>
-```
-
-```json
-{
-  "ty": "gf",
-  "t": 1,                              // 1 = linear
-  "s": {"a": 0, "k": [0, 50]},         // Start point
-  "e": {"a": 0, "k": [100, 50]},       // End point
-  "g": {
-    "p": 2,                            // Numero de stops
-    "k": {
-      "a": 0,
-      "k": [
-        0, 1, 0, 0,                    // offset 0%, R, G, B
-        1, 0, 0, 1                     // offset 100%, R, G, B
-      ]
-    }
-  },
-  "o": {"a": 0, "k": 100}
-}
-```
-
-### Radial Gradient
-
-```xml
-<radialGradient id="grad" cx="50%" cy="50%" r="50%">
-```
-
-```json
-{
-  "ty": "gf",
-  "t": 2,                              // 2 = radial
-  "s": {"a": 0, "k": [50, 50]},        // Center
-  "e": {"a": 0, "k": [100, 50]},       // Edge point
-  "h": {"a": 0, "k": 0},               // Highlight angle
-  "a": {"a": 0, "k": 0},               // Highlight length
-  "g": {
-    "p": 2,
-    "k": {"a": 0, "k": [0, 1, 0, 0, 1, 0, 0, 1]}
-  }
-}
-```
-
-## Stroke Properties
-
-```xml
-<path stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-```
-
-```json
-{
-  "ty": "st",
-  "c": {"a": 0, "k": [0, 0, 0, 1]},
-  "o": {"a": 0, "k": 100},
-  "w": {"a": 0, "k": 2},
-  "lc": 2,                             // 1=butt, 2=round, 3=square
-  "lj": 2                              // 1=miter, 2=round, 3=bevel
-}
-```
-
-## Opacity
-
-```xml
-<rect fill-opacity="0.5" opacity="0.8"/>
-```
-
-```json
-// fill-opacity se aplica al fill
-{
-  "ty": "fl",
-  "o": {"a": 0, "k": 50}
-}
-
-// opacity general se aplica al grupo
-{
-  "ty": "tr",
-  "o": {"a": 0, "k": 80}
-}
-```
-
-## Script de Ayuda: Parsear SVG
+## Helper Script: Parse SVG Path
 
 ```javascript
-// Extraer vertices de un path d
+// Extract vertices from path d
 function parsePathD(d) {
-  const commands = d.match(/[MLHVCSQTAZmlhvcsqtaz][^MLHVCSQTAZmlhvcsqtaz]*/g);
-  const vertices = [];
-  const inTangents = [];
-  const outTangents = [];
-  let current = [0, 0];
-
-  commands.forEach(cmd => {
-    const type = cmd[0];
-    const args = cmd.slice(1).trim().split(/[\s,]+/).map(Number);
-
-    switch(type) {
-      case 'M':
-        current = [args[0], args[1]];
-        vertices.push(current);
-        inTangents.push([0, 0]);
-        outTangents.push([0, 0]);
-        break;
-      case 'L':
-        current = [args[0], args[1]];
-        vertices.push(current);
-        inTangents.push([0, 0]);
-        outTangents.push([0, 0]);
-        break;
-      case 'C':
-        // Cubic bezier
-        const c1 = [args[0], args[1]];
-        const c2 = [args[2], args[3]];
-        const end = [args[4], args[5]];
-
-        // Out tangent del punto anterior
-        outTangents[outTangents.length - 1] = [
-          c1[0] - current[0],
-          c1[1] - current[1]
-        ];
-
-        vertices.push(end);
-        inTangents.push([
-          c2[0] - end[0],
-          c2[1] - end[1]
-        ]);
-        outTangents.push([0, 0]);
-
-        current = end;
-        break;
-      case 'Z':
-        // Mark as closed
-        break;
-    }
-  });
-
-  return {
-    c: d.toUpperCase().includes('Z'),
-    v: vertices,
-    i: inTangents,
-    o: outTangents
-  };
+  // Simplified logic
+  // 1. Split commands
+  // 2. Track current point
+  // 3. For C (cubic):
+  //    outTangents[last] = [c1.x - current.x, c1.y - current.y]
+  //    inTangents[next] = [c2.x - end.x, c2.y - end.y]
+  // 4. Update current point
 }
 ```
 
-## Checklist de Conversion
+## Checklist for Conversion
 
-- [ ] Extraer viewBox para dimensiones
-- [ ] Convertir cada elemento SVG a shape correspondiente
-- [ ] Mapear colores hex a arrays [R, G, B, A]
-- [ ] Aplicar transformaciones a grupos
-- [ ] Convertir paths bezier con tangentes correctas
-- [ ] Manejar gradientes si existen
-- [ ] Verificar strokes y fills
-- [ ] Validar estructura JSON final
-- [ ] Probar en LottieFiles Preview
-
-## Herramientas Utiles
-
-- [SVGOMG](https://jakearchibald.github.io/svgomg/) - Optimizar SVG antes de convertir
-- [SVG Path Editor](https://yqnn.github.io/svg-path-editor/) - Visualizar paths
-- [LottieFiles](https://lottiefiles.com) - Previsualizar y validar
+- [ ] Extract viewBox for dimensions
+- [ ] Convert each SVG element to corresponding shape
+- [ ] Map hex colors to [R, G, B, A] arrays
+- [ ] Apply transforms to groups
+- [ ] Convert bezier paths with correct tangents
+- [ ] Handle gradients if they exist
+- [ ] Verify strokes and fills
+- [ ] Validate final JSON structure

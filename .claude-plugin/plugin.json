@@ -4,7 +4,8 @@
   "description": "Professional SVG to Lottie animation skill with advanced bezier curves and motion graphics. Replace After Effects workflow.",
   "author": {
     "name": "Obed Vargas",
-    "url": "https://github.com/obeskay"
+    "url": "https://obeskay.com",
+    "email": "hola@obeskay.com"
   },
   "repository": "https://github.com/obeskay/lottie-animator-skill",
   "license": "MIT",

@@ -105,6 +105,7 @@ Pre-configured easing presets matching industry standards:
 - **Loop**: Pulse, Wiggle, Float, Rotate
 - **Attention**: Bounce, Shake, Flash
 - **Advanced**: Morph, Stagger, Draw-on
+- **Pro**: Parenting (Rigs), Track Mattes (Liquid/Masks), Bezier Masking
 
 ## Documentation
 
@@ -194,6 +195,8 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **Obed Vargas**
 
+- Website: [obeskay.com](https://obeskay.com)
+- Email: [hola@obeskay.com](mailto:hola@obeskay.com)
 - GitHub: [@obeskay](https://github.com/obeskay)
 
 ---

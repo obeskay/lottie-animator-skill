@@ -1,51 +1,51 @@
-# Estructura Lottie JSON Completa
+# Complete Lottie JSON Structure
 
-Referencia completa de la especificacion Lottie para generacion de animaciones profesionales.
+Full reference of the Lottie specification for professional animation generation.
 
-## Estructura Raiz
+## Root Structure
 
 ```json
 {
-  "v": "5.12.1",      // Version de Lottie
+  "v": "5.12.1",      // Lottie Version
   "fr": 60,           // Frame rate (FPS)
-  "ip": 0,            // In point (frame inicial)
-  "op": 120,          // Out point (frame final)
-  "w": 512,           // Ancho en pixels
-  "h": 512,           // Alto en pixels
-  "nm": "Animation",  // Nombre
-  "ddd": 0,           // 3D deshabilitado
-  "assets": [],       // Assets (imagenes, precomps)
-  "layers": [],       // Capas de animacion
-  "meta": {}          // Metadata opcional
+  "ip": 0,            // In point (start frame)
+  "op": 120,          // Out point (end frame)
+  "w": 512,           // Width in pixels
+  "h": 512,           // Height in pixels
+  "nm": "Animation",  // Name
+  "ddd": 0,           // 3D disabled
+  "assets": [],       // Assets (images, precomps)
+  "layers": [],       // Animation layers
+  "meta": {}          // Optional metadata
 }
 ```
 
-## Tipos de Capas (ty)
+## Layer Types (ty)
 
-| ty | Tipo | Descripcion |
+| ty | Type | Description |
 |----|------|-------------|
-| 0 | Precomp | Composicion anidada |
-| 1 | Solid | Capa de color solido |
-| 2 | Image | Capa de imagen |
-| 3 | Null | Capa nula (control) |
-| 4 | Shape | Capa de formas (SVG) |
-| 5 | Text | Capa de texto |
+| 0 | Precomp | Nested composition |
+| 1 | Solid | Solid color layer |
+| 2 | Image | Image layer |
+| 3 | Null | Null layer (controller) |
+| 4 | Shape | Shape layer (SVG) |
+| 5 | Text | Text layer |
 
-## Capa Shape (ty: 4) - La mas usada
+## Shape Layer (ty: 4) - Most Used
 
 ```json
 {
   "ddd": 0,
   "ty": 4,
-  "ind": 1,           // Indice de capa
+  "ind": 1,           // Layer index
   "nm": "Shape Layer",
   "sr": 1,            // Time stretch
   "st": 0,            // Start time
   "ip": 0,            // In point
   "op": 120,          // Out point
   "ks": {},           // Transform properties
-  "ao": 0,            // Auto-orient (0 o 1)
-  "shapes": []        // Array de shapes
+  "ao": 0,            // Auto-orient (0 or 1)
+  "shapes": []        // Array of shapes
 }
 ```
 
@@ -57,7 +57,7 @@ Referencia completa de la especificacion Lottie para generacion de animaciones p
     "a": {"a": 0, "k": [256, 256]},     // Anchor point
     "p": {"a": 0, "k": [256, 256]},     // Position
     "s": {"a": 0, "k": [100, 100]},     // Scale (%)
-    "r": {"a": 0, "k": 0},              // Rotation (grados)
+    "r": {"a": 0, "k": 0},              // Rotation (degrees)
     "o": {"a": 0, "k": 100},            // Opacity (0-100)
     "sk": {"a": 0, "k": 0},             // Skew
     "sa": {"a": 0, "k": 0}              // Skew axis
@@ -65,13 +65,13 @@ Referencia completa de la especificacion Lottie para generacion de animaciones p
 }
 ```
 
-## Propiedad Animada vs Estatica
+## Animated vs Static Property
 
 ```json
-// Estatica (a: 0)
+// Static (a: 0)
 {"a": 0, "k": [256, 256]}
 
-// Animada (a: 1)
+// Animated (a: 1)
 {
   "a": 1,
   "k": [
@@ -83,13 +83,13 @@ Referencia completa de la especificacion Lottie para generacion de animaciones p
     },
     {
       "t": 60,
-      "s": [256, 256]                   // End value (sin easing)
+      "s": [256, 256]                   // End value (no easing needed at end)
     }
   ]
 }
 ```
 
-## Tipos de Shapes
+## Shape Types
 
 ### Group (ty: "gr")
 ```json
@@ -97,8 +97,8 @@ Referencia completa de la especificacion Lottie para generacion de animaciones p
   "ty": "gr",
   "nm": "Group",
   "it": [
-    // Shapes hijos
-    // Transform al final
+    // Child shapes
+    // Transform at the end
   ]
 }
 ```
@@ -124,7 +124,7 @@ Referencia completa de la especificacion Lottie para generacion de animaciones p
 }
 ```
 
-### Path (ty: "sh") - Para SVGs
+### Path (ty: "sh") - For SVGs
 ```json
 {
   "ty": "sh",
@@ -164,7 +164,7 @@ Referencia completa de la especificacion Lottie para generacion de animaciones p
 }
 ```
 
-### Transform dentro de Group (ty: "tr")
+### Transform within Group (ty: "tr")
 ```json
 {
   "ty": "tr",
@@ -176,229 +176,42 @@ Referencia completa de la especificacion Lottie para generacion de animaciones p
 }
 ```
 
-## Conversion SVG Path a Lottie
-
-### SVG Path Commands
-```
-M = moveto (absoluto)
-m = moveto (relativo)
-L = lineto
-l = lineto relativo
-C = cubic bezier
-c = cubic bezier relativo
-Q = quadratic bezier
-Z = close path
-```
-
-### Mapeo a Lottie
-```json
-// SVG: <path d="M 0,0 C 25,0 75,100 100,100 Z"/>
-
-{
-  "ty": "sh",
-  "ks": {
-    "a": 0,
-    "k": {
-      "c": true,
-      "v": [[0, 0], [100, 100]],
-      "i": [[0, 0], [-25, 0]],      // In tangents (relativos a vertex)
-      "o": [[25, 0], [0, 0]]        // Out tangents (relativos a vertex)
-    }
-  }
-}
-```
-
-### Tangentes Bezier
-- **v**: Vertices (puntos del path)
-- **i**: In tangent = punto_control - vertex (relativo)
-- **o**: Out tangent = punto_control - vertex (relativo)
-
-Para lineas rectas, tangentes son `[0, 0]`.
-
-## Estructura de Keyframe Completa
+## Keyframe Structure
 
 ```json
 {
   "t": 0,                    // Frame number
   "s": [0],                  // Start value (array)
   "h": 0,                    // Hold (0=interpolate, 1=hold)
-  "o": {                     // Out tangent (salida)
+  "o": {                     // Out tangent (outgoing curve)
     "x": [0.33],
     "y": [0]
   },
-  "i": {                     // In tangent (entrada)
+  "i": {                     // In tangent (incoming curve)
     "x": [0.67],
     "y": [1]
   }
 }
 ```
 
-### Valores Especiales
-- **h: 1**: Hold keyframe (sin interpolacion)
-- Sin `o`/`i`: Ultimo keyframe (no necesita easing)
+## Transition Presets
 
-## Presets de Transicion
-
-Basado en Advanced Effects:
+Based on standard motion graphics principles:
 
 ```json
 // Linear
 "o": {"x": [0.33], "y": [0.33]},
 "i": {"x": [0.67], "y": [0.67]}
 
-// Ease (suave)
+// Ease (smooth)
 "o": {"x": [0.33], "y": [0]},
 "i": {"x": [0.67], "y": [1]}
 
-// Fast (rapido)
+// Fast (snappy)
 "o": {"x": [0.17], "y": [0.33]},
 "i": {"x": [0.83], "y": [0.67]}
 
-// Overshoot (rebasa)
+// Overshoot (springy)
 "o": {"x": [0.67], "y": [-0.33]},
 "i": {"x": [0.33], "y": [1.33]}
 ```
-
-## Assets
-
-### Imagen Embebida
-```json
-{
-  "assets": [
-    {
-      "id": "image_0",
-      "w": 512,
-      "h": 512,
-      "e": 1,                        // Embedded (1=si, 0=no)
-      "u": "",                       // Path vacio si embedded
-      "p": "data:image/png;base64,..." // Base64 data
-    }
-  ]
-}
-```
-
-### Imagen Externa
-```json
-{
-  "assets": [
-    {
-      "id": "image_0",
-      "w": 512,
-      "h": 512,
-      "e": 0,
-      "u": "images/",               // Directorio
-      "p": "logo.png"               // Nombre archivo
-    }
-  ]
-}
-```
-
-### Precomposicion
-```json
-{
-  "assets": [
-    {
-      "id": "comp_0",
-      "nm": "Precomp",
-      "layers": []                  // Capas de la precomp
-    }
-  ]
-}
-```
-
-## Efectos Comunes
-
-### Trim Path
-```json
-{
-  "ty": "tm",
-  "nm": "Trim Path",
-  "s": {"a": 0, "k": 0},    // Start (%)
-  "e": {"a": 0, "k": 100},  // End (%)
-  "o": {"a": 0, "k": 0}     // Offset (grados)
-}
-```
-
-### Repeater
-```json
-{
-  "ty": "rp",
-  "nm": "Repeater",
-  "c": {"a": 0, "k": 3},    // Copies
-  "o": {"a": 0, "k": 0},    // Offset
-  "tr": {                    // Transform per copy
-    "a": {"a": 0, "k": [0, 0]},
-    "p": {"a": 0, "k": [50, 0]},
-    "s": {"a": 0, "k": [100, 100]},
-    "r": {"a": 0, "k": 0},
-    "so": {"a": 0, "k": 100},
-    "eo": {"a": 0, "k": 100}
-  }
-}
-```
-
-## Gradientes
-
-### Gradient Fill
-```json
-{
-  "ty": "gf",
-  "nm": "Gradient Fill",
-  "t": 1,                           // Type (1=linear, 2=radial)
-  "s": {"a": 0, "k": [0, 256]},     // Start point
-  "e": {"a": 0, "k": [512, 256]},   // End point
-  "g": {
-    "p": 3,                          // Num color stops
-    "k": {
-      "a": 0,
-      "k": [
-        0, 1, 0, 0,                  // pos, R, G, B
-        0.5, 0, 1, 0,
-        1, 0, 0, 1
-      ]
-    }
-  }
-}
-```
-
-## Mascaras
-
-```json
-{
-  "masksProperties": [
-    {
-      "nm": "Mask",
-      "mode": "a",                   // a=add, s=subtract, i=intersect
-      "pt": {                        // Path
-        "a": 0,
-        "k": {"c": true, "v": [], "i": [], "o": []}
-      },
-      "o": {"a": 0, "k": 100},       // Opacity
-      "x": {"a": 0, "k": 0}          // Expansion
-    }
-  ]
-}
-```
-
-## Validacion
-
-### Checklist de Estructura
-- [ ] `v` version presente
-- [ ] `fr` framerate > 0
-- [ ] `op` > `ip`
-- [ ] `w` y `h` > 0
-- [ ] `layers` es array
-- [ ] Cada layer tiene `ty` valido
-- [ ] Keyframes ordenados por `t` ascendente
-- [ ] Ultimo keyframe no tiene `o`/`i`
-
-### Errores Comunes
-1. **Tangentes fuera de rango**: x debe estar entre 0-1
-2. **Assets faltantes**: Verificar `refId` existe
-3. **Keyframes desordenados**: Ordenar por `t`
-4. **Path sin cerrar**: `c: false` si es abierto
-
-## Referencias
-- [Lottie Docs](https://lottiefiles.github.io/lottie-docs/)
-- [Lottie Spec](https://lottie.github.io/lottie-spec/)
-- [LottieFiles Viewer](https://lottiefiles.com/preview)
