@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lottie Animator - AI-Powered Motion Design</title>
+  <meta name="description" content="Generate professional Lottie animations from SVGs using AI. Replace After Effects with intelligent motion design.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #22c55e;
+      --accent: #f97316;
+      --bg: #0f0f1a;
+      --bg-card: #1a1a2e;
+      --text: #e5e5e5;
+      --text-muted: #9ca3af;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    .gradient-bg {
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(249, 115, 22, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 80px 24px;
+      position: relative;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 100px;
+      font-size: 14px;
+      color: var(--primary);
+      margin-bottom: 32px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--secondary);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    h1 {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.6s ease-out 0.1s both;
+    }
+    
+    h1 .gradient-text {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 50%, var(--secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 48px;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+    
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeInUp 0.6s ease-out 0.3s both;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    /* Animation Preview */
+    .animation-preview {
+      margin-top: 80px;
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+    
+    .preview-item {
+      width: 120px;
+      height: 120px;
+      background: var(--bg-card);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .preview-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+    
+    .preview-item:nth-child(1) .preview-circle {
+      animation: bounce 1.5s ease-in-out infinite;
+    }
+    
+    .preview-item:nth-child(2) .preview-circle {
+      animation: pulse-scale 2s ease-in-out infinite;
+    }
+    
+    .preview-item:nth-child(3) .preview-circle {
+      animation: wiggle 1s ease-in-out infinite;
+    }
+    
+    .preview-item:nth-child(4) .preview-circle {
+      animation: rotate 3s linear infinite;
+    }
+    
+    /* Features */
+    .features {
+      padding: 120px 24px;
+    }
+    
+    .section-title {
+      text-align: center;
+      font-size: clamp(2rem, 5vw, 3rem);
+      margin-bottom: 64px;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .feature-card {
+      background: var(--bg-card);
+      padding: 32px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    
+    .feature-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+    
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+    
+    /* Code Block */
+    .code-section {
+      padding: 80px 24px;
+      text-align: center;
+    }
+    
+    .code-block {
+      background: #1e1e2e;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 600px;
+      margin: 32px auto 0;
+      text-align: left;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .code-block .comment { color: #6b7280; }
+    .code-block .command { color: var(--secondary); }
+    .code-block .string { color: var(--accent); }
+    
+    /* Footer */
+    footer {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    @keyframes pulse-scale {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+    
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero { padding: 60px 16px; }
+      .cta-group { flex-direction: column; width: 100%; }
+      .btn { width: 100%; justify-content: center; }
+      .animation-preview { gap: 16px; }
+      .preview-item { width: 80px; height: 80px; }
+      .preview-circle { width: 40px; height: 40px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <section class="hero">
+    <div class="badge">Open Source • Claude Code Plugin</div>
+    <h1>
+      <span class="gradient-text">Lottie Animator</span><br>
+      AI-Powered Motion Design
+    </h1>
+    <p class="subtitle">
+      Generate professional Lottie animations from SVGs in seconds. 
+      Replace After Effects with intelligent motion design.
+    </p>
+    <div class="cta-group">
+      <a href="https://github.com/obeskay/lottie-animator-skill" class="btn btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        View on GitHub
+      </a>
+      <a href="#install" class="btn btn-secondary">Quick Install</a>
+    </div>
+    
+    <div class="animation-preview">
+      <div class="preview-item"><div class="preview-circle"></div></div>
+      <div class="preview-item"><div class="preview-circle"></div></div>
+      <div class="preview-item"><div class="preview-circle"></div></div>
+      <div class="preview-item"><div class="preview-circle"></div></div>
+    </div>
+  </section>
+  
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title">Why Choose Lottie Animator?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Zero Cost</h3>
+          <p>Open source and free forever. No After Effects subscription required.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>Professional Bezier Curves</h3>
+          <p>20+ easing presets: ease, bounce, elastic, spring, and custom curves.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>AI-Powered</h3>
+          <p>Describe your animation in natural language. Claude handles the rest.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Ready to Use</h3>
+          <p>Export JSON files compatible with web, iOS, Android, and React Native.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="code-section" id="install">
+    <h2 class="section-title">Get Started in Seconds</h2>
+    <div class="code-block">
+      <span class="comment"># Add the marketplace</span><br>
+      <span class="command">/plugin marketplace add</span> <span class="string">obeskay/lottie-animator-skill</span><br><br>
+      <span class="comment"># Install the plugin</span><br>
+      <span class="command">/plugin install</span> <span class="string">lottie-animator</span><br><br>
+      <span class="comment"># Start animating!</span><br>
+      <span class="string">"Animate my logo with a bounce effect"</span>
+    </div>
+  </section>
+  
+  <footer>
+    <p>
+      Made by <a href="https://github.com/obeskay">Obed Vargas</a> • 
+      <a href="https://github.com/obeskay/lottie-animator-skill">GitHub</a> • 
+      MIT License
+    </p>
+  </footer>
+</body>
+</html>

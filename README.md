@@ -34,7 +34,7 @@ With Lottie Animator:
 
 ```bash
 # Add the marketplace
-/plugin marketplace add obedvargas/lottie-animator-skill
+/plugin marketplace add obeskay/lottie-animator-skill
 
 # Install the plugin
 /plugin install lottie-animator
@@ -44,7 +44,7 @@ With Lottie Animator:
 
 ```bash
 # Clone the repository
-git clone https://github.com/obedvargas/lottie-animator-skill.git
+git clone https://github.com/obeskay/lottie-animator-skill.git
 
 # Use with Claude Code
 claude --plugin-dir ./lottie-animator-skill
@@ -194,7 +194,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **Obed Vargas**
 
-- GitHub: [@obedvargas](https://github.com/obedvargas)
+- GitHub: [@obeskay](https://github.com/obeskay)
 
 ---
 
