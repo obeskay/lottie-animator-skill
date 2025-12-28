@@ -1,0 +1,36 @@
+{
+  "name": "lottie-animator-marketplace",
+  "owner": {
+    "name": "Obed Vargas",
+    "email": "contact@obedvargas.dev"
+  },
+  "metadata": {
+    "description": "Marketplace for Lottie Animator plugin - Generate professional Lottie animations from SVGs",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "lottie-animator",
+      "source": "./",
+      "description": "Generate professional Lottie animations from SVGs. Replace After Effects workflow with advanced bezier curves, professional easing presets, and automatic export.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Obed Vargas"
+      },
+      "homepage": "https://github.com/obedvargas/lottie-animator-skill",
+      "repository": "https://github.com/obedvargas/lottie-animator-skill",
+      "license": "MIT",
+      "keywords": [
+        "lottie",
+        "animation",
+        "svg",
+        "motion-graphics",
+        "bezier",
+        "after-effects",
+        "logo-animation",
+        "ui-animation",
+        "micro-interactions"
+      ]
+    }
+  ]
+}
