@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lottie Preview</title>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #1a1a2e;
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .preview-card {
+      background: #16213e;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .preview-card h3 {
+      color: #e94560;
+      margin: 0 0 15px 0;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    lottie-player {
+      background: #0f0f23;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-card">
+    <h3>Rocket Launch</h3>
+    <lottie-player
+      id="rocket"
+      src="../examples/rocket-launch.json"
+      background="transparent"
+      speed="1"
+      style="width: 200px; height: 200px;"
+      loop
+      autoplay>
+    </lottie-player>
+  </div>
+
+  <div class="preview-card">
+    <h3>Chimp Walk</h3>
+    <lottie-player
+      id="chimp"
+      src="../test/chimpanzee-walk.json"
+      background="transparent"
+      speed="1"
+      style="width: 200px; height: 200px;"
+      loop
+      autoplay>
+    </lottie-player>
+  </div>
+</body>
+</html>
