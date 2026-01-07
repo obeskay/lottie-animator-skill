@@ -2,6 +2,15 @@
 
 <div align="center">
 
+<!-- Animated Banner -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/banner.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner.svg">
+  <img alt="Lottie Animator - AI-Powered Motion Design" src="assets/banner.svg" width="100%">
+</picture>
+
+<br><br>
+
 ![Lottie Animator](https://img.shields.io/badge/Lottie-Animator-6366f1?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0tMiAxNWwtNS01IDEuNDEtMS40MUwxMCAxNC4xN2w3LjU5LTcuNTlMMTkgOGwtOSA5eiIvPjwvc3ZnPg==)
 ![Claude Code](https://img.shields.io/badge/Claude-Code-ff6b35?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)
@@ -49,6 +58,31 @@
 | [`rocket-animated.json`](examples/rocket-animated.json) | [`chimp-walk-pro.json`](examples/chimp-walk-pro.json) | Reverse-engineered for learning |
 
 **👆 Preview:** Drag any `.json` file to [LottieFiles Preview](https://lottiefiles.com/preview)
+
+</div>
+
+---
+
+## Live Demo
+
+<div align="center">
+
+| ![Rocket](https://img.shields.io/badge/🚀-Rocket_Launch-6366f1?style=for-the-badge) | ![Chimp](https://img.shields.io/badge/🐵-Chimp_Walk-22c55e?style=for-the-badge) | ![Check](https://img.shields.io/badge/✓-Checkmark-f97316?style=for-the-badge) |
+|:---:|:---:|:---:|
+| Bounce + Scale + Particles | Frame-by-Frame Animation | Trim Path + Draw On |
+| [Preview →](https://lottiefiles.com/preview) | [Preview →](https://lottiefiles.com/preview) | [Preview →](https://lottiefiles.com/preview) |
+
+**Try the animations yourself:**
+
+1. Download any `.json` from [`examples/`](examples/)
+2. Drag to [LottieFiles Preview](https://lottiefiles.com/preview)
+3. Watch the magic!
+
+**Or run locally:**
+```bash
+# Open the live preview page
+open assets/preview-embedded.html
+```
 
 </div>
 
