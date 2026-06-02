@@ -1,258 +1,112 @@
-# Bezier Curves and Easing Functions
+# Bezier Curves, Easing & Timing Physics in Lottie
 
-Complete reference of bezier curves for professional Lottie animations.
+This reference provides a mathematical guide to implementing bezier easing curves, time scales, and distance physics within Lottie JSON keyframe variables.
 
-## Fundamentals
+---
 
-Bezier curves in Lottie control the interpolation between keyframes:
-- **X Axis**: Time (0 = current keyframe, 1 = next keyframe)
-- **Y Axis**: Interpolated Value (0 = current value, 1 = next value)
+## Easing Fundamentals in Lottie
 
-### JSON Structure
+In Lottie JSON, easing controls the speed of value interpolation over time between two keyframes.
+- **X coordinates (`x`)**: Map to Time (0.0 to 1.0).
+- **Y coordinates (`y`)**: Map to Interpolated Value (0.0 to 1.0).
 
+### Keyframe Object Anatomy
 ```json
 {
-  "t": 0,           // Keyframe frame
+  "t": 0,           // Start frame number
   "s": [0],         // Start value
-  "o": {            // OUT - exit from current keyframe
+  "o": {            // OUT: departure tangent from current keyframe
     "x": [0.33],
-    "y": [0]
+    "y": [0.0]
   },
-  "i": {            // IN - entry to next keyframe
+  "i": {            // IN: arrival tangent to next keyframe
     "x": [0.67],
-    "y": [1]
+    "y": [1.0]
   }
 }
 ```
 
-## Easing Presets
+---
 
-### Ease Out (Deceleration)
-Starts fast, ends slow. Ideal for **entrances**.
+## Archetype-Mapped Easing Curves
 
-```json
-// Ease Out Quad
-"o": {"x": [0.25], "y": [0.46]},
-"i": {"x": [0.45], "y": [0.94]}
+Align easing curves with the selected brand archetype. Do not mix curves from different archetypes in a single composition.
 
-// Ease Out Cubic (Recommended)
-"o": {"x": [0.33], "y": [0]},
-"i": {"x": [0.67], "y": [1]}
+| Archetype | Curve Name | Cubic Bezier Points | Lottie OUT Tangents (`o`) | Lottie IN Tangents (`i`) | Rationale |
+|---|---|---|---|---|---|
+| **Playful** | Back Out | `(0.175, 0.885, 0.32, 1.275)` | `{"x": [0.175], "y": [0.885]}` | `{"x": [0.32], "y": [1.275]}` | Reaches destination, overshoots by 27.5%, and settles back |
+| **Premium** | Luxurious Ease | `(0.4, 0, 0.2, 1)` | `{"x": [0.4], "y": [0.0]}` | `{"x": [0.2], "y": [1.0]}` | Decelerates extremely smoothly with a long, slow settle phase |
+| **Corporate** | Precise Fast | `(0.2, 0, 0, 1)` | `{"x": [0.2], "y": [0.0]}` | `{"x": [0.0], "y": [1.0]}` | Immediate snap response with almost instant deceleration |
+| **Energetic** | Expo Out | `(0.16, 1, 0.3, 1)` | `{"x": [0.16], "y": [1.0]}` | `{"x": [0.3], "y": [1.0]}` | Explosive initial acceleration with quick stabilization |
 
-// Ease Out Quart
-"o": {"x": [0.165], "y": [0.84]},
-"i": {"x": [0.44], "y": [1]}
+---
 
-// Ease Out Expo
-"o": {"x": [0.19], "y": [1]},
-"i": {"x": [0.22], "y": [1]}
-```
+## Timing and the 1/3 Rule of Spatial Distance
 
-### Ease In (Acceleration)
-Starts slow, ends fast. Ideal for **exits**.
+Motion duration must scale proportionally with the distance an element travels. A slide of 400px feels incredibly violent and jarring if compressed into the same duration as a subtle 50px hover shift.
 
-```json
-// Ease In Quad
-"o": {"x": [0.55], "y": [0.085]},
-"i": {"x": [0.68], "y": [0.53]}
+### Distance Scaling Formula
+Let $D$ be the path distance in pixels. Let $T_{\text{base}}$ be the base duration for $100\text{px}$ travel.
+- **Base Distance**: $100\text{px} \rightarrow 1.0\times$ base duration.
+- **Medium Distance**: $200\text{px} \rightarrow 1.3\times$ base duration.
+- **Long Distance**: $400\text{px} \rightarrow 1.6\times$ base duration.
 
-// Ease In Cubic
-"o": {"x": [0.55], "y": [0.055]},
-"i": {"x": [0.675], "y": [0.19]}
+### Mathematical Scale Equation
 
-// Ease In Quart
-"o": {"x": [0.895], "y": [0.03]},
-"i": {"x": [0.685], "y": [0.22]}
-```
+$$T_{\text{scale}} = T_{\text{base}} \times \left(\frac{D}{100}\right)^{0.38}$$
 
-### Ease In Out (Symmetric)
-Smooth at both ends. Ideal for **loops** and **transitions**.
+### Rationale Table for UI timing
+Use these durations as absolute parameters for elements in your composition:
 
-```json
-// Ease In Out Quad
-"o": {"x": [0.455], "y": [0.03]},
-"i": {"x": [0.515], "y": [0.955]}
+| Element Type | Target Distance | Corporate Timing | Premium Timing | Easing Family |
+|---|---|---|---|---|
+| **Tooltip / Popover** | 0-10px (Fade only) | 80-120ms | 150-250ms | Decelerate / Ease Out |
+| **Button Feedback** | 0px (Scale only) | 120-180ms | 200-300ms | Decelerate on release |
+| **Icon Transition** | 10-30px | 150-250ms | 300-400ms | Decelerate / Spring |
+| **Card Entrance** | 50-150px | 200-350ms | 400-550ms | Custom Bezier Out |
+| **Modal / Dialog** | 100-300px | 300-400ms | 500-650ms | Ease Out Back / Cubic |
+| **Page Shift** | 400px+ (Full viewport) | 400-600ms | 700-1000ms | Decelerate / Parallax |
 
-// Ease In Out Cubic (Professional)
-"o": {"x": [0.645], "y": [0.045]},
-"i": {"x": [0.355], "y": [1]}
+---
 
-// Ease In Out Quart
-"o": {"x": [0.76], "y": [0]},
-"i": {"x": [0.24], "y": [1]}
+## Interactive Easing Curves
 
-// Ease In Out Expo
-"o": {"x": [1], "y": [0]},
-"i": {"x": [0], "y": [1]}
-```
+Interactive user actions require split-timing:
 
-### Bounce and Elastic
-Movements with rebound. Ideal for **attention** and **playfulness**.
+### Hover Entrances
+- **Constraint**: Must feel responsive.
+- **Duration**: `<100ms`.
+- **Curve**: Smooth deceleration.
+- **Tangents**: `o: {"x": [0.25], "y": [0.0]}, i: {"x": [0.25], "y": [1.0]}`
 
-```json
-// Bounce Out
-"o": {"x": [0.34], "y": [1.56]},
-"i": {"x": [0.64], "y": [1]}
+### Mouse Presses (Active State)
+- **Constraint**: Must feel solid and instantaneous.
+- **Duration**: `<150ms`.
+- **Curve**: Sharp acceleration into flat contraction.
+- **Tangents**: `o: {"x": [0.0], "y": [0.0]}, i: {"x": [0.58], "y": [1.0]}`
 
-// Elastic Out
-"o": {"x": [0.5], "y": [1.5]},
-"i": {"x": [0.5], "y": [1]}
+---
 
-// Back Out (Overshoot)
-"o": {"x": [0.175], "y": [0.885]},
-"i": {"x": [0.32], "y": [1.275]}
-```
+## Multi-Keyframe Spring Formula
 
-### Spring
-Organic spring-like motion.
+To code organic spring dynamics without a real physics engine, chain **three keyframes** using decaying overshoot amplitudes:
 
 ```json
-// Spring Light
-"o": {"x": [0.5], "y": [1.2]},
-"i": {"x": [0.5], "y": [0.9]}
-
-// Spring Heavy
-"o": {"x": [0.35], "y": [1.7]},
-"i": {"x": [0.65], "y": [0.8]}
+// Spring decay loop: 100% -> 120% -> 92% -> 100%
+"s": {
+  "a": 1,
+  "k": [
+    { "t": 0, "s": [0, 0], "o": { "x": [0.34], "y": [1.56] }, "i": { "x": [0.64], "y": [1] } },
+    { "t": 12, "s": [120, 120], "o": { "x": [0.33], "y": [0] }, "i": { "x": [0.67], "y": [1] } },
+    { "t": 22, "s": [92, 92], "o": { "x": [0.33], "y": [0] }, "i": { "x": [0.67], "y": [1] } },
+    { "t": 32, "s": [100, 100] }
+  ]
+}
 ```
 
-## Visual Guide
+---
 
-```
-LINEAR:        ____________________
-               /
-              /
-             /
-            /
-
-EASE OUT:      ____________________
-               /
-              |
-              |
-             /
-
-EASE IN:       ____________________
-                               /
-                              |
-                              |
-                             /
-
-EASE IN OUT:   ____________________
-                    _____
-                   /     \
-                  |       |
-                 /         \
-
-BOUNCE:        ____________________
-                    ___
-                   /   \_/\
-                  |
-                 /
-```
-
-## By Use Case
-
-### Modern UI/UX
-```json
-// Material Design Standard
-"o": {"x": [0.4], "y": [0]},
-"i": {"x": [0.2], "y": [1]}
-
-// iOS Spring
-"o": {"x": [0.5], "y": [1.8]},
-"i": {"x": [0.5], "y": [0.7]}
-```
-
-### Motion Graphics
-```json
-// Smooth Cinematic
-"o": {"x": [0.7], "y": [0]},
-"i": {"x": [0.3], "y": [1]}
-
-// Dramatic
-"o": {"x": [0.9], "y": [0]},
-"i": {"x": [0.1], "y": [1]}
-```
-
-### Corporate Logos
-```json
-// Professional Controlled
-"o": {"x": [0.25], "y": [0.1]},
-"i": {"x": [0.25], "y": [1]}
-
-// Elegant
-"o": {"x": [0.42], "y": [0]},
-"i": {"x": [0.58], "y": [1]}
-```
-
-### Icons and Micro-interactions
-```json
-// Fast and Snappy
-"o": {"x": [0.2], "y": [0]},
-"i": {"x": [0], "y": [1]}
-
-// Subtle Bounce
-"o": {"x": [0.34], "y": [1.2]},
-"i": {"x": [0.64], "y": [1]}
-```
-
-## Extreme Values
-
-### Overshoot
-When `y > 1`, the value goes past the destination before settling:
-
-```json
-// Overshoot 20%
-"o": {"x": [0.2], "y": [0]},
-"i": {"x": [0.5], "y": [1.2]}
-
-// Dramatic Overshoot 50%
-"o": {"x": [0.1], "y": [0]},
-"i": {"x": [0.4], "y": [1.5]}
-```
-
-### Undershoot
-When `y < 0` at the start, it moves backward before moving forward:
-
-```json
-// Anticipation
-"o": {"x": [0.5], "y": [-0.1]},
-"i": {"x": [0.5], "y": [1]}
-```
-
-## Multi-Keyframe Combinations
-
-### Realistic Bounce (3 keyframes)
-```json
-[
-  {"t": 0, "s": [0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-  {"t": 15, "s": [115], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-  {"t": 25, "s": [95], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-  {"t": 35, "s": [100]}
-]
-```
-
-### Elastic Settle (4 keyframes)
-```json
-[
-  {"t": 0, "s": [0], "o": {"x": [0.22], "y": [1]}, "i": {"x": [0.36], "y": [1]}},
-  {"t": 12, "s": [120], "o": {"x": [0.22], "y": [1]}, "i": {"x": [0.36], "y": [1]}},
-  {"t": 22, "s": [92], "o": {"x": [0.22], "y": [1]}, "i": {"x": [0.36], "y": [1]}},
-  {"t": 30, "s": [104], "o": {"x": [0.22], "y": [1]}, "i": {"x": [0.36], "y": [1]}},
-  {"t": 38, "s": [100]}
-]
-```
-
-## Tools
-
-- [Cubic Bezier Editor](https://cubic-bezier.com/)
-- [Easings.net](https://easings.net/)
-- [Lottie Preview](https://lottiefiles.com/preview)
-
-## Tips
-
-1. **Consistency**: Use the same easing for related animations.
-2. **Duration**: Smooth easings need more frames to be appreciated.
-3. **Overshoots**: Use sparingly, max 20-30% for professional looks.
-4. **Loops**: Always use symmetric ease in-out for seamless loops.
-5. **Testing**: Test at 0.5x and 2x speed to validate smoothness.
+## Common Mistakes & Quality Rules
+1. **Never use Linear (`[0,0], [1,1]`)** for positional shifts. This looks robotic and cold. Use symmetric curves for loops, and snappy ease-outs for entrances.
+2. **Matching start/end curves for loops**: Ensure your loop starting frame tangents match the exit curves of the terminal frame to prevent sharp "hiccups" at the loop boundary.
+3. **Clamping overshoots**: Keep overshoot targets between `105%` and `125%` max. Values above `130%` look sloppy and unstable.
