@@ -240,5 +240,7 @@ Ensure you consult specific reference documents for complex animation behaviors:
   - [references/professional-techniques.md](references/professional-techniques.md)
 - **Frame-by-Frame Switching**: Implement walk cycles using layered `ip`/`op` sprite frames.
   - [references/professional-techniques.md](references/professional-techniques.md)
+- **GSAP & ScrollTrigger Integration**: Bind Lottie scrub parameters, canvas pools, and 3D spring deflections to mouse/scroll events.
+  - [references/lottie-gsap-integration.md](references/lottie-gsap-integration.md)
 - **Bezier Easing Reference**: Map snappiness using custom cubic bezier coordinates.
   - [references/bezier-easing.md](references/bezier-easing.md)
