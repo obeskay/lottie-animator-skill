@@ -242,5 +242,7 @@ Ensure you consult specific reference documents for complex animation behaviors:
   - [references/professional-techniques.md](references/professional-techniques.md)
 - **GSAP & ScrollTrigger Integration**: Bind Lottie scrub parameters, canvas pools, and 3D spring deflections to mouse/scroll events.
   - [references/lottie-gsap-integration.md](references/lottie-gsap-integration.md)
+- **Lottie Tools & Ecosystem**: Select editing workflows, leverage dotLottie (.lottie) compression packaging, and audit run-time rendering.
+  - [references/lottie-tools-ecosystem.md](references/lottie-tools-ecosystem.md)
 - **Bezier Easing Reference**: Map snappiness using custom cubic bezier coordinates.
   - [references/bezier-easing.md](references/bezier-easing.md)
