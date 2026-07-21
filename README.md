@@ -59,47 +59,43 @@
 
 ---
 
-## 🎯 Brand Mark Showcase: Adobe After Effects
+## ✦ Motion Showcase: Morphing Star
 
 > **"The best motion design tool deserves a motion design entrance."**
 
-The After Effects logo is the canonical example of a professional brand mark — a real Adobe product, not a generic icon. Animating it with this skill proves that Lottie Animator can handle production-grade work, not just toy demos.
+This original example demonstrates a clean, brand-neutral loop: a violet star breathes while an amber orbit traces a precise arc around it.
 
 | Source | Output | Preview |
 |:------:|:------:|:-------:|
-| `examples/adobe-after-effects-solid.svg` | `examples/after-effects-logo.json` | `examples/after-effects-logo.gif` |
+| Source | Output | Technique |
+|:------:|:------:|:---------:|
+| `examples/rocket-icon.svg` | `examples/morphing-star.json` | Scale + rotation + orbit |
 
 <div align="center">
 
-![After Effects Logo — animated](examples/after-effects-logo.gif)
-
-*2.0s loop · 60fps · 256×256 · ~47 KB · white background*
+*1.5s loop · 60fps · 240×240 · dependency-free JSON*
 
 </div>
 
-### Motion Design Decisions (8-Step Checklist)
+### Motion Design Decisions
 
 | # | Decision | Choice |
 |---|----------|--------|
-| 1 | **Emotional target** | Creative confidence + technical mastery (this is a pro tool) |
-| 2 | **Motion personality** | **Premium** — controlled, deliberate, no overshoot on the brand mark |
-| 3 | **Primary property** | Trim-path reveal (the brand mark *draws itself*, an act of authorship) |
-| 4 | **Timing** | 120 frames @ 60fps = 2.0s (corporate breathing) |
-| 5 | **Easing** | Ease-out `[0.33, 0, 0.67, 1]` for the body, elastic `[0.34, 1.56, 0.64, 1]` for the eyebrow accent |
-| 6 | **Staging** | Body (0–75) → eyebrow dot (60–78) → brow (75–95) → settle pulse (95–120) |
-| 7 | **Secondary layer** | Subtle 2% scale pulse on the body to keep it alive after settling |
-| 8 | **Volume preservation** | Skipped — premium forbids squash on a brand mark |
+| 1 | **Emotional target** | Focus + creative energy |
+| 2 | **Motion personality** | **Premium** — controlled rotation, soft settle |
+| 3 | **Primary property** | Scale breathing with a continuous orbit |
+| 4 | **Timing** | 90 frames @ 60fps = 1.5s |
+| 5 | **Easing** | Ease-out entrance, smooth linear-feeling loop |
+| 6 | **Staging** | Orbit fades in first; star settles 6 frames later |
 
 ### Timeline (frame-accurate)
 
 ```
-Frame  0────30────60────75────90──105──120
+Frame  0────12────18────34────────────90
        │             │              │
        ▼             ▼              ▼
-Body   ████████████░░░░░░░░░░░░░░░ (scale 86→102→100, mask reveal 0→75)
-Accent ──────────●● (dot fades in, 60→78, bounce 70→115→100)
-Brow   ────────────────●●● (brow fades in, 75→95, bounce 88→112→100)
-Pulse  ──────────────────────◯◯◯ (body 100→101.5→100, ambient breathing)
+Orbit  ████──────────────────────── (opacity 0→100, rotation -20→340)
+Star   ───██████─────────────────── (scale 72→108→96→72)
 ```
 
 ### Try It
@@ -110,43 +106,20 @@ open assets/preview-embedded.html
 
 # 2. Or drag the JSON into the web preview
 open https://lottiefiles.com/preview
-# Then drop: examples/after-effects-logo.json
+# Then drop: examples/morphing-star.json
 
 # 3. Or embed in any HTML page
 ```
 
 ```html
 <lottie-player
-  src="examples/after-effects-logo.json"
+  src="examples/morphing-star.json"
   background="transparent"
   speed="1"
   loop
   autoplay
   style="width: 256px; height: 256px;">
 </lottie-player>
-```
-
-**Source SVG used:**
-
-```xml
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <path fill="#000" d="m9.015 10.55l-.572 1.826h1.903l-.583-1.826
-    a21.152 21.152 0 0 1-.31-1.133l-.064-.253h-.022l-.114.465
-    c-.074.31-.15.632-.238.921Z"/>
-  <path fill="#000" d="m15.297 10.946c-.836 0-1.188.759-1.243 1.309
-    h2.354c.01-.495-.21-1.309-1.111-1.309Z"/>
-  <path fill="#000" fill-rule="evenodd" d="M6.77 3.082a47.472 47.472
-    0 0 1 10.46 0c1.899.212 3.43 1.707 3.653 3.613a45.67 45.67
-    0 0 1 0 10.61c-.223 1.906-1.754 3.401-3.652 3.614a47.468
-    47.468 0 0 1-10.461 0c-1.899-.213-3.43-1.708-3.653-3.613
-    a45.672 45.672 0 0 1 0-10.611C3.34 4.789 4.871 3.294
-    6.77 3.082Z M11.248 15.5l-.67-2.101H8.222L7.585 15.5H6.188
-    l2.376-7.414h1.727l2.41 7.414h-1.453Z M17.684 12.629c0 .253
-    -.022.451-.044.572h-3.586c.033.968.792 1.386 1.65 1.386
-    c.627 0 1.078-.088 1.485-.242l.198.935c-.462.187-1.1.341-1.87.341
-    c-1.738 0-2.761-1.078-2.761-2.717 0-1.485.902-2.882
-    2.618-2.882 1.749 0 2.31 1.43 2.31 2.607Z" clip-rule="evenodd"/>
-</svg>
 ```
 
 </details>
