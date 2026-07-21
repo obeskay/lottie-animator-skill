@@ -1,59 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">Lottie Animator</title>
+  <desc id="desc">A dark motion design workspace showing an SVG path becoming a polished Lottie animation.</desc>
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0f0f1a"/>
-      <stop offset="100%" style="stop-color:#1a1a2e"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#6366f1"/>
-      <stop offset="50%" style="stop-color:#f97316"/>
-      <stop offset="100%" style="stop-color:#22c55e"/>
-    </linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#080b12"/><stop offset="1" stop-color="#151126"/></linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a855f7"/><stop offset="1" stop-color="#6d28d9"/></linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#f59e0b"/><stop offset="1" stop-color="#fbbf24"/></linearGradient>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#94a3b8" stroke-opacity=".08"/></pattern>
+    <filter id="glow"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   </defs>
-  
-  <!-- Background -->
-  <rect width="800" height="200" fill="url(#bg)" rx="12"/>
-  
-  <!-- Animated circles -->
-  <circle cx="100" cy="100" r="30" fill="#6366f1" opacity="0.3">
-    <animate attributeName="r" values="30;35;30" dur="2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.3;0.5;0.3" dur="2s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="700" cy="100" r="25" fill="#22c55e" opacity="0.3">
-    <animate attributeName="r" values="25;30;25" dur="1.5s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.3;0.5;0.3" dur="1.5s" repeatCount="indefinite"/>
-  </circle>
-  
-  <!-- Rocket icon -->
-  <g transform="translate(100, 100)">
-    <animateTransform attributeName="transform" type="translate" values="100,100;100,90;100,100" dur="1.5s" repeatCount="indefinite"/>
-    <path d="M-8 8c-0.75 0.63-1 2.5-1 2.5s1.87-0.25 2.5-1c0.35-0.42 0.35-1.06-0.05-1.45a1.09 1.09 0 0 0-1.45-0.05z" fill="#f97316"/>
-    <path d="M0 -2l-1.5-1.5a11 11 0 0 1 1-1.97A6.44 6.44 0 0 1 5 -11c0 1.36-0.39 3.75-3 5.5a11.17 11.17 0 0 1-2 1z" fill="#6366f1"/>
-    <path d="M-1.5 0H-4s0.27-1.51 1-2c0.81-0.54 2.5 0 2.5 0" fill="#6366f1"/>
-    <path d="M0 -2v2.5s1.51-0.27 2-1c0.54-0.81 0-2.5 0-2.5" fill="#6366f1"/>
-  </g>
-  
-  <!-- Title -->
-  <text x="400" y="85" text-anchor="middle" fill="url(#accent)" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="800">
-    Lottie Animator
-  </text>
-  <text x="400" y="120" text-anchor="middle" fill="#9ca3af" font-family="system-ui, sans-serif" font-size="16">
-    AI-Powered Motion Design for Claude Code
-  </text>
-  
-  <!-- Stars -->
-  <g fill="#fbbf24">
-    <circle cx="650" cy="60" r="3">
-      <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
-    </circle>
-    <circle cx="180" cy="150" r="2">
-      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite"/>
-    </circle>
-    <circle cx="620" cy="140" r="2.5">
-      <animate attributeName="opacity" values="0.5;1;0.5" dur="0.8s" repeatCount="indefinite"/>
-    </circle>
-  </g>
-  
-  <!-- Decorative line -->
-  <line x1="250" y1="145" x2="550" y2="145" stroke="url(#accent)" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <rect width="1200" height="360" rx="24" fill="url(#bg)"/>
+  <rect x="1" y="1" width="1198" height="358" rx="23" fill="none" stroke="#334155"/>
+  <rect x="32" y="32" width="500" height="296" rx="18" fill="#0b111a" stroke="#243244"/>
+  <rect x="32" y="32" width="500" height="296" rx="18" fill="url(#grid)"/>
+  <path d="M92 248C168 244 150 105 238 112s60 141 145 92 34-108 94-126" fill="none" stroke="#8b5cf6" stroke-width="5" stroke-linecap="round"/>
+  <path d="M92 248C168 244 150 105 238 112s60 141 145 92 34-108 94-126" fill="none" stroke="#c084fc" stroke-opacity=".25" stroke-width="18" filter="url(#glow)"/>
+  <g fill="#f8fafc" stroke="#8b5cf6" stroke-width="3"><circle cx="92" cy="248" r="8"/><circle cx="238" cy="112" r="8"/><circle cx="383" cy="204" r="8"/><circle cx="477" cy="78" r="8"/></g>
+  <path d="M590 100h520M590 132h410M590 164h465" stroke="#475569" stroke-width="10" stroke-linecap="round"/>
+  <path d="M590 226h300" stroke="url(#violet)" stroke-width="10" stroke-linecap="round"/><path d="M590 258h420" stroke="url(#amber)" stroke-width="10" stroke-linecap="round"/>
+  <text x="590" y="66" fill="#f8fafc" font-family="Inter,system-ui,sans-serif" font-size="38" font-weight="800">Lottie Animator</text>
+  <text x="590" y="304" fill="#94a3b8" font-family="Inter,system-ui,sans-serif" font-size="20">SVG → motion, with intention.</text>
+  <g transform="translate(1060 242)"><path d="M0 0l22 12-22 12 6-12z" fill="url(#amber)"/><circle cx="0" cy="12" r="5" fill="#f8fafc"/></g>
 </svg>

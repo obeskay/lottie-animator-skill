@@ -15,6 +15,22 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 
 Professional skill to create advanced Lottie animations from SVGs, eliminating the After Effects workflow entirely by using intelligent motion design.
 
+## Quality Gate: Generate → Inspect → Revise
+
+Do not stop when the JSON parses. Every generated animation must pass three checks:
+
+1. **Structural** — required Lottie metadata exists, timing is valid, layers is an array, and all referenced assets resolve.
+2. **Motion** — preview the first, middle, and final loop states. Check that the hero is visible, the loop closes cleanly, and no element clips the canvas.
+3. **Intent** — compare the result with the chosen motion personality and emotional target. Remove decorative motion that competes with the subject.
+
+When working in this repository, run:
+
+```bash
+python3 scripts/validate_lottie.py examples/your-animation.json
+```
+
+Use a small first pass, inspect it, then revise timing, easing, staging, or layer order. Do not claim visual quality from JSON alone.
+
 ---
 
 ## Quick Reference: 8-Step Animation Checklist
@@ -171,12 +187,17 @@ See: [references/bezier-easing.md](references/bezier-easing.md)
 ### Phase 6: Validate and Export
 
 ```bash
-# Validate JSON structure
+# Validate the complete Lottie contract when working in this repository
+python3 scripts/validate_lottie.py animation.json
+
+# Fallback: validate JSON syntax in any project
 python3 -c "import json; json.load(open('animation.json'))"
 
 # Preview
 echo "Open in: https://lottiefiles.com/preview"
 ```
+
+Before delivery, verify the animation at 0%, 50%, and 100% of its loop. If the final frame visibly jumps, shorten the loop or match the first and last poses; never hide a bad loop behind autoplay.
 
 ---
 

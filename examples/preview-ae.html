@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>After Effects Logo — Animation Preview</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #FFFFFF;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+    color: #111;
+    padding: 60px 40px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+  .subtitle {
+    color: #666;
+    font-size: 16px;
+    margin: 0 0 50px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .panel {
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .panel-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6366f1;
+    margin-bottom: 16px;
+  }
+  .panel h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 24px;
+    color: #111;
+  }
+  .stage {
+    background: #FFFFFF;
+    border: 1px solid #F0F0F0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    overflow: hidden;
+  }
+  .stage img, .stage #lottie-stage {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+  }
+  .meta {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    font-size: 13px;
+  }
+  .meta div { color: #666; }
+  .meta b { color: #111; font-weight: 600; }
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  button {
+    background: #6366f1;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  button:hover { background: #4f46e5; }
+  button.ghost { background: transparent; color: #6366f1; border: 1px solid #6366f1; }
+  input[type=range] { flex: 1; accent-color: #6366f1; }
+  .footer {
+    text-align: center;
+    margin-top: 60px;
+    color: #999;
+    font-size: 13px;
+  }
+</style>
+<script src="lottie.min.js"></script>
+</head>
+<body>
+
+<h1>Adobe After Effects — animated brand mark</h1>
+<p class="subtitle">Built with lottie-animator-skill · 1024×1024 canvas · 2.0s @ 60fps · 3 layers · real SVG geometry</p>
+
+<div class="grid">
+
+  <div class="panel">
+    <span class="panel-label">Static preview</span>
+    <h2>GIF · 21 KB · white background</h2>
+    <div class="stage">
+      <img src="after-effects-logo.gif" alt="After Effects animated logo">
+    </div>
+    <div class="meta">
+      <div><b>Format</b><br>GIF 89a</div>
+      <div><b>Duration</b><br>2.0 s loop</div>
+      <div><b>Frame rate</b><br>60 fps</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <span class="panel-label">Interactive · lottie-web</span>
+    <h2>Lottie JSON · 22 KB · scalable</h2>
+    <div class="stage" id="lottie-stage"></div>
+    <div class="controls">
+      <button id="btn-play">Play</button>
+      <button class="ghost" id="btn-restart">Restart</button>
+      <input type="range" id="scrub" min="0" max="120" value="0">
+      <span id="time" style="font-size:12px;color:#666;min-width:48px">0.00s</span>
+    </div>
+    <div class="meta">
+      <div><b>Layers</b><br>3 (body + 2 accents)</div>
+      <div><b>Easing</b><br>ease-out + bounce</div>
+      <div><b>Vector</b><br>∞ resolution</div>
+    </div>
+  </div>
+
+</div>
+
+<p class="footer">Lottie JSON: examples/after-effects-logo.json · GIF: examples/after-effects-logo.gif · Source: examples/adobe-after-effects-solid.svg</p>
+
+<script>
+fetch('after-effects-logo.json').then(r => r.json()).then(data => {
+  const anim = lottie.loadAnimation({
+    container: document.getElementById('lottie-stage'),
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    animationData: data,
+    rendererSettings: { preserveAspectRatio: 'xMidYMid meet' },
+  });
+  window._anim = anim;
+  const scrub = document.getElementById('scrub');
+  const time = document.getElementById('time');
+  anim.addEventListener('enterFrame', () => {
+    scrub.value = anim.currentFrame;
+    time.textContent = (anim.currentFrame / 60).toFixed(2) + 's';
+  });
+  scrub.addEventListener('input', e => anim.goToAndStop(+e.target.value, false));
+  document.getElementById('btn-play').onclick = () => anim.play();
+  document.getElementById('btn-restart').onclick = () => { anim.stop(); anim.play(); };
+});
+</script>
+
+</body>
+</html>
