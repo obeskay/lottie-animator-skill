@@ -18,13 +18,17 @@ The skill can now verify its own output instead of assuming it.
 - **`scripts/render.mjs`** — headless render via `lottie-web` and a local Chrome.
   Writes PNG frames and a labelled contact sheet, and reports empty frames, content off
   canvas, and content clipped by the edge.
-- **`tests/`** — 80 stdlib-only unit tests. Path arithmetic is pinned against
+- **`tests/`** — 93 stdlib-only unit tests. Path arithmetic is pinned against
   hand-computed coordinates; every lint rule is pinned by a test.
 - **CI** — tests and lint on Python 3.8 and 3.12, plus a job that renders every example
   in a real player and uploads the filmstrips.
 - `references/shape-modifiers.md`, which the skill linked in three places but never had.
 - `tests/test_docs.py`, which lints every complete composition embedded in the
-  documentation so the prose cannot drift from the tooling.
+  documentation so the prose cannot drift from the tooling, and enforces the
+  test count stated in the README rather than leaving it to be maintained.
+- `tests/test_cli.py`, pinning the exit-code contract the CI depends on: 0 for
+  success, 1 for bad content, 2 for a bad invocation. A tool that prints an
+  error and still exits 0 makes a green build meaningless.
 
 ### Fixed
 

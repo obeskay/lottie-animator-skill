@@ -117,6 +117,29 @@ class DocumentedExamplesTest(unittest.TestCase):
         self.assertGreater(checked, 0, "no parseable snippets found in the docs")
         self.assertEqual(failures, [], "\n".join(failures))
 
+    def test_stated_test_count_matches_reality(self):
+        """The badge drifted twice while this branch was being written.
+
+        A number nobody rechecks is exactly the drift this repository set out
+        to remove, so the claim is now enforced rather than maintained.
+        """
+        suite = unittest.TestLoader().discover(str(REPO / "tests"), top_level_dir=str(REPO / "tests"))
+        actual = suite.countTestCases()
+
+        readme = (REPO / "README.md").read_text(encoding="utf-8")
+        changelog = (REPO / "CHANGELOG.md").read_text(encoding="utf-8")
+
+        claims = [int(n) for n in re.findall(r"tests-(\d+)-", readme)]
+        claims += [int(n) for n in re.findall(r"# (\d+) tests, stdlib only", readme)]
+        claims += [int(n) for n in re.findall(r"(\d+) stdlib-only unit tests", changelog)]
+
+        self.assertTrue(claims, "no test count is stated anywhere; the check is dead")
+        for claimed in claims:
+            self.assertEqual(
+                claimed, actual,
+                "documentation claims %d tests but the suite has %d" % (claimed, actual),
+            )
+
     def test_every_reference_link_resolves(self):
         """SKILL.md linked shape-modifiers.md for months before it existed."""
         missing = []
