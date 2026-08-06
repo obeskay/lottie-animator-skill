@@ -25,6 +25,52 @@ DOCS = sorted((REPO / "skills" / "lottie-animator" / "references").glob("*.md"))
 
 FENCE = re.compile(r"```json\n(.*?)```", re.S)
 
+# Shape items whose absence blanks the layer, mirrored from the linter so a
+# fragment is held to the same standard as a whole file.
+from lottie_lint import SHAPE_NAMES, SHAPE_REQUIRED, STAR_REQUIRED  # noqa: E402
+
+
+def _strip_annotations(snippet):
+    """Docs annotate snippets with // comments and trailing commas."""
+    snippet = re.sub(r"//[^\n]*", "", snippet)
+    snippet = re.sub(r"/\*.*?\*/", "", snippet, flags=re.S)
+    return re.sub(r",(\s*[}\]])", r"\1", snippet)
+
+
+def fragments():
+    """Every json snippet that parses once its annotations are removed."""
+    for path in DOCS:
+        text = path.read_text(encoding="utf-8")
+        for match in FENCE.finditer(text):
+            line = text[: match.start()].count("\n") + 1
+            try:
+                yield path, line, json.loads(_strip_annotations(match.group(1)))
+            except json.JSONDecodeError:
+                continue
+
+
+def _shape_defects(node, out):
+    if isinstance(node, dict):
+        ty = node.get("ty")
+        if isinstance(ty, str) and ty in SHAPE_REQUIRED:
+            required = list(SHAPE_REQUIRED[ty])
+            if ty == "sr" and node.get("sy", 1) == 1:
+                required.extend(STAR_REQUIRED)
+            if ty == "tr" and "sk" in node:
+                required.append("sa")
+            missing = [k for k in required if k not in node]
+            if missing:
+                out.append("%s missing %s" % (SHAPE_NAMES.get(ty, ty), ", ".join(missing)))
+        if "k" in node and isinstance(node.get("a"), int) and not isinstance(node.get("a"), bool):
+            stray = [k for k in ("i", "o", "t", "s", "h") if k in node]
+            if stray:
+                out.append("keyframe fields %s on the property" % ", ".join(stray))
+        for value in node.values():
+            _shape_defects(value, out)
+    elif isinstance(node, list):
+        for value in node:
+            _shape_defects(value, out)
+
 
 def complete_compositions():
     """Every fenced json block that is a whole Lottie file, not a fragment."""
@@ -53,6 +99,22 @@ class DocumentedExamplesTest(unittest.TestCase):
                         "%s:%d %s %s" % (path.name, line, finding.code, finding.message)
                     )
         self.assertGreater(checked, 0, "no complete compositions found in the docs")
+        self.assertEqual(failures, [], "\n".join(failures))
+
+    def test_snippet_fragments_carry_required_properties(self):
+        """A partial snippet is still copied verbatim, so it must be correct.
+
+        The walk-cycle example shipped a fill and a transform with no opacity,
+        which drops the layer in every player.
+        """
+        checked = 0
+        failures = []
+        for path, line, data in fragments():
+            checked += 1
+            defects = []
+            _shape_defects(data, defects)
+            failures.extend("%s:%d %s" % (path.name, line, d) for d in defects)
+        self.assertGreater(checked, 0, "no parseable snippets found in the docs")
         self.assertEqual(failures, [], "\n".join(failures))
 
     def test_every_reference_link_resolves(self):

@@ -1,14 +1,15 @@
 # Professional Lottie Animation Techniques
 
-Técnicas avanzadas extraídas del análisis de animaciones profesionales (Running Cat, etc.).
+Techniques taken from picking apart professional character animations.
 
 ## 1. Frame-by-Frame Animation (Sprite Sheet Style)
 
-La técnica más profesional para animaciones de personajes complejos.
+The most reliable approach for complex character motion.
 
-### Concepto
+### Concept
 
-En lugar de animar propiedades continuamente, creas **múltiples "poses"** que aparecen/desaparecen en secuencia.
+Instead of animating properties continuously, build **several distinct poses**
+and switch between them in sequence.
 
 ```
 Frame 0-6:   Pose 1 (visible)
@@ -17,79 +18,84 @@ Frame 12-18: Pose 3 (visible)
 ...
 ```
 
-### Estructura JSON
+### JSON structure
 
 ```json
 {
   "layers": [
     {
       "nm": "Cat Pose 1",
-      "ip": 0,    // In Point: aparece frame 0
-      "op": 6,    // Out Point: desaparece frame 6
-      "shapes": [/* Gato en pose 1 */]
+      "ip": 0,    // in point: appears at frame 0
+      "op": 6,    // out point: disappears at frame 6
+      "st": 0,
+      "shapes": [/* cat in pose 1 */]
     },
     {
       "nm": "Cat Pose 2",
-      "ip": 6,    // Aparece frame 6
-      "op": 12,   // Desaparece frame 12
-      "shapes": [/* Gato en pose 2 */]
+      "ip": 6,
+      "op": 12,
+      "st": 0,
+      "shapes": [/* cat in pose 2 */]
     },
     {
       "nm": "Cat Pose 3",
       "ip": 12,
       "op": 18,
-      "shapes": [/* Gato en pose 3 */]
+      "st": 0,
+      "shapes": [/* cat in pose 3 */]
     }
   ]
 }
 ```
 
-### Ventajas
+Every layer needs `ip`, `op`, **and** `st`. Leave out any one of them and the
+player hides the layer at every frame.
 
-- **Libertad total**: Cada pose puede tener formas completamente diferentes
-- **No requiere mismo vertex count**: A diferencia del morphing
-- **Más orgánico**: Mejor para animaciones de personajes complejos
-- **Profesional**: Técnica usada en animaciones de alta calidad
+### Why use it
 
-### Cuándo Usarla
+- **Total freedom** — each pose can be a completely different shape
+- **No matching vertex count** — unlike morphing, which requires it
+- **More organic** — better for characters than interpolating one shape
+- Standard practice in hand-animated work
 
-- Walk cycles de personajes
-- Run cycles
-- Animaciones con cambios drásticos de forma
-- Cuando el morphing produce resultados feos
+### When to reach for it
 
-### Cálculo de Frames
+- Walk cycles and run cycles
+- Any motion with drastic shape changes
+- Whenever morphing produces ugly in-between frames
+
+### Frame arithmetic
 
 ```
-Total Frames = (Número de Poses) × (Frames por Pose)
-Duración (segundos) = Total Frames / Frame Rate
+total frames = pose count × frames per pose
+duration     = total frames / frame rate
 
-Ejemplo Running Cat:
-- 6 poses × 6 frames = 36 frames total
-- 36 frames / 60 fps = 0.6 segundos de loop
+Example:
+  6 poses × 6 frames = 36 frames
+  36 frames / 60 fps = 0.6s per loop
 ```
 
 ---
 
 ## 2. Parenting Hierarchy (Bone System)
 
-Sistema de jerarquía padre-hijo para animaciones coordinadas.
+A parent/child chain for coordinated motion.
 
-### Concepto
+### Concept
 
-Un layer "parent" controla la posición/rotación de múltiples "children".
+One parent layer drives the position and rotation of its children.
 
 ```
-Shadow (Parent Layer 14)
-├── Head (child)
-├── Body (child)
-├── Ear Inner (child)
-├── Eye (child)
-├── Nose (child)
-└── ...13 total children
+Shadow (parent, ind 14)
+├── Head
+├── Body
+├── Ear Inner
+├── Eye
+├── Nose
+└── ...
 ```
 
-### Estructura JSON
+### JSON structure
 
 ```json
 {
@@ -99,16 +105,16 @@ Shadow (Parent Layer 14)
       "nm": "Shadow",
       "ty": 4,
       "ks": {
-        "p": {"a": 0, "k": [340, 195, 0]}  // Posición del parent
+        "p": {"a": 0, "k": [340, 195, 0]}  // the parent's own position
       }
     },
     {
       "ind": 1,
       "nm": "Head",
-      "parent": 14,  // <-- Referencia al parent
+      "parent": 14,  // <-- points at the parent's ind
       "ty": 4,
       "ks": {
-        "p": {"a": 0, "k": [88, -84, 0]}  // Posición RELATIVA al parent
+        "p": {"a": 0, "k": [88, -84, 0]}  // RELATIVE to the parent
       }
     },
     {
@@ -124,27 +130,30 @@ Shadow (Parent Layer 14)
 }
 ```
 
-### Usos Prácticos
+`parent` refers to the target layer's `ind`, not its array index. A chain that
+loops back on itself will hang or break the renderer, so keep it a tree.
 
-1. **Sombra como Parent**: Mueve la sombra = mueve todo el personaje
-2. **Cuerpo como Parent**: Mueve el cuerpo = cabeza y extremidades siguen
-3. **Brazo Upper como Parent**: Rota hombro = antebrazo y mano rotan
+### Practical rigs
 
-### Beneficios
+1. **Shadow as parent** — move the shadow, the whole character travels
+2. **Body as parent** — move the body, head and limbs follow
+3. **Upper arm as parent** — rotate the shoulder, forearm and hand swing with it
 
-- Mueve un layer → todos los children siguen
-- Fácil de coordinar animaciones complejas
-- Reduce keyframes necesarios
+### Benefits
+
+- Move one layer and every child follows
+- Far fewer keyframes for coordinated motion
+- Complex scenes stay manageable
 
 ---
 
 ## 3. Stroke + Fill Combination (Outline Style)
 
-Estilo visual con contornos definidos.
+The look that reads well at small sizes: a solid fill inside a defined contour.
 
-### Concepto
+### Concept
 
-Cada shape tiene **fill (relleno) + stroke (contorno)**.
+Each shape carries both a **fill** and a **stroke**.
 
 ```json
 {
@@ -152,53 +161,66 @@ Cada shape tiene **fill (relleno) + stroke (contorno)**.
     {
       "ty": "gr",
       "it": [
-        {"ty": "sh", "ks": {...}},  // Path
-        {"ty": "st",                  // Stroke (contorno)
-          "c": {"a": 0, "k": [0.259, 0.153, 0.141, 1]},  // Dark brown
-          "w": {"a": 0, "k": 1},      // 1px width
-          "lc": 2,                     // Round line cap
-          "lj": 2                      // Round line join
+        {"ty": "sh", "ks": {}},
+        {"ty": "st",
+          "c": {"a": 0, "k": [0.259, 0.153, 0.141, 1]},  // dark brown
+          "o": {"a": 0, "k": 100},
+          "w": {"a": 0, "k": 1},
+          "lc": 2,
+          "lj": 2
         },
-        {"ty": "fl",                  // Fill (relleno)
-          "c": {"a": 0, "k": [0.302, 0.604, 0.816, 1]}   // Blue
+        {"ty": "fl",
+          "c": {"a": 0, "k": [0.302, 0.604, 0.816, 1]},  // blue
+          "o": {"a": 0, "k": 100}
         },
-        {"ty": "tr", ...}
+        {"ty": "tr",
+          "p": {"a": 0, "k": [0, 0]}, "a": {"a": 0, "k": [0, 0]},
+          "s": {"a": 0, "k": [100, 100]}, "r": {"a": 0, "k": 0},
+          "o": {"a": 0, "k": 100}
+        }
       ]
     }
   ]
 }
 ```
 
-### Propiedades del Stroke
+A stroke needs `c`, `o` and `w`; a fill needs `c` and `o`. Omit the opacity and
+the player drops the whole layer without reporting anything.
 
-| Propiedad | Valor | Descripción |
-|-----------|-------|-------------|
-| `lc` (lineCap) | 1 | Butt (cortado) |
-| `lc` | 2 | Round (redondeado) |
-| `lc` | 3 | Square (cuadrado) |
-| `lj` (lineJoin) | 1 | Miter (punta) |
-| `lj` | 2 | Round (redondeado) |
-| `lj` | 3 | Bevel (biselado) |
+Order matters: items listed later paint on top, so putting the stroke before the
+fill keeps the fill from being swallowed by a thick contour.
 
-### Paleta de Colores Profesional (Running Cat)
+### Stroke properties
+
+| Property | Value | Meaning |
+|---|---|---|
+| `lc` (line cap) | 1 | Butt |
+| `lc` | 2 | Round |
+| `lc` | 3 | Square |
+| `lj` (line join) | 1 | Miter |
+| `lj` | 2 | Round |
+| `lj` | 3 | Bevel |
+
+### A coherent palette
+
+Five or six colours is usually enough for a character. Keep one dark tone for
+every outline so the silhouette stays consistent.
 
 ```json
 {
-  "body_fill": [0.302, 0.604, 0.816, 1],       // RGB(77, 154, 208) - Blue
-  "outline": [0.259, 0.153, 0.141, 1],          // RGB(66, 39, 36) - Dark brown
-  "eye_white": [0.902, 0.976, 1.0, 1],          // RGB(230, 249, 255) - Near white
-  "ear_inner": [0.941, 0.757, 0.686, 1],        // RGB(240, 193, 175) - Skin
-  "shadow": [0.608, 0.706, 0.878, 1]            // RGB(155, 180, 224) - Light blue
+  "body_fill": [0.302, 0.604, 0.816, 1],
+  "outline":   [0.259, 0.153, 0.141, 1],
+  "eye_white": [0.902, 0.976, 1.0, 1],
+  "ear_inner": [0.941, 0.757, 0.686, 1],
+  "shadow":    [0.608, 0.706, 0.878, 1]
 }
 ```
 
 ---
 
-## 4. Bezier Paths con Tangentes
+## 4. Bezier Paths and Tangents
 
-Paths suaves usando curvas bezier.
-
-### Estructura de Path
+### Path structure
 
 ```json
 {
@@ -206,29 +228,33 @@ Paths suaves usando curvas bezier.
   "ks": {
     "a": 0,
     "k": {
-      "c": true,           // Closed path
-      "v": [[0, 0], [100, 0], [100, 100], [0, 100]],  // Vertices
-      "i": [[0, -10], [10, 0], [0, 10], [-10, 0]],    // In tangents
-      "o": [[10, 0], [0, 10], [-10, 0], [0, -10]]     // Out tangents
+      "c": true,
+      "v": [[0, 0], [100, 0], [100, 100], [0, 100]],
+      "i": [[0, -10], [10, 0], [0, 10], [-10, 0]],
+      "o": [[10, 0], [0, 10], [-10, 0], [0, -10]]
     }
   }
 }
 ```
 
-### Tangentes
+### Tangents
 
-- `"i"` (in tangent): Control point ENTRANDO al vertex
-- `"o"` (out tangent): Control point SALIENDO del vertex
-- Valores son **RELATIVOS** al vertex
-- `[0, 0]` = sin curva (línea recta)
+- `i` is the control point **entering** the vertex
+- `o` is the control point **leaving** the vertex
+- Both are **relative to their own vertex**, not absolute
+- `[0, 0]` on both sides gives a straight corner
+
+`v`, `i` and `o` must be the same length. On a closed path (`c: true`) the
+start point is not repeated at the end; the tangents carry across the seam.
+
+Deriving these by hand is where most SVG conversions go wrong. Use
+`scripts/svg2lottie.py` instead — see [svg-to-lottie.md](svg-to-lottie.md).
 
 ---
 
 ## 5. Pre-compositions (Assets)
 
-Agrupar animaciones complejas en composiciones reutilizables.
-
-### Estructura
+Group a complex animation into a reusable composition.
 
 ```json
 {
@@ -237,72 +263,78 @@ Agrupar animaciones complejas en composiciones reutilizables.
       "id": "comp_0",
       "nm": "Cat Animation",
       "fr": 60,
-      "layers": [/* 82 layers del gato */]
+      "layers": [/* the character's layers */]
     }
   ],
   "layers": [
     {
-      "ty": 0,           // Type 0 = Precomp reference
-      "refId": "comp_0", // Reference to asset
+      "ty": 0,           // type 0 = precomp reference
+      "refId": "comp_0", // must match an asset id
       "nm": "Cat",
       "ip": 0,
-      "op": 36
+      "op": 36,
+      "st": 0
     }
   ]
 }
 ```
 
-### Beneficios
+A `refId` with no matching asset renders as empty space, so check the id spelling
+if a precomp layer disappears.
 
-- Reutilizar animaciones
-- Organizar layers complejos
-- Aplicar transformaciones al grupo completo
+### Benefits
+
+- Reuse one animation in several places
+- Keep a large layer list organised
+- Transform the whole group at once
 
 ---
 
-## 6. Timing Profesional
+## 6. Professional Timing
 
-### Frame Rate y Duración
+### Frame rate and duration
 
-| Tipo | FPS | Frames | Duración | Uso |
-|------|-----|--------|----------|-----|
-| Loop rápido | 60 | 36 | 0.6s | Run cycles |
-| Loop normal | 30 | 24 | 0.8s | Walk cycles |
-| Loop lento | 30 | 60 | 2.0s | Idle animations |
-| Transición | 60 | 45 | 0.75s | Entrances |
+| Type | FPS | Frames | Duration | Use |
+|---|---|---|---|---|
+| Fast loop | 60 | 36 | 0.6s | Run cycles |
+| Normal loop | 30 | 24 | 0.8s | Walk cycles |
+| Slow loop | 30 | 60 | 2.0s | Idle animations |
+| Transition | 60 | 45 | 0.75s | Entrances |
 
-### Estructura de Loop Perfecto
+### A loop that closes
 
 ```
-Frame 0: Estado A
+Frame 0:   state A
 ...
-Frame N-1: Estado A' (casi igual a A)
-Frame N: [Vuelve a Frame 0]
+Frame N-1: state A' (all but identical to A)
+Frame N:   [wraps back to frame 0]
 ```
 
-**Clave**: El último frame (op) NO se renderiza, solo marca el punto de loop.
+**The key point**: the final frame (`op`) is not rendered — it only marks the
+wrap point. If the first and last frames differ, the wrap will visibly jump.
 
 ---
 
-## 7. Layer Order = Z-Depth
+## 7. Layer Order is Z-Depth
 
-El orden de los layers en el array determina la profundidad visual.
+Position in the `layers` array decides what sits in front.
 
 ```json
 {
   "layers": [
-    {"ind": 1, "nm": "Background"},  // Más atrás (renderiza primero)
+    {"ind": 1, "nm": "Foreground"},
     {"ind": 2, "nm": "Character"},
-    {"ind": 3, "nm": "Foreground"}   // Más adelante (renderiza último)
+    {"ind": 3, "nm": "Background"}
   ]
 }
 ```
 
-**Nota**: Layers con `ind` más alto se renderizan ENCIMA.
+**Note**: the first layer in the array paints on top — the opposite of SVG,
+where later elements win. Converting between the two means reversing the order.
 
 ---
 
-## Ejemplo Completo: Walk Cycle Profesional
+## Complete Example: Walk Cycle
 
 ```json
 {
@@ -316,7 +348,7 @@ El orden de los layers en el array determina la profundidad visual.
   "ddd": 0,
   "assets": [],
   "layers": [
-    // Shadow (Parent for all poses)
+    // Shadow, the parent for every pose
     {
       "ind": 1,
       "ty": 4,
@@ -337,13 +369,15 @@ El orden de los layers en el array determina la profundidad visual.
           "ty": "gr",
           "it": [
             {"ty": "el", "s": {"a": 0, "k": [60, 12]}, "p": {"a": 0, "k": [0, 0]}},
-            {"ty": "fl", "c": {"a": 0, "k": [0.2, 0.2, 0.2, 1]}},
-            {"ty": "tr", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [100, 100]}}
+            {"ty": "fl", "c": {"a": 0, "k": [0.2, 0.2, 0.2, 1]}, "o": {"a": 0, "k": 100}},
+            {"ty": "tr", "p": {"a": 0, "k": [0, 0]}, "a": {"a": 0, "k": [0, 0]},
+             "s": {"a": 0, "k": [100, 100]}, "r": {"a": 0, "k": 0}, "o": {"a": 0, "k": 100}}
           ]
         }
       ],
       "ip": 0,
-      "op": 24
+      "op": 24,
+      "st": 0
     },
     // Pose 1 (frames 0-6)
     {
@@ -353,7 +387,8 @@ El orden de los layers en el array determina la profundidad visual.
       "parent": 1,
       "ip": 0,
       "op": 6,
-      "shapes": [/* Character pose 1 shapes */]
+      "st": 0,
+      "shapes": [/* character pose 1 shapes */]
     },
     // Pose 2 (frames 6-12)
     {
@@ -363,7 +398,8 @@ El orden de los layers en el array determina la profundidad visual.
       "parent": 1,
       "ip": 6,
       "op": 12,
-      "shapes": [/* Character pose 2 shapes */]
+      "st": 0,
+      "shapes": [/* character pose 2 shapes */]
     },
     // Pose 3 (frames 12-18)
     {
@@ -373,7 +409,8 @@ El orden de los layers en el array determina la profundidad visual.
       "parent": 1,
       "ip": 12,
       "op": 18,
-      "shapes": [/* Character pose 3 shapes */]
+      "st": 0,
+      "shapes": [/* character pose 3 shapes */]
     },
     // Pose 4 (frames 18-24)
     {
@@ -383,21 +420,24 @@ El orden de los layers en el array determina la profundidad visual.
       "parent": 1,
       "ip": 18,
       "op": 24,
-      "shapes": [/* Character pose 4 shapes */]
+      "st": 0,
+      "shapes": [/* character pose 4 shapes */]
     }
   ]
 }
 ```
 
+The shadow squashing on every second pose is what sells the weight of the steps.
+
 ---
 
-## Checklist de Animación Profesional
+## Checklist
 
-- [ ] Definir número de poses para frame-by-frame
-- [ ] Calcular timing: poses × frames_por_pose / fps = duración
-- [ ] Establecer jerarquía parent-child
-- [ ] Usar stroke + fill para estilo outline
-- [ ] Paleta de colores coherente (max 5-6 colores)
-- [ ] Shadow pulsa con los pasos
-- [ ] Loop seamless (frame 0 = estado similar a frame final)
-- [ ] Testar en LottieFiles Preview
+- [ ] Pose count chosen for the frame-by-frame cycle
+- [ ] Timing worked out: poses × frames per pose / fps = duration
+- [ ] Parent/child hierarchy established, with no cycles
+- [ ] Stroke and fill both present, each with its opacity
+- [ ] Palette held to five or six colours, one shared outline tone
+- [ ] Shadow reacts to the steps
+- [ ] Loop closes: the first and last frames match
+- [ ] Linted and rendered, and the filmstrip actually looked at
