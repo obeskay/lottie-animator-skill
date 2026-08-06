@@ -1,269 +1,153 @@
 ---
 name: lottie-animator
-description: |
-  Generates professional Lottie animations from static SVGs. Replaces After Effects for motion graphics.
-  Use when the user asks to: animate logo, create lottie, svg animation, motion graphics, wiggle animation,
-  bounce effect, rotate animation, pulse effect, entrance animation, loading animation, loop animation,
-  icon animation, character animation, morphing, path drawing, trim path, walking animation, run cycle,
-  walk cycle, frame-by-frame animation, sprite animation.
-  Supports advanced bezier curves, shape modifiers, parenting, mattes, morphing, character rigs,
-  and professional frame-by-frame animation techniques.
-allowed-tools: Read, Write, Bash, Glob, Grep
+description: >-
+  Create, inspect, and repair Lottie animations, including converting SVG art into
+  animated Lottie JSON. Use when asked to animate a logo, icon, or SVG; build motion
+  graphics, micro-interactions, loaders, spinners, or entrance animations; produce or
+  edit a .json/.lottie animation file; add wiggle, bounce, pulse, fade, scale, rotate,
+  morph, or trim-path draw-on effects; build walk cycles or character rigs; or debug a
+  Lottie that renders blank, jumps at the loop, or looks wrong in a player.
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
-# Lottie Animator - SVG to Motion Graphics
+# Lottie Animator
 
-Professional skill to create advanced Lottie animations from SVGs, eliminating the After Effects workflow entirely by using intelligent motion design.
+Lottie is JSON, which makes it easy to write and easy to write wrongly. The failure
+mode is specific and nasty: **a broken Lottie still parses.** A missing `os` on a
+polystar, an easing handle one level too high, a layer without `ip`/`op` — the file
+loads, the player reports no error, and the canvas stays empty.
 
-## Quality Gate: Generate → Inspect → Revise
+So do not judge an animation by whether the JSON is valid. Judge it by looking at it.
 
-Do not stop when the JSON parses. Every generated animation must pass three checks:
+## The loop
 
-1. **Structural** — required Lottie metadata exists, timing is valid, layers is an array, and all referenced assets resolve.
-2. **Motion** — preview the first, middle, and final loop states. Check that the hero is visible, the loop closes cleanly, and no element clips the canvas.
-3. **Intent** — compare the result with the chosen motion personality and emotional target. Remove decorative motion that competes with the subject.
+```
+convert  →  lint  →  render  →  LOOK  →  revise
+```
 
-When working in this repository, run:
+Never skip the render. "The JSON is valid" is not a claim about what the user sees.
 
 ```bash
-python3 scripts/validate_lottie.py examples/your-animation.json
+python3 scripts/svg2lottie.py logo.svg -o build/logo.json --size 512
+python3 scripts/lottie_lint.py build/logo.json --allow-static
+node scripts/render.mjs build/logo.json
+# then Read the filmstrip PNG it prints and actually look at it
 ```
 
-Use a small first pass, inspect it, then revise timing, easing, staging, or layer order. Do not claim visual quality from JSON alone.
+`render.mjs` writes `filmstrip.png`: labelled frames across the timeline, each with a
+shape count and canvas coverage. Read that image. It reports `EMPTY FRAME` when
+nothing paints, `off canvas` when the art has left the frame, and `clipped` when it
+runs past an edge.
 
----
+If the tools are unavailable (another repository, no Node), say so and fall back to
+`python3 -c "import json; json.load(open('a.json'))"` — but tell the user the result
+is unverified rather than implying it was checked.
 
-## Quick Reference: 8-Step Animation Checklist
+## Start from real geometry
 
-Before creating or writing any animation keyframes, you **MUST** align on the following checklist:
-
-1. **Emotional target?** — What should the viewer feel? (joy, calm, trust, excitement, urgency)
-2. **Motion Personality?** — Select exactly one archetype: Playful, Premium, Corporate, or Energetic.
-3. **Primary property?** — Focus on the hero transition first: position (`p`), scale (`s`), rotation (`r`), or opacity (`o`).
-4. **Distance and Timing?** — Calculate target frames based on the 1/3 spatial scaling rule.
-5. **Easing family?** — Map curve constants: entrance = ease-out, exit = ease-in, loop = ease-in-out.
-6. **Hero elements?** — Plan staging offsets (hero enters 100-200ms after background).
-7. **Secondary & ambient layers?** — Plan secondary accents (shadow shifts, spark wiggles).
-8. **Volume Preservation?** — Keep X/Y scale multiplication constant (`~10,000`) for wiggles and squashes (skip for premium).
-
----
-
-## When to Activate
-
-Activate this skill when the user requests:
-- Animate a logo, icon, or SVG graphic
-- Create motion graphics or vector animations
-- Generate Lottie JSON files
-- Effects: wiggle, bounce, rotate, pulse, fade, scale, morph
-- Entrance, loop, loading animations, or transitions
-- Path drawing/reveal animations (Trim Path)
-- Character animation, walking cycles, run cycles
-- Shape morphing (icon transitions)
-- Replace After Effects workflow
-
-**Decision tree:**
-1. Does it serve a functional purpose (feedback, guidance)? → Apply strict responsive timing rules (<150ms).
-2. Does it express brand personality? → Select and stick to a single Motion Personality archetype.
-3. Does it tell a story or guide attention? → Apply adapted Disney principles (anticipation, arcs, staging).
-4. Is this a complex multi-element scene? → Plan layers, parenting bone systems, and stagger offsets.
-
----
-
-## Critical: SVG Understanding
-
-Before animating ANY SVG, you MUST understand its path structure.
-
-See: [references/svg-to-lottie.md](references/svg-to-lottie.md)
-
-### SVG Path Command Quick Reference
-
-| Command | Description | Lottie Conversion |
-|---------|-------------|-------------------|
-| M x,y | Move to | Starting vertex |
-| L x,y | Line to | Vertex with zero tangents |
-| C cp1 cp2 end | Cubic bezier | Native support |
-| Q ctrl end | Quadratic bezier | Convert to cubic |
-| A rx ry ... | Arc | Split into cubic segments |
-| Z | Close path | Set `c: true` |
-
-### Path to Lottie Vertex Formula
-
-```
-For C x1,y1 x2,y2 x,y from point (px, py):
-- Previous vertex outTangent: [x1-px, y1-py]
-- Current vertex: [x, y]
-- Current vertex inTangent: [x2-x, y2-y]
-```
-
----
-
-## Main Workflow
-
-### Phase 1: Motion Philosophy (30 seconds)
-
-**MANDATORY** before any code. Define:
-
-1. **Brand Personality**: Professional, playful, elegant, energetic (see [references/motion-personality.md](references/motion-personality.md))
-2. **Emotional Response**: Trust, excitement, calm, urgency
-3. **Motion Metaphor**: Fluid like water, solid like rock, light like air
-
-```
-Example: "Fintech Logo → professional + trust → precise and controlled movement"
-Example: "Music App → creative + energy → organic with rhythmic pulses"
-Example: "Healthcare → calm + reliable → smooth, slow easings"
-```
-
-### Phase 2: SVG Deep Analysis
-
-Before animating, thoroughly analyze:
-1. **Structure**: Elements, groups, paths, viewBox dimensions
-2. **Path Complexity**: Vertex count, curve types (C, Q, A commands)
-3. **Hierarchy**: Primary elements vs. secondary details
-4. **Animation Opportunities**: Independent parts, stroke-based vs fill-based
+Do not hand-write bezier vertices. `svg2lottie.py` converts SVG paths, rects,
+circles, ellipses, lines, polygons, polylines, groups, transforms, strokes, and
+linear/radial gradients into Lottie shape layers. Each element becomes its own named
+layer anchored at its own centre, so scale and rotation pivot correctly.
 
 ```bash
-# Analyze SVG structure
-cat icon.svg | grep -E '<(path|g|rect|circle|ellipse|line|polyline)' | head -30
+python3 scripts/svg2lottie.py icon.svg -o icon.json --size 512 --current-color "#a855f7"
 ```
 
-**Key Questions**:
-- Is it stroke-based? → Consider Trim Path animation.
-- Multiple paths? → Consider staggered entrance.
-- Complex shape? → Consider scale/rotate instead of morph.
-- Icon library (Phosphor/Lucide)? → Clean, minimal vertices.
+Icon sets paint with `currentColor`; pass `--current-color` or the art comes out
+black. `<text>`, `<use>`, `clipPath`, and `mask` are reported as warnings — flatten
+them in the source SVG first. The output is deliberately static; you add the motion.
 
-### Phase 3: Animation Strategy Selection
+When there is no SVG, write the JSON directly — but lint and render it the same way.
 
-| Strategy | Best For | Technique | Reference |
-|---|---|---|---|
-| **Draw On** | Stroke icons, signatures | Trim Path | [references/shape-modifiers.md](references/shape-modifiers.md) |
-| **Pop In** | Logos, buttons | Scale + Opacity | [references/disney-principles.md](references/disney-principles.md) |
-| **Morph** | Icon transitions (hamburger→X) | Path keyframes | [references/professional-techniques.md](references/professional-techniques.md) |
-| **Stagger** | Multiple elements | Delayed start times | [references/disney-principles.md](references/disney-principles.md) |
-| **Character** | People, mascots | Parenting + bone hierarchy | [references/professional-techniques.md](references/professional-techniques.md) |
-| **Loader** | Progress, spinners | Rotation + Trim Path | [references/shape-modifiers.md](references/shape-modifiers.md) |
-| **Frame-by-Frame** | Walk/run cycles, complex characters | `ip`/`op` layer switching | [references/professional-techniques.md](references/professional-techniques.md) |
+## Before keyframing, decide the motion
 
----
+Answer these before touching a keyframe. It takes thirty seconds and prevents most
+revision cycles:
 
-### Phase 4: Create Lottie JSON
+1. **Feeling** — what should the viewer feel? (trust, delight, urgency, calm)
+2. **Personality** — pick exactly one: Playful, Premium, Corporate, or Energetic.
+   See [references/motion-personality.md](references/motion-personality.md).
+3. **Hero property** — one of position, scale, rotation, opacity. One. The rest support it.
+4. **Timing** — functional feedback under 150 ms; expressive motion 300–600 ms.
+5. **Easing** — entrance eases out, exit eases in, loop eases in-out.
+6. **Staging** — the hero enters 100–200 ms after its background.
 
-See: [references/lottie-structure.md](references/lottie-structure.md)
+Motion that competes with the subject is noise. Cut it.
 
-**Base Structure:**
-```json
-{
-  "v": "5.12.1",
-  "fr": 60,
-  "ip": 0,
-  "op": 120,
-  "w": 512,
-  "h": 512,
-  "nm": "Animation Name",
-  "ddd": 0,
-  "assets": [],
-  "layers": []
-}
-```
+## Technique by intent
 
----
+| Intent | Technique | Reference |
+|---|---|---|
+| Stroke icon draws itself | Trim path (`tm`) | [shape-modifiers.md](references/shape-modifiers.md) |
+| Logo or button appears | Scale + opacity, overshoot | [disney-principles.md](references/disney-principles.md) |
+| Icon becomes another icon | Path keyframes, equal vertex counts | [professional-techniques.md](references/professional-techniques.md) |
+| Several elements arrive | Staggered `ip` and keyframe offsets | [disney-principles.md](references/disney-principles.md) |
+| Spinner or loader | Rotation 0→360, or trim path offset | [shape-modifiers.md](references/shape-modifiers.md) |
+| Character or mascot | Parenting and bone hierarchy | [professional-techniques.md](references/professional-techniques.md) |
+| Walk or run cycle | Per-pose layers switched via `ip`/`op` | [professional-techniques.md](references/professional-techniques.md) |
+| Radial or repeated pattern | Repeater (`rp`) | [shape-modifiers.md](references/shape-modifiers.md) |
+| Scroll-driven playback | Scrub via GSAP ScrollTrigger | [lottie-gsap-integration.md](references/lottie-gsap-integration.md) |
 
-### Phase 5: Apply Professional Easing and Timing
+Structure, property names, and worked JSON:
+[lottie-structure.md](references/lottie-structure.md) ·
+[svg-to-lottie.md](references/svg-to-lottie.md) ·
+[bezier-easing.md](references/bezier-easing.md) ·
+[examples.md](references/examples.md) ·
+[lottie-tools-ecosystem.md](references/lottie-tools-ecosystem.md)
 
-Map bezier curves and frame durations strictly using your selected archetype.
+## Easing
 
-See: [references/bezier-easing.md](references/bezier-easing.md)
+Handles belong **inside a keyframe**, never on the property that holds them. `x` must
+stay within 0–1; `y` may overshoot, and that overshoot is exactly what makes a bounce.
+Handles on keyframe *n* shape the segment from *n* to *n+1* — putting them on the
+wrong keyframe eases the wrong half of the move.
 
-| Use Case | Out Tangent (`o`) | In Tangent (`i`) | Rationale |
-|----------|-------------|------------|---|
-| **Entrance (Ease Out)** | `[0.33, 0]` | `[0.67, 1]` | Fast start, gentle settle |
-| **Exit (Ease In)** | `[0.55, 0.055]` | `[0.675, 0.19]` | Gentle start, explosive departure |
-| **Loop (Ease In Out)** | `[0.645, 0.045]` | `[0.355, 1]` | Seamless symmetrical timing |
-| **Bounce (Playful)** | `[0.34, 1.56]` | `[0.64, 1]` | Bouncy overshoot, soft settle |
-| **Spring (Elastic)** | `[0.5, 1.5]` | `[0.5, 0.9]` | High responsiveness, dynamic tension |
+| Use | out (`o`) | in (`i`) |
+|---|---|---|
+| Entrance (ease out) | `{"x":[0.33],"y":[0]}` | `{"x":[0.67],"y":[1]}` |
+| Exit (ease in) | `{"x":[0.55],"y":[0.055]}` | `{"x":[0.675],"y":[0.19]}` |
+| Loop (ease in-out) | `{"x":[0.645],"y":[0.045]}` | `{"x":[0.355],"y":[1]}` |
+| Bounce | `{"x":[0.34],"y":[1.56]}` | `{"x":[0.64],"y":[1]}` |
 
----
+## The defects that render blank
 
-### Phase 6: Validate and Export
+Every one of these shipped in this repository at some point and passed a JSON-parse
+check. The linter now catches all of them; the tests pin them.
 
-```bash
-# Validate the complete Lottie contract when working in this repository
-python3 scripts/validate_lottie.py animation.json
+| Symptom | Cause |
+|---|---|
+| Whole file blank, no console error | Easing handles on the property instead of inside a keyframe (`KF011`) |
+| One layer missing | Layer has no `ip`, `op`, or `st`, so the playhead never matches it (`LY005`) |
+| One layer missing | A shape item lacks a required property, so the player drops the layer (`SH001`) |
+| Geometry present, nothing visible | No fill or stroke on the group (`LY015`), or opacity 0 throughout (`LY016`) |
+| Shape draws at zero size | Geometry left loose in `shapes` instead of inside a `gr` group |
+| Art lands in the wrong place | The same offset applied on both the layer transform and the group transform |
+| Visible jump each cycle | First and last keyframe values differ (`KF010`) |
+| Motion feels mechanical | No easing handles; everything interpolates linearly (`KF007`) |
 
-# Fallback: validate JSON syntax in any project
-python3 -c "import json; json.load(open('animation.json'))"
+Every layer needs `ip`, `op`, and `st`. Miss any one and the layer is hidden at
+every frame.
 
-# Preview
-echo "Open in: https://lottiefiles.com/preview"
-```
+Properties whose absence makes a player drop the layer — each verified by removing
+it from a working file and rendering the result:
 
-Before delivery, verify the animation at 0%, 50%, and 100% of its loop. If the final frame visibly jumps, shorten the loop or match the first and last poses; never hide a bad loop behind autoplay.
+fill `c,o` · stroke `c,o,w` · gradient fill `s,e,g,o` · polystar `p,r,pt,or,os`
+plus `ir,is` when `sy` is 1 · ellipse `p,s` · rect `p,s,r` · trim `s,e,o` ·
+transform `o`, plus `sa` whenever `sk` is present.
 
----
+The spec also lists `a,p,s,r` on a transform and `t` on a gradient. lottie-web
+supplies defaults for those, so the linter reports them as warnings (`SH003`)
+rather than errors — but other players are not guaranteed to be as forgiving.
 
-## Shape Modifiers
+## Finishing
 
-See: [references/shape-modifiers.md](references/shape-modifiers.md)
+Before saying it is done:
 
-### Trim Path (Icon Drawing Animation)
+- `lottie_lint.py` reports no errors (use `--strict` to fail on warnings too).
+- `render.mjs` shows the intended motion at the start, middle, and end.
+- For a loop, the first and last frames match — check the filmstrip, not the numbers.
+- Nothing is clipped or off canvas unless that was the intent.
 
-```json
-{
-  "ty": "tm",
-  "s": {"a": 0, "k": 0},
-  "e": {
-    "a": 1,
-    "k": [
-      {"t": 0, "s": [0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-      {"t": 45, "s": [100]}
-    ]
-  },
-  "o": {"a": 0, "k": 0},
-  "m": 1
-}
-```
-
-### Repeater (Radial/Linear Patterns)
-
-```json
-{
-  "ty": "rp",
-  "c": {"a": 0, "k": 8},
-  "tr": {
-    "r": {"a": 0, "k": 45},
-    "so": {"a": 0, "k": 100},
-    "eo": {"a": 0, "k": 30}
-  }
-}
-```
-
-### Offset Path (Glow/Outline Effects)
-
-```json
-{
-  "ty": "op",
-  "a": {"a": 1, "k": [{"t": 0, "s": [0]}, {"t": 30, "s": [8]}]},
-  "lj": 2
-}
-```
-
----
-
-## Advanced Techniques & Reference Links
-
-Ensure you consult specific reference documents for complex animation behaviors:
-
-- **Disney Principles**: Apply squash/stretch, anticipation, and arcs correctly.
-  - [references/disney-principles.md](references/disney-principles.md)
-- **Brand Personalities**: Select Playful, Premium, Corporate, or Energetic.
-  - [references/motion-personality.md](references/motion-personality.md)
-- **Bone Parenting & Rigs**: Rig layers using parenting offsets.
-  - [references/professional-techniques.md](references/professional-techniques.md)
-- **Frame-by-Frame Switching**: Implement walk cycles using layered `ip`/`op` sprite frames.
-  - [references/professional-techniques.md](references/professional-techniques.md)
-- **GSAP & ScrollTrigger Integration**: Bind Lottie scrub parameters, canvas pools, and 3D spring deflections to mouse/scroll events.
-  - [references/lottie-gsap-integration.md](references/lottie-gsap-integration.md)
-- **Lottie Tools & Ecosystem**: Select editing workflows, leverage dotLottie (.lottie) compression packaging, and audit run-time rendering.
-  - [references/lottie-tools-ecosystem.md](references/lottie-tools-ecosystem.md)
-- **Bezier Easing Reference**: Map snappiness using custom cubic bezier coordinates.
-  - [references/bezier-easing.md](references/bezier-easing.md)
+Report what you verified and what you did not. If you could not render it, say that
+plainly instead of implying the motion was checked.

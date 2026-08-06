@@ -12,6 +12,7 @@ Classic entrance animation with fade and scale.
   "fr": 60,
   "ip": 0,
   "op": 60,
+  "st": 0,
   "w": 512,
   "h": 512,
   "nm": "Logo Entrance",
@@ -27,6 +28,7 @@ Classic entrance animation with fade and scale.
       "st": 0,
       "ip": 0,
       "op": 60,
+      "st": 0,
       "ks": {
         "a": {"a": 0, "k": [256, 256]},
         "p": {"a": 0, "k": [256, 256]},
@@ -104,6 +106,7 @@ Infinite pulse loop for indicators or status lights.
   "fr": 60,
   "ip": 0,
   "op": 60,
+  "st": 0,
   "w": 200,
   "h": 200,
   "nm": "Pulse Loop",
@@ -119,6 +122,7 @@ Infinite pulse loop for indicators or status lights.
       "st": 0,
       "ip": 0,
       "op": 60,
+      "st": 0,
       "ks": {
         "a": {"a": 0, "k": [100, 100]},
         "p": {"a": 0, "k": [100, 100]},
@@ -260,6 +264,7 @@ A realistic heart beat beat with "Lub-Dub" rhythm and secondary action.
   "fr": 60,
   "ip": 0,
   "op": 60,
+  "st": 0,
   "w": 200,
   "h": 200,
   "nm": "Organic Heart",
@@ -275,6 +280,7 @@ A realistic heart beat beat with "Lub-Dub" rhythm and secondary action.
       "st": 0,
       "ip": 0,
       "op": 60,
+      "st": 0,
       "ks": {
         "a": {"a": 0, "k": [100, 100]},
         "p": {"a": 0, "k": [100, 100]},
@@ -317,6 +323,7 @@ Organic animation with deformation.
   "fr": 60,
   "ip": 0,
   "op": 60,
+  "st": 0,
   "w": 200,
   "h": 300,
   "nm": "Bouncy Ball",
@@ -332,6 +339,7 @@ Organic animation with deformation.
       "st": 0,
       "ip": 0,
       "op": 60,
+      "st": 0,
       "ks": {
         "a": {"a": 0, "k": [100, 250]},
         "p": {
@@ -490,77 +498,302 @@ Simulates a liquid filling a circle using a Track Matte.
   "op": 120,
   "w": 200,
   "h": 200,
-  "nm": "Liquid Loader",
+  "nm": "Liquid Fill",
   "ddd": 0,
   "assets": [],
   "layers": [
     {
+      "ddd": 0,
       "ind": 1,
       "ty": 4,
       "nm": "Matte_Circle",
-      "td": 1,
+      "sr": 1,
       "ks": {
-         "a": {"a":0, "k":[100,100]},
-         "p": {"a":0, "k":[100,100]},
-         "s": {"a":0, "k":[100,100]},
-         "r": {"a":0, "k":0},
-         "o": {"a":0, "k":100}
+        "o": {
+          "a": 0,
+          "k": 100
+        },
+        "r": {
+          "a": 0,
+          "k": 0
+        },
+        "p": {
+          "a": 0,
+          "k": [
+            100,
+            100,
+            0
+          ]
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            0,
+            0,
+            0
+          ]
+        },
+        "s": {
+          "a": 0,
+          "k": [
+            100,
+            100,
+            100
+          ]
+        }
       },
+      "ao": 0,
       "shapes": [
         {
-          "ty": "el",
-          "p": {"a": 0, "k": [0, 0]},
-          "s": {"a": 0, "k": [180, 180]}
-        },
-        {
-          "ty": "fl",
-          "c": {"a": 0, "k": [1, 1, 1, 1]},
-          "o": {"a": 0, "k": 100}
-        },
-        {
-           "ty": "tr",
-           "p": {"a": 0, "k": [100, 100]}, 
-           "s": {"a": 0, "k": [100, 100]},
-           "r": {"a": 0, "k": 0},
-           "o": {"a": 0, "k": 100}
+          "ty": "gr",
+          "nm": "Disc",
+          "it": [
+            {
+              "ty": "el",
+              "nm": "Disc",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ]
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  180,
+                  180
+                ]
+              }
+            },
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {
+                "a": 0,
+                "k": [
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "a": 0,
+                "k": 100
+              }
+            },
+            {
+              "ty": "tr",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ]
+              },
+              "a": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ]
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  100,
+                  100
+                ]
+              },
+              "r": {
+                "a": 0,
+                "k": 0
+              },
+              "o": {
+                "a": 0,
+                "k": 100
+              },
+              "sk": {
+                "a": 0,
+                "k": 0
+              },
+              "sa": {
+                "a": 0,
+                "k": 0
+              }
+            }
+          ]
         }
-      ]
+      ],
+      "ip": 0,
+      "op": 120,
+      "st": 0,
+      "bm": 0,
+      "td": 1
     },
     {
+      "ddd": 0,
       "ind": 2,
       "ty": 4,
       "nm": "Liquid_Wave",
-      "tt": 1,
+      "sr": 1,
       "ks": {
-         "a": {"a":0, "k":[0,0]},
-         "p": {
-            "a":1, 
-            "k": [
-               {"t": 0, "s": [100, 220], "o": {"x":[0.33], "y":[0]}, "i": {"x":[0.67], "y":[1]}},
-               {"t": 120, "s": [100, -20]}
-            ]
-         },
-         "r": {"a":0, "k":0},
-         "o": {"a":0, "k":100}
+        "o": {
+          "a": 0,
+          "k": 100
+        },
+        "r": {
+          "a": 0,
+          "k": 0
+        },
+        "p": {
+          "a": 1,
+          "k": [
+            {
+              "t": 0,
+              "s": [
+                100,
+                330,
+                0
+              ],
+              "o": {
+                "x": [
+                  0.33
+                ],
+                "y": [
+                  0
+                ]
+              },
+              "i": {
+                "x": [
+                  0.67
+                ],
+                "y": [
+                  1
+                ]
+              }
+            },
+            {
+              "t": 119,
+              "s": [
+                100,
+                140,
+                0
+              ]
+            }
+          ]
+        },
+        "a": {
+          "a": 0,
+          "k": [
+            0,
+            0,
+            0
+          ]
+        },
+        "s": {
+          "a": 0,
+          "k": [
+            100,
+            100,
+            100
+          ]
+        }
       },
+      "ao": 0,
       "shapes": [
-         {
-            "ty": "rc", 
-            "p": {"a":0, "k":[0,0]},
-            "s": {"a":0, "k":[300, 300]}, 
-            "r": {"a":0, "k":20} 
-         },
-         {
-             "ty": "fl", "c": {"a":0, "k":[0.2, 0.6, 1, 1]}, "o": {"a":0, "k":100}
-         },
-         {
-             "ty": "tr",
-             "p": {"a": 0, "k": [0, 0]},
-             "s": {"a": 0, "k": [100, 100]},
-             "r": {"a": 0, "k": 0},
-             "o": {"a": 0, "k": 100}
-         }
-      ]
+        {
+          "ty": "gr",
+          "nm": "Wave",
+          "it": [
+            {
+              "ty": "rc",
+              "nm": "Wave",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ]
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  220,
+                  260
+                ]
+              },
+              "r": {
+                "a": 0,
+                "k": 0
+              }
+            },
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {
+                "a": 0,
+                "k": [
+                  0.2,
+                  0.6,
+                  1,
+                  1
+                ]
+              },
+              "o": {
+                "a": 0,
+                "k": 100
+              }
+            },
+            {
+              "ty": "tr",
+              "p": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ]
+              },
+              "a": {
+                "a": 0,
+                "k": [
+                  0,
+                  0
+                ]
+              },
+              "s": {
+                "a": 0,
+                "k": [
+                  100,
+                  100
+                ]
+              },
+              "r": {
+                "a": 0,
+                "k": 0
+              },
+              "o": {
+                "a": 0,
+                "k": 100
+              },
+              "sk": {
+                "a": 0,
+                "k": 0
+              },
+              "sa": {
+                "a": 0,
+                "k": 0
+              }
+            }
+          ]
+        }
+      ],
+      "ip": 0,
+      "op": 120,
+      "st": 0,
+      "bm": 0,
+      "tt": 1
     }
   ]
 }
@@ -576,6 +809,7 @@ Hierarchical animation: Body -> Upper Arm -> Forearm -> Hand.
   "fr": 60,
   "ip": 0,
   "op": 60,
+  "st": 0,
   "w": 500,
   "h": 500,
   "nm": "Arm Wave",
@@ -586,6 +820,9 @@ Hierarchical animation: Body -> Upper Arm -> Forearm -> Hand.
       "ind": 1,
       "nm": "Hand",
       "ty": 4,
+      "ip": 0,
+      "op": 60,
+      "st": 0,
       "parent": 2,
       "ks": {
         "a": {"a": 0, "k": [0, 0]},
@@ -601,12 +838,15 @@ Hierarchical animation: Body -> Upper Arm -> Forearm -> Hand.
         "s": {"a": 0, "k": [100, 100]},
         "o": {"a": 0, "k": 100}
       },
-      "shapes": []
+      "shapes": [ ... ]   // your shape group here
     },
     {
       "ind": 2,
       "nm": "Forearm",
       "ty": 4,
+      "ip": 0,
+      "op": 60,
+      "st": 0,
       "parent": 3,
       "ks": {
         "a": {"a": 0, "k": [0, 0]},
@@ -622,12 +862,15 @@ Hierarchical animation: Body -> Upper Arm -> Forearm -> Hand.
         "s": {"a": 0, "k": [100, 100]},
         "o": {"a": 0, "k": 100}
       },
-      "shapes": []
+      "shapes": [ ... ]   // your shape group here
     },
     {
       "ind": 3,
       "nm": "UpperArm",
       "ty": 4,
+      "ip": 0,
+      "op": 60,
+      "st": 0,
       "ks": {
         "a": {"a": 0, "k": [0, 0]},
         "p": {"a": 0, "k": [250, 250]}, 
@@ -642,7 +885,7 @@ Hierarchical animation: Body -> Upper Arm -> Forearm -> Hand.
         "s": {"a": 0, "k": [100, 100]},
         "o": {"a": 0, "k": 100}
       },
-      "shapes": []
+      "shapes": [ ... ]   // your shape group here
     }
   ]
 }

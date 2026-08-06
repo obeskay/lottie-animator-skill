@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests and lint (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.8", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Lint every shipped animation
+        run: python3 scripts/lottie_lint.py examples/
+
+  render:
+    name: Render examples in a real player
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm ci
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+        id: chrome
+        with:
+          chrome-version: stable
+
+      # A Lottie can lint clean and still paint nothing, so prove each example
+      # actually renders before it ships.
+      - name: Render every example
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+        run: |
+          status=0
+          for file in examples/*.json; do
+            echo "--- $file"
+            node scripts/render.mjs "$file" --out "/tmp/render/$(basename "$file" .json)" || status=1
+          done
+          exit $status
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: filmstrips
+          path: /tmp/render/**/filmstrip.png
+          if-no-files-found: warn

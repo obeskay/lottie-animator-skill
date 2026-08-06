@@ -7,14 +7,14 @@
   },
   "metadata": {
     "description": "Marketplace for Lottie Animator plugin - Generate professional Lottie animations from SVGs",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "plugins": [
     {
       "name": "lottie-animator",
       "source": "./",
-      "description": "Generate professional Lottie animations from SVGs. Replace After Effects workflow with advanced bezier curves, professional easing presets, and automatic export.",
-      "version": "1.0.0",
+      "description": "Build Lottie animations from SVG with a deterministic converter, a linter for the defects that render blank, and a headless renderer for visual verification.",
+      "version": "2.0.0",
       "author": {
         "name": "Obed Vargas"
       },

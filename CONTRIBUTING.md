@@ -26,23 +26,40 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 1. Fork the repo and create your branch from `main`
 2. Make your changes
-3. Ensure your code follows the existing style
-4. Test your changes with real SVG files
-5. Submit a pull request
+3. Run the checks below and make sure they pass
+4. Submit a pull request
+
+Every change must satisfy three gates, in this order:
+
+```bash
+python3 -m unittest discover -s tests   # unit tests
+python3 scripts/lottie_lint.py examples/
+npm install && node scripts/render.mjs examples/<your-file>.json
+```
+
+The third one is not optional and not automatable away: **open the filmstrip and look
+at it.** A Lottie can lint clean and still paint nothing. If you are adding a lint
+rule, add a test that fails without it.
 
 ## Project Structure
 
 ```
 lottie-animator-skill/
 ├── .claude-plugin/       # Plugin configuration
-├── assets/               # Preview files
+├── .github/workflows/    # CI: tests, lint, and a real render
+├── assets/               # preview.html and the README hero
 ├── docs/                 # Landing page
-├── examples/             # Sample animations
+├── examples/             # Sample animations and their SVG sources
+├── scripts/
+│   ├── svg2lottie.py     # SVG -> Lottie shape layers
+│   ├── svgpath.py        # Path grammar -> cubic beziers
+│   ├── lottie_lint.py    # Structural and motion linting
+│   └── render.mjs        # Headless render + filmstrip
 ├── skills/
 │   └── lottie-animator/
 │       ├── SKILL.md      # Main skill definition
 │       └── references/   # Technical documentation
-└── test/                 # Test files
+└── tests/                # Unit tests (stdlib only)
 ```
 
 ## Adding New Features
@@ -62,18 +79,20 @@ lottie-animator-skill/
 
 ### New Examples
 
-1. Create the Lottie JSON in `examples/`
-2. Document in `references/examples.md`
-3. Include SVG source if applicable
+1. Prefer generating geometry with `svg2lottie.py` over hand-writing vertices
+2. Create the Lottie JSON in `examples/`, keeping the SVG source alongside it
+3. Confirm `lottie_lint.py` is clean and the filmstrip shows the intended motion
+4. Document in `references/examples.md`
 
 ## Style Guidelines
 
 ### Lottie JSON
 
 - Use 2-space indentation
-- Include meaningful `nm` (name) properties
-- Comment complex animations
-- Follow existing keyframe structure
+- Include meaningful `nm` (name) properties on layers and shape groups
+- Easing handles belong inside a keyframe, never on the property holding it
+- Give every layer explicit `ip` and `op`
+- Include every required property for a shape type; a missing one drops the layer
 
 ### Documentation
 
@@ -84,9 +103,23 @@ lottie-animator-skill/
 
 ## Testing
 
-Test your animations at:
-- [LottieFiles Preview](https://lottiefiles.com/preview)
-- Local preview: Open `assets/lottie-preview.html`
+The Python tools have no dependencies; rendering needs Node and a local Chrome
+(`npm install`, then set `CHROME_PATH` if it is not in a standard location).
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 scripts/lottie_lint.py examples/ --strict
+node scripts/render.mjs examples/panda-loader.json
+```
+
+For a browser preview, serve over HTTP — `file://` cannot fetch the JSON:
+
+```bash
+python3 -m http.server 8000
+```
+
+Then open `http://localhost:8000/assets/preview.html`, or drop a file on
+[LottieFiles Preview](https://lottiefiles.com/preview).
 
 ## Questions?
 
