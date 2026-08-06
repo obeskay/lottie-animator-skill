@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Manual re-run. Without this there is no way to retry a run that never
+  # started — GitHub stops creating new ones once a repo's queue backs up,
+  # and a push is then the only lever, which rewrites history to fix CI.
+  workflow_dispatch:
   schedule:
     - cron: "0 6 * * 1"
 
