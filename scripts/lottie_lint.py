@@ -39,9 +39,9 @@ LAYER_TYPES = {
 REQUIRED_DOC_KEYS = ("v", "fr", "ip", "op", "w", "h", "layers")
 NUMERIC_DOC_KEYS = ("fr", "ip", "op", "w", "h")
 
-# Properties each shape item must carry. A player that hits a missing one
-# throws while building the layer and then drops the whole layer silently --
-# the file loads, reports no error, and paints nothing.
+# Properties whose absence makes a player drop the entire layer: the file
+# loads, reports no error, and paints nothing. Each entry below was verified
+# by removing the property from a working animation and rendering the result.
 SHAPE_REQUIRED = {
     "sh": ("ks",),                     # path
     "rc": ("p", "s", "r"),             # rectangle
@@ -49,11 +49,22 @@ SHAPE_REQUIRED = {
     "sr": ("p", "r", "pt", "or", "os"),  # polystar
     "fl": ("c", "o"),                  # fill
     "st": ("c", "o", "w"),             # stroke
-    "gf": ("s", "e", "g", "t", "o"),   # gradient fill
-    "gs": ("s", "e", "g", "t", "o", "w"),  # gradient stroke
-    "tr": ("a", "p", "s", "r", "o"),   # shape transform
+    "gf": ("s", "e", "g", "o"),        # gradient fill
+    "gs": ("s", "e", "g", "o", "w"),   # gradient stroke
+    "tr": ("o",),                      # shape transform
     "tm": ("s", "e", "o"),             # trim path
     "rp": ("c", "o", "tr"),            # repeater
+}
+
+# Required by the specification, but lottie-web supplies a default rather than
+# failing. Other players are not guaranteed to be as forgiving, so these are
+# reported as warnings instead of being ignored.
+# Fill rule (fl.r) is deliberately absent: almost every real Lottie omits it and
+# the default is correct, so warning about it is noise rather than signal.
+SHAPE_RECOMMENDED = {
+    "gf": ("t",),                          # gradient type; defaults to linear
+    "gs": ("t",),
+    "tr": ("a", "p", "s", "r"),            # default to identity
 }
 
 # A star (sy == 1) also needs the inner radius pair; a polygon (sy == 2) does not.
@@ -272,14 +283,19 @@ class Linter:
             self.add("LY004", WARN, where + ".ty", "unknown layer type %r" % ty)
 
         # The defect that renders a layer invisible while the JSON still parses.
-        missing = [k for k in ("ip", "op") if k not in layer]
+        # st matters as much as ip/op: the playhead is compared against
+        # (frame - st), and an undefined st makes that comparison NaN, so the
+        # layer is hidden at every frame. Verified by rendering.
+        missing = [k for k in ("ip", "op", "st") if k not in layer]
         if missing:
             self.add(
                 "LY005", ERROR, where,
-                "%s missing %s; the layer will not render" % (label, " and ".join(missing)),
-                "Players compare the playhead against ip/op. Undefined bounds never "
-                "match, so the layer silently disappears. Set ip/op to the range the "
-                "layer should be visible for.",
+                "%s missing %s; the layer will not render"
+                % (label, " and ".join(missing)),
+                "Players compare the playhead against the layer's ip/op offset by "
+                "st. Any of them undefined makes the comparison fail at every "
+                'frame and the layer silently disappears. Set ip/op to the visible '
+                'range and st to 0 unless the layer is time-shifted.',
             )
         else:
             lip = _num(layer.get("ip"))
@@ -377,20 +393,34 @@ class Linter:
 
         ty = node.get("ty")
         if isinstance(ty, str) and ty in SHAPE_REQUIRED:
+            label = SHAPE_NAMES.get(ty, ty)
+            name = _brief(node.get("nm") or ty, 24)
             required = list(SHAPE_REQUIRED[ty])
             if ty == "sr" and node.get("sy", 1) == 1:
                 required.extend(STAR_REQUIRED)
+            # A skew angle without its axis blanks the layer; the axis alone is fine.
+            if ty == "tr" and "sk" in node:
+                required.append("sa")
+
             missing = [key for key in required if key not in node]
             if missing:
                 self.add(
                     "SH001", ERROR, where,
-                    "%s %s is missing %s"
-                    % (SHAPE_NAMES.get(ty, ty), _brief(node.get("nm") or ty, 24),
-                       ", ".join(missing)),
+                    "%s %s is missing %s" % (label, name, ", ".join(missing)),
                     "Players throw while building this item and then drop the entire "
                     "layer without reporting an error: the file loads and paints "
-                    "nothing. Every %s needs %s."
-                    % (SHAPE_NAMES.get(ty, ty), ", ".join(required)),
+                    "nothing. Every %s needs %s." % (label, ", ".join(required)),
+                )
+
+            advisory = [
+                key for key in SHAPE_RECOMMENDED.get(ty, ()) if key not in node
+            ]
+            if advisory:
+                self.add(
+                    "SH003", WARN, where,
+                    "%s %s is missing %s" % (label, name, ", ".join(advisory)),
+                    "The specification requires this. lottie-web substitutes a "
+                    "default, but other players are not guaranteed to.",
                 )
         elif isinstance(ty, str) and ty not in SHAPE_NAMES and ty not in ("mm", "gr"):
             self.add("SH002", WARN, where, "unknown shape item type %r" % ty)

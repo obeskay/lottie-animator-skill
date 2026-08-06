@@ -118,15 +118,27 @@ check. The linter now catches all of them; the tests pin them.
 | Symptom | Cause |
 |---|---|
 | Whole file blank, no console error | Easing handles on the property instead of inside a keyframe (`KF011`) |
-| One layer missing | Layer has no `ip`/`op`, so the playhead never matches it (`LY005`) |
+| One layer missing | Layer has no `ip`, `op`, or `st`, so the playhead never matches it (`LY005`) |
 | One layer missing | A shape item lacks a required property, so the player drops the layer (`SH001`) |
 | Geometry present, nothing visible | No fill or stroke on the group (`LY015`), or opacity 0 throughout (`LY016`) |
+| Shape draws at zero size | Geometry left loose in `shapes` instead of inside a `gr` group |
+| Art lands in the wrong place | The same offset applied on both the layer transform and the group transform |
 | Visible jump each cycle | First and last keyframe values differ (`KF010`) |
 | Motion feels mechanical | No easing handles; everything interpolates linearly (`KF007`) |
 
-Required properties by shape type: fill `c,o` · stroke `c,o,w` · gradient fill
-`s,e,g,t,o` · polystar `p,r,pt,or,os` plus `ir,is` when `sy` is 1 · ellipse `p,s` ·
-rect `p,s,r` · trim `s,e,o` · transform `a,p,s,r,o`.
+Every layer needs `ip`, `op`, and `st`. Miss any one and the layer is hidden at
+every frame.
+
+Properties whose absence makes a player drop the layer — each verified by removing
+it from a working file and rendering the result:
+
+fill `c,o` · stroke `c,o,w` · gradient fill `s,e,g,o` · polystar `p,r,pt,or,os`
+plus `ir,is` when `sy` is 1 · ellipse `p,s` · rect `p,s,r` · trim `s,e,o` ·
+transform `o`, plus `sa` whenever `sk` is present.
+
+The spec also lists `a,p,s,r` on a transform and `t` on a gradient. lottie-web
+supplies defaults for those, so the linter reports them as warnings (`SH003`)
+rather than errors — but other players are not guaranteed to be as forgiving.
 
 ## Finishing
 

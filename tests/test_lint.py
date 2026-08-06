@@ -88,6 +88,12 @@ class LayerTest(unittest.TestCase):
         del animation["layers"][0]["op"]
         self.assertIn("LY005", codes(animation))
 
+    def test_layer_without_st_is_an_error(self):
+        """st is compared against the playhead too; undefined hides the layer."""
+        animation = base_animation()
+        del animation["layers"][0]["st"]
+        self.assertIn("LY005", codes(animation))
+
     def test_shape_layer_without_shapes(self):
         animation = base_animation()
         animation["layers"][0]["shapes"] = []
@@ -159,6 +165,49 @@ class ShapeSchemaTest(unittest.TestCase):
             "ir": {"a": 0, "k": 5}, "is": {"a": 0, "k": 0},
         }
         self.assertNotIn("SH001", codes(animation))
+
+    def test_transform_without_anchor_is_advisory_not_an_error(self):
+        """lottie-web defaults a missing anchor, so this must not read as fatal."""
+        animation = base_animation()
+        transform = next(
+            i for i in animation["layers"][0]["shapes"][0]["it"] if i["ty"] == "tr"
+        )
+        del transform["a"]
+        found = codes(animation)
+        self.assertIn("SH003", found)
+        self.assertNotIn("SH001", found)
+
+    def test_transform_without_opacity_is_an_error(self):
+        animation = base_animation()
+        transform = next(
+            i for i in animation["layers"][0]["shapes"][0]["it"] if i["ty"] == "tr"
+        )
+        del transform["o"]
+        self.assertIn("SH001", codes(animation))
+
+    def test_skew_without_its_axis_is_an_error(self):
+        """A skew angle with no axis blanks the layer; the axis alone is fine."""
+        animation = base_animation()
+        transform = next(
+            i for i in animation["layers"][0]["shapes"][0]["it"] if i["ty"] == "tr"
+        )
+        transform["sk"] = {"a": 0, "k": 0}
+        self.assertIn("SH001", codes(animation))
+        transform["sa"] = {"a": 0, "k": 0}
+        self.assertNotIn("SH001", codes(animation))
+
+    def test_gradient_without_type_is_advisory(self):
+        animation = base_animation()
+        items = animation["layers"][0]["shapes"][0]["it"]
+        items[1] = {
+            "ty": "gf",
+            "s": {"a": 0, "k": [0, 0]}, "e": {"a": 0, "k": [10, 10]},
+            "g": {"p": 2, "k": {"a": 0, "k": [0, 1, 0, 0, 1, 0, 0, 1]}},
+            "o": {"a": 0, "k": 100},
+        }
+        found = codes(animation)
+        self.assertIn("SH003", found)
+        self.assertNotIn("SH001", found)
 
     def test_polygon_does_not_need_inner_radius(self):
         animation = base_animation()
