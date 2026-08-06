@@ -8,6 +8,12 @@ on:
 permissions:
   contents: read
 
+# Only the tip of a branch is worth testing. Without this, a run is queued per
+# push and superseded ones sit in the queue competing for the same runners.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Tests and lint (Python ${{ matrix.python }})
