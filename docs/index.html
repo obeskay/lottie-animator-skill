@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lottie Animator - AI-Powered Motion Design</title>
-  <meta name="description" content="Generate professional Lottie animations from SVGs using AI. Replace After Effects with intelligent motion design.">
+  <title>Lottie Animator — SVG to motion, verified</title>
+  <meta name="description" content="A Claude Code skill that converts SVG to Lottie, lints the defects that render blank, and renders the result in a real player.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -203,9 +203,10 @@
     
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      /* Four cards, so hold two columns rather than leaving an orphan on row two. */
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 32px;
-      max-width: 1000px;
+      max-width: 780px;
       margin: 0 auto;
     }
     
@@ -230,8 +231,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
       margin-bottom: 20px;
+      color: #fff;
+    }
+    .feature-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
     }
     
     .feature-card h3 {
@@ -335,11 +345,12 @@
     <div class="badge">Open Source • Claude Code Plugin</div>
     <h1>
       <span class="gradient-text">Lottie Animator</span><br>
-      AI-Powered Motion Design
+      SVG to motion, verified
     </h1>
     <p class="subtitle">
-      Generate professional Lottie animations from SVGs in seconds. 
-      Replace After Effects with intelligent motion design.
+      A broken Lottie still parses. This skill converts SVG to Lottie, lints the
+      defects that render blank, and renders the result in a real player — so the
+      animation is looked at before it ships.
     </p>
     <div class="cta-group">
       <a href="https://github.com/obeskay/lottie-animator-skill" class="btn btn-primary">
@@ -359,27 +370,35 @@
   
   <section class="features">
     <div class="container">
-      <h2 class="section-title">Why Choose Lottie Animator?</h2>
+      <h2 class="section-title">What it actually does</h2>
       <div class="features-grid">
         <div class="feature-card">
-          <div class="feature-icon">⚡</div>
-          <h3>Zero Cost</h3>
-          <p>Open source and free forever. No After Effects subscription required.</p>
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/></svg>
+          </div>
+          <h3>Real SVG conversion</h3>
+          <p>Full path grammar including elliptical arcs, plus groups, nested transforms, strokes and gradients. No hand-written vertex maths.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🎨</div>
-          <h3>Professional Bezier Curves</h3>
-          <p>20+ easing presets: ease, bounce, elastic, spring, and custom curves.</p>
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3>Linting that finds blanks</h3>
+          <p>Missing shape properties, easing handles on the wrong object, dead layers, unpainted geometry, loops that never close.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🤖</div>
-          <h3>AI-Powered</h3>
-          <p>Describe your animation in natural language. Claude handles the rest.</p>
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <h3>Headless rendering</h3>
+          <p>Loads the file in real lottie-web and writes a labelled filmstrip, flagging empty, clipped and off-canvas frames.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">📦</div>
-          <h3>Ready to Use</h3>
-          <p>Export JSON files compatible with web, iOS, Android, and React Native.</p>
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/><path d="m7.5 4.27 9 5.15"/></svg>
+          </div>
+          <h3>Standard Lottie out</h3>
+          <p>Plain Lottie JSON for web, iOS, Android and React Native. Python tooling has no dependencies at all.</p>
         </div>
       </div>
     </div>
