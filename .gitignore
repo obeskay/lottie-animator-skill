@@ -34,3 +34,14 @@ build/
 .env
 .env.local
 .env.*.local
+
+# --- secrets & local agent scratch (security hardening 2026-08-06) ---
+.env
+.env.*
+!.env.example
+!.env.sample
+.agents/
+ORIGINAL_REQUEST.md
+*.pem
+*.key
+.claude/settings.local.json
