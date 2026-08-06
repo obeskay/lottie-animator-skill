@@ -13,7 +13,7 @@ renderer so the animation is actually looked at before it ships.
 [Why](#why) · [Quick start](#quick-start) · [Tools](#tools) · [Examples](#examples) · [Install](#install)
 
 ![Lottie](https://img.shields.io/badge/Lottie-5.12-8b5cf6?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-79-22c55e?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-80-22c55e?style=flat-square)
 ![Dependencies](https://img.shields.io/badge/python%20deps-none-64748b?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-f59e0b?style=flat-square)
 
@@ -149,7 +149,7 @@ References live beside the skill:
 ## Development
 
 ```bash
-python3 -m unittest discover -s tests -v   # 79 tests, stdlib only
+python3 -m unittest discover -s tests -v   # 80 tests, stdlib only
 python3 scripts/lottie_lint.py examples/
 npm install && node scripts/render.mjs examples/panda-loader.json
 ```

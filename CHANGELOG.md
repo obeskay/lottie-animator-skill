@@ -18,7 +18,7 @@ The skill can now verify its own output instead of assuming it.
 - **`scripts/render.mjs`** — headless render via `lottie-web` and a local Chrome.
   Writes PNG frames and a labelled contact sheet, and reports empty frames, content off
   canvas, and content clipped by the edge.
-- **`tests/`** — 79 stdlib-only unit tests. Path arithmetic is pinned against
+- **`tests/`** — 80 stdlib-only unit tests. Path arithmetic is pinned against
   hand-computed coordinates; every lint rule is pinned by a test.
 - **CI** — tests and lint on Python 3.8 and 3.12, plus a job that renders every example
   in a real player and uploads the filmstrips.
