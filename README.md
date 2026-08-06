@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Lottie Animator — the shipped examples](assets/readme-hero.png)
+![Lottie Animator — SVG to motion, verified](assets/readme-hero.png)
 
 **SVG → motion, verified.**
 
@@ -94,6 +94,8 @@ node scripts/render.mjs a.json --frames 0,12,24 --bg "#0d1117"
 ```
 
 ## Examples
+
+![The four shipped examples](assets/examples.png)
 
 Every example is linted and rendered in CI before it ships.
 
