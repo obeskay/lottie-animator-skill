@@ -4,3 +4,9 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+
+  # The render tooling pulls in puppeteer-core and lottie-web.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
