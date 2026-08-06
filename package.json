@@ -1,0 +1,17 @@
+{
+  "name": "lottie-animator-skill",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Tooling for the Lottie Animator skill: headless rendering and visual inspection.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "lint": "python3 scripts/lottie_lint.py examples/",
+    "test": "python3 -m unittest discover -s tests -v",
+    "render": "node scripts/render.mjs"
+  },
+  "devDependencies": {
+    "lottie-web": "5.12.2",
+    "puppeteer-core": "23.11.1"
+  }
+}
