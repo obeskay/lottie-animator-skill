@@ -8,7 +8,8 @@
   "scripts": {
     "lint": "python3 scripts/lottie_lint.py examples/",
     "test": "python3 -m unittest discover -s tests -v",
-    "render": "node scripts/render.mjs"
+    "render": "node scripts/render.mjs",
+    "gifs": "node scripts/make-gifs.mjs"
   },
   "devDependencies": {
     "lottie-web": "5.12.2",

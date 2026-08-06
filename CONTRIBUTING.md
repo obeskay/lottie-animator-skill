@@ -47,14 +47,15 @@ rule, add a test that fails without it.
 lottie-animator-skill/
 ├── .claude-plugin/       # Plugin configuration
 ├── .github/workflows/    # CI: tests, lint, and a real render
-├── assets/               # preview.html and the README hero
+├── assets/               # preview.html, the README hero, and the example GIFs
 ├── docs/                 # Landing page
 ├── examples/             # Sample animations and their SVG sources
 ├── scripts/
 │   ├── svg2lottie.py     # SVG -> Lottie shape layers
 │   ├── svgpath.py        # Path grammar -> cubic beziers
 │   ├── lottie_lint.py    # Structural and motion linting
-│   └── render.mjs        # Headless render + filmstrip
+│   ├── render.mjs        # Headless render + filmstrip
+│   └── make-gifs.mjs     # README GIFs, built from the same renderer
 ├── skills/
 │   └── lottie-animator/
 │       ├── SKILL.md      # Main skill definition

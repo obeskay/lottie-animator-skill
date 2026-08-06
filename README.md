@@ -95,18 +95,49 @@ node scripts/render.mjs a.json --frames 0,12,24 --bg "#0d1117"
 
 ## Examples
 
-![The four shipped examples](assets/examples.png)
+These are the shipped files, actually running. Every GIF below was rendered by
+`scripts/render.mjs` from the JSON in `examples/` — same renderer the skill uses to
+check its own work.
 
-Every example is linted and rendered in CI before it ships.
+<table>
+<tr>
+<td width="50%" align="center">
+<img src="assets/rocket-launch.gif" width="280" alt="A rocket assembling itself part by part, each overshooting slightly before settling, then drifting upward"><br>
+<a href="examples/rocket-launch.json"><code>rocket-launch.json</code></a><br>
+<sub>Staggered entrance, overshoot easing, drift — converted from SVG</sub>
+</td>
+<td width="50%" align="center">
+<img src="assets/logo-draw-on.gif" width="280" alt="A gradient disc scaling in, then a checkmark drawing itself on stroke by stroke"><br>
+<a href="examples/logo-draw-on.json"><code>logo-draw-on.json</code></a><br>
+<sub>Trim-path draw-on over a gradient fill</sub>
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+<img src="assets/shape-morph.gif" width="280" alt="A square morphing continuously into a circle and back"><br>
+<a href="examples/shape-morph.json"><code>shape-morph.json</code></a><br>
+<sub>True path morph on a closed loop</sub>
+</td>
+<td width="50%" align="center">
+<img src="assets/panda-loader.gif" width="280" alt="A panda chewing a bamboo stalk that sways, looping seamlessly"><br>
+<a href="examples/panda-loader.json"><code>panda-loader.json</code></a><br>
+<sub>Seamless loading loop with secondary motion</sub>
+</td>
+</tr>
+</table>
 
-| File | Technique |
-|---|---|
-| [`rocket-launch.json`](examples/rocket-launch.json) | Staggered entrance, overshoot easing, drift — converted from SVG |
-| [`logo-draw-on.json`](examples/logo-draw-on.json) | Trim-path draw-on over a gradient fill |
-| [`shape-morph.json`](examples/shape-morph.json) | True path morph on a closed loop |
-| [`panda-loader.json`](examples/panda-loader.json) | Seamless loading loop with secondary motion |
+Every example is linted and rendered in CI before it ships. Rebuild the GIFs with:
 
-Preview them in a browser (over HTTP — `file://` cannot fetch the JSON):
+```bash
+node scripts/make-gifs.mjs                 # all four
+node scripts/make-gifs.mjs panda-loader    # just one
+```
+
+It drops the leading empty frame an entrance animation legitimately starts on — in a
+loop that blank reads as a flash — and holds the settled state before repeating. Needs
+`ffmpeg` on PATH.
+
+Or preview them live in a browser (over HTTP — `file://` cannot fetch the JSON):
 
 ```bash
 python3 -m http.server 8000

@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- **`examples/panda-loader.json` painted its own face and then covered it.** The head
+  and body groups were authored back-to-front — `Face Base` sat above the pupils,
+  eyebrows, blush, nose and mouth, and `Chest & Arms` sat above `White Belly`. Lottie
+  paints the first item in a `shapes` array on top, so every feature rendered and was
+  then hidden under an opaque ellipse. The file linted clean the whole time, and the
+  defect had propagated into `assets/examples.png`. Shape order reversed in both
+  groups; the panda now has the face it always contained.
+
+### Added
+
+- **`scripts/make-gifs.mjs`** — builds the README's animated GIFs from the examples
+  using `render.mjs`, so the documentation shows motion rather than stills. Drops the
+  leading empty frame an entrance starts on (a flash on every loop) and appends a hold
+  so the settled state is legible before repeating. `npm run gifs`.
+
+### Changed
+
+- The Examples section now shows the four animations running, not a static contact
+  sheet. `assets/examples.png` is gone — it was a still of a motion library, and its
+  panda was the broken render.
+- `panda-loader.gif` is rendered on a light card: the panda is a black-and-white
+  character and its chest and ears vanish against the dark background the other three
+  examples use.
+
 ## 2.0.0
 
 The skill can now verify its own output instead of assuming it.
