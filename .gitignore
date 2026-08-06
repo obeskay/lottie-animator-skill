@@ -45,3 +45,6 @@ ORIGINAL_REQUEST.md
 *.pem
 *.key
 .claude/settings.local.json
+
+# Render output
+.lottie-preview/
