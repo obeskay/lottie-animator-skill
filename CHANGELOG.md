@@ -14,6 +14,13 @@
 
 ### Added
 
+- **`SH004`, an occlusion check in `lottie_lint.py`.** Reports a shape group that an
+  opaque sibling painted above it covers completely — the defect below, which every
+  structural check passed. Deliberately conservative: the coverer must be opaque,
+  static and unrotated, and the covered geometry must fall inside the *inscribed*
+  box of the covering shape rather than its bounding box, since an ellipse leaves
+  its corners visible. Paths, repeaters, nested groups and anything animated are
+  left alone. Brings the suite to 104 stdlib-only unit tests.
 - **`scripts/make-gifs.mjs`** — builds the README's animated GIFs from the examples
   using `render.mjs`, so the documentation shows motion rather than stills. Drops the
   leading empty frame an entrance starts on (a flash on every loop) and appends a hold
@@ -46,8 +53,8 @@ The skill can now verify its own output instead of assuming it.
 - **`scripts/render.mjs`** — headless render via `lottie-web` and a local Chrome.
   Writes PNG frames and a labelled contact sheet, and reports empty frames, content off
   canvas, and content clipped by the edge.
-- **`tests/`** — 93 stdlib-only unit tests. Path arithmetic is pinned against
-  hand-computed coordinates; every lint rule is pinned by a test.
+- **`tests/`** — a stdlib-only unit suite, 93 tests at this release. Path arithmetic
+  is pinned against hand-computed coordinates; every lint rule is pinned by a test.
 - **CI** — tests and lint on Python 3.8 and 3.12, plus a job that renders every example
   in a real player and uploads the filmstrips.
 - `references/shape-modifiers.md`, which the skill linked in three places but never had.

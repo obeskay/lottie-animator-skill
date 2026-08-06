@@ -348,6 +348,7 @@ class Linter:
                 )
             else:
                 self._check_paintable(shapes, where + ".shapes", label)
+                self._check_occluded(shapes, where + ".shapes", label)
                 self._check_shape_items(shapes, where + ".shapes", label)
 
         ks = layer.get("ks")
@@ -381,6 +382,53 @@ class Linter:
                 "%s has no fill or stroke; the geometry is invisible" % label,
                 "Add a fill (fl) or stroke (st) item to the shape group.",
             )
+
+    def _check_occluded(self, shapes, where, label):
+        """A group hidden underneath an opaque sibling renders, then disappears.
+
+        Lottie paints the FIRST item of a `shapes` array on top. Authoring a
+        character front-to-back — the way layer panels in most editors read —
+        puts the face plate above the eyes, and every feature is drawn and then
+        covered by an opaque ellipse. Nothing is malformed, so every structural
+        check passes and the canvas is simply wrong. This repository shipped
+        exactly that defect in `panda-loader.json` for two releases.
+
+        Only certain occlusion is reported. A group has to be opaque, static
+        and unrotated to count as a coverer, and the covered geometry has to
+        fall inside the *inscribed* box of the covering shape, never merely its
+        bounding box — an ellipse leaves its corners visible.
+        """
+        groups = [
+            (index, item) for index, item in enumerate(shapes)
+            if isinstance(item, dict) and item.get("ty") == "gr"
+        ]
+        if len(groups) < 2:
+            return
+
+        described = []
+        for index, group in groups:
+            described.append((index, group, _group_footprint(group)))
+
+        for above_pos, (above_index, above, above_fp) in enumerate(described):
+            if above_fp is None or above_fp.solid is None:
+                continue
+            for below_index, below, below_fp in described[above_pos + 1:]:
+                if below_fp is None or below_fp.extent is None:
+                    continue
+                if not _contains(above_fp.solid, below_fp.extent):
+                    continue
+                self.add(
+                    "SH004", WARN, "%s[%d]" % (where, below_index),
+                    "%s: %s is completely covered by %s, painted above it"
+                    % (
+                        label,
+                        _brief(below.get("nm") or "group %d" % below_index, 28),
+                        _brief(above.get("nm") or "group %d" % above_index, 28),
+                    ),
+                    "Lottie paints the first item of a shapes array on top, so "
+                    "this group renders and is then hidden. If it was authored "
+                    "back-to-front, reverse the order of the groups.",
+                )
 
     def _check_shape_items(self, node, where, label):
         """Walk shape items and confirm each carries the properties its type needs."""
@@ -719,6 +767,143 @@ def referenced_pairs(data):
 
     walk(data.get("layers"), "$.layers")
     return out
+
+
+class _Footprint:
+    """What a shape group definitely paints, and how far it definitely reaches.
+
+    `solid` is the largest axis-aligned box the group is guaranteed to fill
+    with an opaque colour, or None when that cannot be established. `extent`
+    is the box outside which the group certainly paints nothing.
+    """
+
+    __slots__ = ("solid", "extent")
+
+    def __init__(self, solid, extent):
+        self.solid = solid
+        self.extent = extent
+
+
+def _static(prop):
+    """The value of a property that never animates, else None."""
+    if not isinstance(prop, dict) or prop.get("a") == 1:
+        return None
+    return prop.get("k")
+
+
+def _static_pair(prop):
+    value = _static(prop)
+    if not isinstance(value, list) or len(value) < 2:
+        return None
+    x, y = _num(value[0]), _num(value[1])
+    return None if x is None or y is None else (x, y)
+
+
+def _translation_only(group):
+    """Offset of a group whose transform is a pure, static translation.
+
+    Anything else — animated, scaled, rotated or skewed — returns None, which
+    takes the group out of the check entirely rather than guessing at its
+    footprint.
+    """
+    tr = None
+    for item in group.get("it") or []:
+        if isinstance(item, dict) and item.get("ty") == "tr":
+            tr = item
+    if tr is None:
+        return (0.0, 0.0)
+
+    opacity = _static(tr.get("o"))
+    if _scalar(opacity) is not None and _scalar(opacity) < 100:
+        return None
+    for key in ("r", "rz", "sk", "sa"):
+        if key in tr:
+            angle = _scalar(_static(tr.get(key)))
+            if angle is None or abs(angle) > 0.01:
+                return None
+    if "s" in tr:
+        scale = _static_pair(tr.get("s"))
+        if scale is None or abs(scale[0] - 100) > 0.01 or abs(scale[1] - 100) > 0.01:
+            return None
+
+    position = _static_pair(tr.get("p")) if "p" in tr else (0.0, 0.0)
+    anchor = _static_pair(tr.get("a")) if "a" in tr else (0.0, 0.0)
+    if position is None or anchor is None:
+        return None
+    return (position[0] - anchor[0], position[1] - anchor[1])
+
+
+def _group_footprint(group):
+    if not isinstance(group, dict) or not isinstance(group.get("it"), list):
+        return None
+    offset = _translation_only(group)
+    if offset is None:
+        return None
+
+    items = group["it"]
+    # A nested group could paint anywhere; refuse to reason about it.
+    if any(isinstance(i, dict) and i.get("ty") == "gr" for i in items):
+        return None
+
+    opaque_fill = False
+    stroke_reach = 0.0
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        if item.get("ty") == "fl":
+            alpha = _scalar(_static(item.get("o")))
+            if alpha is not None and alpha >= 100:
+                opaque_fill = True
+        elif item.get("ty") in ("st", "gs"):
+            width = _scalar(_static(item.get("w")))
+            if width is None:
+                return None          # unknown reach; do not bound this group
+            stroke_reach = max(stroke_reach, width / 2.0)
+        elif item.get("ty") in ("rp",):
+            return None              # a repeater clones geometry elsewhere
+
+    boxes = []
+    inscribed = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        ty = item.get("ty")
+        if ty not in ("el", "rc"):
+            if ty in ("sh", "sr"):
+                return None          # arbitrary path: no cheap, safe bounds
+            continue
+        centre = _static_pair(item.get("p"))
+        size = _static_pair(item.get("s"))
+        if centre is None or size is None:
+            return None
+        cx, cy = centre[0] + offset[0], centre[1] + offset[1]
+        hw, hh = abs(size[0]) / 2.0, abs(size[1]) / 2.0
+        boxes.append((cx - hw - stroke_reach, cy - hh - stroke_reach,
+                      cx + hw + stroke_reach, cy + hh + stroke_reach))
+        if ty == "el":
+            # The largest axis-aligned box inside an ellipse.
+            inscribed.append((cx - hw * 0.7071, cy - hh * 0.7071,
+                              cx + hw * 0.7071, cy + hh * 0.7071))
+        else:
+            radius = _scalar(_static(item.get("r"))) or 0.0
+            inscribed.append((cx - hw + radius, cy - hh + radius,
+                              cx + hw - radius, cy + hh - radius))
+
+    if not boxes:
+        return None
+    extent = (min(b[0] for b in boxes), min(b[1] for b in boxes),
+              max(b[2] for b in boxes), max(b[3] for b in boxes))
+    # One shape is enough to cover; several would need a union, which is not
+    # worth the risk of claiming solidity that is not there.
+    solid = inscribed[0] if opaque_fill and len(inscribed) == 1 else None
+    return _Footprint(solid, extent)
+
+
+def _contains(outer, inner):
+    return (
+        outer[0] <= inner[0] and outer[1] <= inner[1]
+        and outer[2] >= inner[2] and outer[3] >= inner[3]
+    )
 
 
 def _collect_shape_types(node, out):

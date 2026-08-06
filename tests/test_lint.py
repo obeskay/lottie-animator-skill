@@ -309,5 +309,137 @@ class ShippedExamplesTest(unittest.TestCase):
         self.assertEqual(failures, [], "\n".join(failures))
 
 
+def _group(name, shape, fill=True, offset=(0, 0)):
+    """A shape group holding one ellipse or rectangle, optionally filled."""
+    items = [shape]
+    if fill:
+        items.append({"ty": "fl", "c": {"a": 0, "k": [1, 1, 1, 1]},
+                      "o": {"a": 0, "k": 100}})
+    items.append({"ty": "tr", "p": {"a": 0, "k": list(offset)},
+                  "a": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [100, 100]},
+                  "r": {"a": 0, "k": 0}, "o": {"a": 0, "k": 100}})
+    return {"ty": "gr", "nm": name, "it": items}
+
+
+def _ellipse(cx, cy, w, h):
+    return {"ty": "el", "p": {"a": 0, "k": [cx, cy]}, "s": {"a": 0, "k": [w, h]}}
+
+
+def _rect(cx, cy, w, h, r=0):
+    return {"ty": "rc", "p": {"a": 0, "k": [cx, cy]},
+            "s": {"a": 0, "k": [w, h]}, "r": {"a": 0, "k": r}}
+
+
+def _with_groups(*groups):
+    animation = base_animation()
+    animation["layers"][0]["shapes"] = list(groups)
+    return animation
+
+
+class OcclusionTest(unittest.TestCase):
+    """panda-loader.json shipped for two releases with its face painted and
+    then covered: Lottie draws shapes[0] on top, and the file was authored
+    back-to-front. Nothing was malformed, so every other check passed."""
+
+    def test_group_hidden_under_an_opaque_sibling_above_it(self):
+        animation = _with_groups(
+            _group("Face Base", _ellipse(0, 0, 80, 80)),
+            _group("Pupils", _ellipse(0, 0, 10, 10)),
+        )
+        self.assertIn("SH004", codes(animation))
+
+    def test_correct_order_is_not_reported(self):
+        """The same two groups, authored front-to-back, are fine."""
+        animation = _with_groups(
+            _group("Pupils", _ellipse(0, 0, 10, 10)),
+            _group("Face Base", _ellipse(0, 0, 80, 80)),
+        )
+        self.assertNotIn("SH004", codes(animation))
+
+    def test_corner_of_an_ellipse_is_not_treated_as_covered(self):
+        """An ellipse leaves its bounding-box corners visible, so a shape out
+        there is still on screen. Using the bbox rather than the inscribed box
+        would report this."""
+        animation = _with_groups(
+            _group("Disc", _ellipse(0, 0, 80, 80)),
+            _group("Corner", _ellipse(36, 36, 6, 6)),
+        )
+        self.assertNotIn("SH004", codes(animation))
+
+    def test_translucent_cover_is_not_reported(self):
+        animation = _with_groups(
+            _group("Glass", _ellipse(0, 0, 80, 80)),
+            _group("Behind", _ellipse(0, 0, 10, 10)),
+        )
+        animation["layers"][0]["shapes"][0]["it"][1]["o"]["k"] = 40
+        self.assertNotIn("SH004", codes(animation))
+
+    def test_unfilled_cover_is_not_reported(self):
+        """Geometry with no fill paints nothing and hides nothing."""
+        animation = _with_groups(
+            _group("Outline", _ellipse(0, 0, 80, 80), fill=False),
+            _group("Behind", _ellipse(0, 0, 10, 10)),
+        )
+        self.assertNotIn("SH004", codes(animation))
+
+    def test_animated_cover_is_not_reported(self):
+        """A shape that moves may expose what is under it at some frame."""
+        animation = _with_groups(
+            _group("Sliding plate", _ellipse(0, 0, 80, 80)),
+            _group("Behind", _ellipse(0, 0, 10, 10)),
+        )
+        animation["layers"][0]["shapes"][0]["it"][2]["p"] = {
+            "a": 1, "k": [{"t": 0, "s": [0, 0]}, {"t": 30, "s": [200, 0]}],
+        }
+        self.assertNotIn("SH004", codes(animation))
+
+    def test_rotated_cover_is_not_reported(self):
+        animation = _with_groups(
+            _group("Tilted", _rect(0, 0, 80, 80)),
+            _group("Behind", _ellipse(0, 0, 10, 10)),
+        )
+        animation["layers"][0]["shapes"][0]["it"][2]["r"]["k"] = 45
+        self.assertNotIn("SH004", codes(animation))
+
+    def test_rounded_rectangle_shrinks_by_its_radius(self):
+        """The rounded corner is not solid, so content there stays visible."""
+        animation = _with_groups(
+            _group("Card", _rect(0, 0, 80, 80, r=30)),
+            _group("In the corner", _ellipse(34, 34, 4, 4)),
+        )
+        self.assertNotIn("SH004", codes(animation))
+
+    def test_group_offset_by_its_transform_is_placed_correctly(self):
+        """The covered group sits at the origin only after its transform."""
+        animation = _with_groups(
+            _group("Plate", _ellipse(0, 0, 80, 80)),
+            _group("Moved out", _ellipse(0, 0, 6, 6), offset=(200, 200)),
+        )
+        self.assertNotIn("SH004", codes(animation))
+
+    def test_path_geometry_is_never_claimed_to_be_covered(self):
+        """An arbitrary path has no cheap bounds, so it is left alone."""
+        animation = _with_groups(
+            _group("Plate", _ellipse(0, 0, 80, 80)),
+            {"ty": "gr", "nm": "Squiggle", "it": [
+                {"ty": "sh", "ks": {"a": 0, "k": {"c": False, "v": [[0, 0]],
+                                                  "i": [[0, 0]], "o": [[0, 0]]}}},
+                {"ty": "fl", "c": {"a": 0, "k": [0, 0, 0, 1]},
+                 "o": {"a": 0, "k": 100}},
+                {"ty": "tr", "p": {"a": 0, "k": [0, 0]}, "a": {"a": 0, "k": [0, 0]},
+                 "s": {"a": 0, "k": [100, 100]}, "r": {"a": 0, "k": 0},
+                 "o": {"a": 0, "k": 100}},
+            ]},
+        )
+        self.assertNotIn("SH004", codes(animation))
+
+    def test_the_shipped_panda_is_ordered_correctly(self):
+        """Regression pin for the file this check was written from."""
+        data = json.loads((REPO / "examples" / "panda-loader.json").read_text())
+        found = [f for f in Linter(data).run() if f.code == "SH004"]
+        self.assertEqual(found, [], [f.message for f in found])
+
+
+
 if __name__ == "__main__":
     unittest.main()

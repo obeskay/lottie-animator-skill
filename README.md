@@ -13,7 +13,7 @@ renderer so the animation is actually looked at before it ships.
 [Why](#why) · [Quick start](#quick-start) · [Tools](#tools) · [Examples](#examples) · [Install](#install)
 
 ![Lottie](https://img.shields.io/badge/Lottie-5.12-8b5cf6?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-93-22c55e?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-104-22c55e?style=flat-square)
 ![Dependencies](https://img.shields.io/badge/python%20deps-none-64748b?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-f59e0b?style=flat-square)
 
@@ -74,8 +74,9 @@ python3 scripts/svg2lottie.py icon.svg -o icon.json --size 512 --current-color "
 
 Structural checks, plus the ones that actually bite: per-shape required properties,
 easing handles on the wrong object, layers outside the composition range, permanently
-transparent layers, geometry with no paint, parent cycles, dead keyframes, and loops
-that do not close.
+transparent layers, geometry with no paint, parent cycles, dead keyframes, loops that
+do not close, and groups painted underneath an opaque sibling — content that renders
+correctly and is then covered.
 
 ```bash
 python3 scripts/lottie_lint.py examples/          # a directory
@@ -182,7 +183,7 @@ References live beside the skill:
 ## Development
 
 ```bash
-python3 -m unittest discover -s tests -v   # 93 tests, stdlib only
+python3 -m unittest discover -s tests -v   # 104 tests, stdlib only
 python3 scripts/lottie_lint.py examples/
 npm install && node scripts/render.mjs examples/panda-loader.json
 ```
