@@ -13,6 +13,6 @@
   },
   "devDependencies": {
     "lottie-web": "5.12.2",
-    "puppeteer-core": "23.11.1"
+    "puppeteer-core": "25.9.0"
   }
 }
