@@ -12,7 +12,7 @@
     "gifs": "node scripts/make-gifs.mjs"
   },
   "devDependencies": {
-    "lottie-web": "5.12.2",
+    "lottie-web": "5.13.0",
     "puppeteer-core": "23.11.1"
   }
 }
