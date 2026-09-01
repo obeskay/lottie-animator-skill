@@ -50,7 +50,7 @@ jobs:
       - run: npm ci
 
       - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
+        uses: browser-actions/setup-chrome@v2
         id: chrome
         with:
           chrome-version: stable
