@@ -357,10 +357,10 @@ where later elements win. Converting between the two means reversing the order.
         "o": {"a": 0, "k": 30},
         "p": {"a": 0, "k": [100, 180, 0]},
         "s": {"a": 1, "k": [
-          {"t": 0, "s": [100, 100, 100]},
-          {"t": 6, "s": [95, 100, 100]},
-          {"t": 12, "s": [100, 100, 100]},
-          {"t": 18, "s": [95, 100, 100]},
+          {"t": 0, "s": [100, 100, 100], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+          {"t": 6, "s": [95, 100, 100], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+          {"t": 12, "s": [100, 100, 100], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+          {"t": 18, "s": [95, 100, 100], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
           {"t": 24, "s": [100, 100, 100]}
         ]}
       },
@@ -440,4 +440,5 @@ The shadow squashing on every second pose is what sells the weight of the steps.
 - [ ] Palette held to five or six colours, one shared outline tone
 - [ ] Shadow reacts to the steps
 - [ ] Loop closes: the first and last frames match
+- [ ] Every keyframe but the last carries `o` and `i` handles
 - [ ] Linted and rendered, and the filmstrip actually looked at

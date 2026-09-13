@@ -13,9 +13,8 @@ Creating standard-compliant Lotties requires choosing the correct environment an
 | Tool | Export Capability | Web Compliance | Best Use Case |
 | :--- | :--- | :--- | :--- |
 | **After Effects + Bodymovin** | Full JSON / `.lottie` | High (excluding expressions) | Complex multi-layer rigs, particle systems, cinematic paths. |
-| **LottieLab / Lottie Creator** | Web Native JSON | $100\%$ Compliant | Collaborative vector animations, micro-interactions, edits. |
+| **LottieLab / Lottie Creator** | Web Native JSON | 100% compliant | Collaborative vector animations, micro-interactions, edits. |
 | **Keyshape (macOS)** | Clean JSON, SVG, CSS | High | Light vector wiggles, icon morphs, clean raw curves. |
-| **Haiku Animator** | Direct Web Components | High | Programmatic state transitions and interactive UI loops. |
 
 > [!WARNING]
 > When exporting from After Effects, **NEVER** use After Effects Expressions or advanced effects (like Gaussian Blur or Drop Shadow). The `lottie-web` canvas and SVG renderers must parse these dynamically, causing heavy CPU bottlenecks and frame drops. Convert all expressions to baked keyframes before export.
@@ -42,7 +41,7 @@ my-animation.lottie (ZIP Container)
 
 ### Bandwidth & Performance Advantages
 
-1. **ZIP Compression**: Reduces raw JSON size by **$70\%$ to $80\%$** automatically, outperforming gzip/brotli transport levels.
+1. **ZIP Compression**: Reduces raw JSON size by **70% to 80%**, comparable to what gzip/brotli transport would give you, but it also survives being saved to disk.
 2. **Resource Consolidation**: Bundles standard assets (Lottie JSON, raster PNGs, sound files) into a single archive, eliminating CORS issues and multiple network requests.
 3. **Multi-Animation Bundling**: Allows switching animations (e.g. state changes like `hover`, `active`, `success`) instantly without loading separate assets.
 

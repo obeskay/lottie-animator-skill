@@ -254,6 +254,41 @@ class KeyframeTest(unittest.TestCase):
         animation["layers"][0]["ks"]["p"] = {"a": 1, "k": [50, 50, 0]}
         self.assertIn("KF002", codes(animation))
 
+    def test_keyframe_without_handles_is_an_error(self):
+        """The sello defect: lottie-web throws while interpolating a keyframe
+        that has no handles, the render pass aborts, and the canvas freezes on
+        the previous frame. No console error. Measured on lottie-web 5.12.2."""
+        animation = base_animation()
+        keyframe = animation["layers"][0]["ks"]["p"]["k"][0]
+        del keyframe["o"]
+        del keyframe["i"]
+        self.assertIn("KF012", codes(animation))
+
+    def test_hold_keyframe_needs_no_handles(self):
+        animation = base_animation()
+        keyframe = animation["layers"][0]["ks"]["p"]["k"][0]
+        del keyframe["o"]
+        del keyframe["i"]
+        keyframe["h"] = 1
+        self.assertNotIn("KF012", codes(animation))
+
+    def test_last_keyframe_needs_no_handles(self):
+        """Nothing follows the last keyframe, so it has no segment to shape."""
+        self.assertNotIn("KF012", codes(base_animation()))
+
+    def test_explicit_linear_handles_are_a_note_not_an_error(self):
+        """Linear motion is a taste question; a missing handle is a defect."""
+        animation = base_animation()
+        keyframe = animation["layers"][0]["ks"]["p"]["k"][0]
+        keyframe["o"] = {"x": [0.333], "y": [0.333]}
+        keyframe["i"] = {"x": [0.667], "y": [0.667]}
+        found = codes(animation)
+        self.assertNotIn("KF012", found)
+        self.assertIn("KF007", found)
+
+    def test_eased_handles_are_not_reported_as_linear(self):
+        self.assertNotIn("KF007", codes(base_animation()))
+
 
 class LoopTest(unittest.TestCase):
     def test_open_loop_warns_when_looping(self):

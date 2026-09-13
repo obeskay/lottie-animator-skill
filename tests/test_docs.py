@@ -43,10 +43,15 @@ def fragments():
         text = path.read_text(encoding="utf-8")
         for match in FENCE.finditer(text):
             line = text[: match.start()].count("\n") + 1
-            try:
-                yield path, line, json.loads(_strip_annotations(match.group(1)))
-            except json.JSONDecodeError:
-                continue
+            snippet = _strip_annotations(match.group(1))
+            # A fragment such as `"s": {...}` is a member list, not an object;
+            # wrapping it makes it readable without changing what it shows.
+            for candidate in (snippet, "{%s}" % snippet):
+                try:
+                    yield path, line, json.loads(candidate)
+                    break
+                except json.JSONDecodeError:
+                    continue
 
 
 def _shape_defects(node, out):
@@ -65,6 +70,16 @@ def _shape_defects(node, out):
             stray = [k for k in ("i", "o", "t", "s", "h") if k in node]
             if stray:
                 out.append("keyframe fields %s on the property" % ", ".join(stray))
+            # A keyframe without handles freezes lottie-web mid-render (KF012),
+            # and a reader copies a snippet's keyframes verbatim.
+            frames = node.get("k")
+            if node.get("a") == 1 and isinstance(frames, list) and frames \
+                    and all(isinstance(f, dict) for f in frames):
+                for index, frame in enumerate(frames[:-1]):
+                    if frame.get("h"):
+                        continue
+                    if not isinstance(frame.get("o"), dict) or not isinstance(frame.get("i"), dict):
+                        out.append("keyframe %d has no easing handles" % index)
         for value in node.values():
             _shape_defects(value, out)
     elif isinstance(node, list):

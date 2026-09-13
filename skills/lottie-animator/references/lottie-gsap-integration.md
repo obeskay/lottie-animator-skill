@@ -97,42 +97,27 @@ To elevate standard scrolling into an experience that matches native macOS/iOS f
 
 ### Spring-Deceleration Mouse Parallax
 
-Instead of letting a Lottie layer tilt rigidly, apply a spring ease that interpolates coordinates toward mouse offsets, creating organic secondary action.
+lottie-web has no public API for moving one layer inside a running animation, and reaching into `renderer.elements[n].finalTransform` breaks between minor versions. Drive the parallax on the container instead — or split the parallax planes into separate Lotties, one per container — and interpolate toward the pointer with a spring so the motion has weight.
 
 ```javascript
-const targetCoords = { x: 0, y: 0 };
-const currentCoords = { x: 0, y: 0 };
-const springStrength = 0.08; // Lower = looser/softer spring movement
+const target = { x: 0, y: 0 };
+const current = { x: 0, y: 0 };
+const spring = 0.08; // lower = softer, slower settle
 
 document.addEventListener('mousemove', (e) => {
-  const { clientX, clientY } = e;
-  const { innerWidth, innerHeight } = window;
-  
-  // Normalize coordinates from -1 to 1
-  targetCoords.x = (clientX - innerWidth / 2) / (innerWidth / 2);
-  targetCoords.y = (clientY - innerHeight / 2) / (innerHeight / 2);
+  target.x = (e.clientX - innerWidth / 2) / (innerWidth / 2);   // -1 .. 1
+  target.y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
 });
 
-function animateParallaxLoop() {
-  // Spring interpolation formula: current = current + (target - current) * strength
-  currentCoords.x += (targetCoords.x - currentCoords.x) * springStrength;
-  currentCoords.y += (targetCoords.y - currentCoords.y) * springStrength;
-  
-  // Bind interpolated coordinates to a Lottie Layer's transform or rotation property
-  // Example: deflecting the head layer Y-axis or rotation slightly
-  if (animation.isLoaded) {
-    const headLayer = animation.renderer.elements[3]; // Head element index
-    if (headLayer && headLayer.finalTransform) {
-      // Manually deflect the Lottie element matrix
-      headLayer.finalTransform.mProps.r.setValue(currentCoords.x * 8); // Rotate up to 8 deg
-    }
-  }
-  
-  requestAnimationFrame(animateParallaxLoop);
+const plane = document.getElementById('lottie-head'); // the container of one Lottie
+function tick() {
+  current.x += (target.x - current.x) * spring;
+  current.y += (target.y - current.y) * spring;
+  plane.style.transform =
+    `translate3d(${current.x * 12}px, ${current.y * 8}px, 0) rotate(${current.x * 4}deg)`;
+  requestAnimationFrame(tick);
 }
-
-// Start the physics loop
-animateParallaxLoop();
+tick();
 ```
 
 ---
@@ -141,11 +126,10 @@ animateParallaxLoop();
 
 To guarantee smooth performance on multi-section cinematic landing pages:
 
-1. **Lazy Keyframe Compile**: Initialize Lottie-Web with `lazy: true` to defer path generation until the first render cycle.
-2. **Asset Budgets**: Keep Lottie JSON files under `250KB`. If a file exceeds `500KB`, split it into multiple smaller modular loops or compress the vector paths.
-3. **Hardware Acceleration**: Force GPU layer creation on containers using `transform: translate3d(0, 0, 0);` and `will-change: transform;` in CSS.
-4. **Debounced Resizing**: Call `animation.resize()` within a debounced resize handler (at least `150ms`) to avoid blocking browser resizing reflows.
-5. **Frame Pre-Caching**: Enable Lottie-Web's frame caching for scrubbed animations to prevent seek stuttering:
+1. **Asset Budgets**: Keep Lottie JSON files under `250KB`. If a file exceeds `500KB`, split it into multiple smaller modular loops or compress the vector paths.
+2. **Hardware Acceleration**: Force GPU layer creation on containers using `transform: translate3d(0, 0, 0);` and `will-change: transform;` in CSS.
+3. **Debounced Resizing**: Call `animation.resize()` within a debounced resize handler (at least `150ms`) to avoid blocking browser resizing reflows.
+4. **Subframe rendering**: Enable Lottie-Web's frame caching for scrubbed animations to prevent seek stuttering:
    ```javascript
    animation.setSubframe(true); // Enables subframe rendering for fluid intermediate curves
    ```

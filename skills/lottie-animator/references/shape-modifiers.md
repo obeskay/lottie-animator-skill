@@ -57,12 +57,15 @@ A spinner is a trim window of fixed width chased around a circle by the offset:
   "ty": "tm",
   "s": {"a": 0, "k": 15},
   "e": {"a": 0, "k": 85},
-  "o": {"a": 1, "k": [{"t": 0, "s": [0]}, {"t": 60, "s": [360]}]},
+  "o": {"a": 1, "k": [
+    {"t": 0, "s": [0], "o": {"x": [0.333], "y": [0.333]}, "i": {"x": [0.667], "y": [0.667]}},
+    {"t": 60, "s": [360]}
+  ]},
   "m": 1
 }
 ```
 
-Rotating `o` by exactly 360 closes the loop perfectly, so the cycle never jumps.
+Rotating `o` by exactly 360 closes the loop perfectly, so the cycle never jumps. The handles are linear on purpose — a loader must not slow down — but they are still written out: a keyframe with none freezes lottie-web.
 
 ---
 
@@ -121,7 +124,10 @@ that a stroke cannot express.
 ```json
 {
   "ty": "op", "nm": "Grow",
-  "a": {"a": 1, "k": [{"t": 0, "s": [0]}, {"t": 30, "s": [8]}]},
+  "a": {"a": 1, "k": [
+    {"t": 0, "s": [0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
+    {"t": 30, "s": [8]}
+  ]},
   "lj": 2
 }
 ```
@@ -163,6 +169,7 @@ Only affects actual corners; it does nothing to a path that is already smooth.
 
 - The modifier sits after its geometry and before the paint, in the same group.
 - Every required property is present — a missing one drops the whole layer.
+- Every keyframe but the last carries `o` and `i` — a bare one freezes the render.
 - Repeater rotation divides evenly into 360.
 - Trim offsets that loop travel exactly 360.
 - You rendered it and looked at it. Modifier support varies by player more than any
