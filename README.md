@@ -13,7 +13,7 @@ renderer so the animation is actually looked at before it ships.
 [Why](#why) · [Quick start](#quick-start) · [Tools](#tools) · [Examples](#examples) · [Install](#install)
 
 ![Lottie](https://img.shields.io/badge/Lottie-5.12-8b5cf6?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-109-22c55e?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-112-22c55e?style=flat-square)
 ![Dependencies](https://img.shields.io/badge/python%20deps-none-64748b?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-f59e0b?style=flat-square)
 
@@ -67,7 +67,7 @@ arcs, smooth curves, and relative commands. Each element becomes its own named l
 anchored at its own centre so scale and rotation pivot where you expect.
 
 ```bash
-python3 scripts/svg2lottie.py icon.svg -o icon.json --size 512 --current-color "#a855f7"
+python3 scripts/svg2lottie.py icon.svg -o icon.json --size 512 --current-color "#1E1B18"
 ```
 
 ### `lottie_lint.py` — the defects that render blank
@@ -91,7 +91,23 @@ contact sheet. Flags empty frames, content off canvas, and content clipped by th
 
 ```bash
 node scripts/render.mjs a.json --at 0,25,50,75,100
-node scripts/render.mjs a.json --frames 0,12,24 --bg "#0d1117"
+node scripts/render.mjs a.json --frames 0,12,24 --bg "#F3EEE6"
+node scripts/render.mjs a.json --onion     # frames stacked: spacing is the easing, the path is the arc
+```
+
+### `motion.py` — taste as tokens
+
+The render proves an animation is not broken; it does not make it good. `motion.py`
+holds the house defaults from
+[motion-taste.md](skills/lottie-animator/references/motion-taste.md) so a generator never
+types a handle or a hex value: strong ease-out, zero overshoot (`playful` exists for
+briefs that ask for bounce), a warm low-chroma palette, and a continuous-curvature
+`squircle()` path. `track()` puts handles on every keyframe but the last, so the
+frozen-canvas defect cannot happen.
+
+```python
+from motion import track, rgba, squircle, PALETTE
+"s": track((0, [94, 94, 100], "out"), (26, [100, 100, 100]))
 ```
 
 ## Examples
@@ -103,21 +119,21 @@ check its own work.
 <table>
 <tr>
 <td width="50%" align="center">
-<img src="assets/rocket-launch.gif" width="280" alt="A rocket assembling itself part by part, each overshooting slightly before settling, then drifting upward"><br>
+<img src="assets/rocket-launch.gif" width="280" alt="A rocket assembling itself in a 50 ms cascade, ink strokes with a clay flame, then lifting gently"><br>
 <a href="examples/rocket-launch.json"><code>rocket-launch.json</code></a><br>
-<sub>Staggered entrance, overshoot easing, drift — converted from SVG</sub>
+<sub>Cascade entrance, strong ease-out, no overshoot — converted from SVG</sub>
 </td>
 <td width="50%" align="center">
-<img src="assets/logo-draw-on.gif" width="280" alt="A gradient disc scaling in, then a checkmark drawing itself on stroke by stroke"><br>
+<img src="assets/logo-draw-on.gif" width="280" alt="A clay disc settling in, then a checkmark drawing itself in one gesture"><br>
 <a href="examples/logo-draw-on.json"><code>logo-draw-on.json</code></a><br>
-<sub>Trim-path draw-on over a gradient fill</sub>
+<sub>Trim-path draw-on over a flat fill</sub>
 </td>
 </tr>
 <tr>
 <td width="50%" align="center">
-<img src="assets/shape-morph.gif" width="280" alt="A square morphing continuously into a circle and back"><br>
+<img src="assets/shape-morph.gif" width="280" alt="A squircle easing into a circle and back, resting at each end"><br>
 <a href="examples/shape-morph.json"><code>shape-morph.json</code></a><br>
-<sub>True path morph on a closed loop</sub>
+<sub>Squircle ↔ circle path morph, holds at both rests</sub>
 </td>
 <td width="50%" align="center">
 <img src="assets/panda-loader.gif" width="280" alt="A panda chewing a bamboo stalk that sways, looping seamlessly"><br>
@@ -174,8 +190,7 @@ References live beside the skill:
 [structure](skills/lottie-animator/references/lottie-structure.md) ·
 [SVG → Lottie](skills/lottie-animator/references/svg-to-lottie.md) ·
 [shape modifiers](skills/lottie-animator/references/shape-modifiers.md) ·
-[easing](skills/lottie-animator/references/bezier-easing.md) ·
-[motion personality](skills/lottie-animator/references/motion-personality.md) ·
+[motion taste](skills/lottie-animator/references/motion-taste.md) ·
 [Disney principles](skills/lottie-animator/references/disney-principles.md) ·
 [techniques](skills/lottie-animator/references/professional-techniques.md) ·
 [GSAP](skills/lottie-animator/references/lottie-gsap-integration.md)
@@ -183,7 +198,7 @@ References live beside the skill:
 ## Development
 
 ```bash
-python3 -m unittest discover -s tests -v   # 109 tests, stdlib only
+python3 -m unittest discover -s tests -v   # 112 tests, stdlib only
 python3 scripts/lottie_lint.py examples/
 npm install && node scripts/render.mjs examples/panda-loader.json
 ```

@@ -74,7 +74,7 @@ lottie-animator-skill/
 
 ### New Easing Presets
 
-1. Add to `references/bezier-easing.md`
+1. Add to `references/motion-taste.md`
 2. Include visual representation
 3. Document use cases
 

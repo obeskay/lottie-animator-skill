@@ -49,6 +49,7 @@ function parseArgs(argv) {
     width: null,
     strip: true,
     keepFrames: true,
+    onion: false,
   };
   const positional = [];
   for (let i = 0; i < argv.length; i += 1) {
@@ -84,6 +85,9 @@ function parseArgs(argv) {
       case '--strip-only':
         opts.keepFrames = false;
         break;
+      case '--onion':
+        opts.onion = true;
+        break;
       case '-h':
       case '--help':
         console.log(HELP);
@@ -95,6 +99,9 @@ function parseArgs(argv) {
     }
   }
   if (positional.length !== 1) fail('expected exactly one Lottie JSON path', HELP);
+  if (opts.onion && !opts.frames && !argv.includes('--at')) {
+    opts.at = Array.from({ length: 12 }, (_, i) => (i * 100) / 11);
+  }
   opts.input = positional[0];
   return opts;
 }
@@ -108,7 +115,10 @@ const HELP = `Usage: node scripts/render.mjs <file.json> [options]
   --width N       render width in px (default the composition width)
   --scale N       device pixel ratio (default 1)
   --no-strip      skip the contact sheet
-  --strip-only    write only the contact sheet, not the individual frames`;
+  --strip-only    write only the contact sheet, not the individual frames
+  --onion         also write onion.png: sampled frames stacked, oldest faintest.
+                  Spacing between ghosts is the easing; their path is the arc.
+                  Samples 12 frames unless --at or --frames is given.`;
 
 function resolveChrome() {
   for (const candidate of CHROME_CANDIDATES) {
@@ -202,7 +212,7 @@ async function main() {
 
     await page.setContent(
       `<!doctype html><html><head><meta charset="utf-8"><style>
-        html,body{margin:0;padding:0;${backgroundCss(opts.bg)}}
+        html,body{margin:0;padding:0;${backgroundCss(opts.onion ? 'transparent' : opts.bg)}}
         #stage{width:${width}px;height:${height}px}
         #stage svg{display:block}
       </style></head><body><div id="stage"></div></body></html>`,
@@ -247,13 +257,20 @@ async function main() {
 
       const label = `frame-${String(Math.round(frame)).padStart(4, '0')}`;
       const file = path.join(outDir, `${label}.png`);
-      await stage.screenshot({ path: file, omitBackground: opts.bg === 'transparent' });
+      await stage.screenshot({ path: file, omitBackground: opts.onion || opts.bg === 'transparent' });
       results.push({
         frame: Math.round(frame),
         time: ((frame - ip) / fr).toFixed(3),
         file,
         ...drawn,
       });
+    }
+
+    if (opts.onion) {
+      const onionPath = path.join(outDir, 'onion.png');
+      await renderOnion(page, results, { width, height, bg: opts.bg, name: animation.nm || path.basename(inputPath) });
+      await page.screenshot({ path: onionPath, fullPage: true });
+      results.onion = onionPath;
     }
 
     if (opts.strip) {
@@ -353,14 +370,14 @@ async function renderStrip(page, results, { width, height, bg, name }) {
   });
   await page.setContent(
     `<!doctype html><html><head><meta charset="utf-8"><style>
-      body{margin:0;padding:16px;background:#11151f;color:#e6e9f0;
+      body{margin:0;padding:16px;background:#141210;color:#d8d0c3;
         font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
-      h1{font-size:13px;margin:0 0 12px;color:#a855f7;font-weight:600}
+      h1{font-size:13px;margin:0 0 12px;font-weight:600}
       .row{display:flex;gap:16px;align-items:flex-start}
       figure{margin:0}
-      .frame{width:${cellWidth}px;${backgroundCss(bg)};border:1px solid #2a3040;border-radius:4px;overflow:hidden}
+      .frame{width:${cellWidth}px;${backgroundCss(bg)};border:1px solid #2e2a26;border-radius:4px;overflow:hidden}
       .frame img{display:block;width:100%}
-      figcaption{margin-top:6px;color:#8b93a7}
+      figcaption{margin-top:6px;color:#8a8178}
       .empty{color:#f59e0b}
     </style></head><body>
       <h1>${escapeHtml(name)}</h1>
@@ -375,6 +392,33 @@ async function renderStrip(page, results, { width, height, bg, name }) {
             </figcaption></figure>`,
         )
         .join('')}</div></body></html>`,
+    { waitUntil: 'domcontentloaded' },
+  );
+}
+
+async function renderOnion(page, results, { width, height, bg, name }) {
+  const n = results.length;
+  const layers = [];
+  for (let i = 0; i < n; i += 1) {
+    const src = `data:image/png;base64,${(await readFile(results[i].file)).toString('base64')}`;
+    // Quadratic ramp: the last pose reads solid, early ones stay legible but quiet.
+    const opacity = n === 1 ? 1 : 0.1 + 0.9 * (i / (n - 1)) ** 2;
+    layers.push(`<img src="${src}" style="opacity:${opacity.toFixed(3)}">`);
+  }
+  await page.setViewport({ width: width + 32, height: height + 72, deviceScaleFactor: 1 });
+  await page.setContent(
+    `<!doctype html><html><head><meta charset="utf-8"><style>
+      body{margin:0;padding:16px;background:#141210;color:#d8d0c3;
+        font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
+      h1{font-size:13px;margin:0 0 12px;font-weight:600}
+      .stage{position:relative;width:${width}px;height:${height}px;${backgroundCss(bg)};border-radius:4px;overflow:hidden}
+      .stage img{position:absolute;inset:0;width:100%;height:100%}
+      p{margin:8px 0 0;color:#8a8178}
+    </style></head><body>
+      <h1>${escapeHtml(name)} · onion skin</h1>
+      <div class="stage">${layers.join('')}</div>
+      <p>${n} frames, frame ${results[0].frame} faintest to ${results[n - 1].frame} solid</p>
+    </body></html>`,
     { waitUntil: 'domcontentloaded' },
   );
 }
@@ -401,7 +445,8 @@ function report(results, outDir, opts) {
         `${flags.length ? `  <- ${flags.join(', ')}` : ''}`,
     );
   }
-  if (results.strip) console.log(`\nfilmstrip: ${results.strip}`);
+  if (results.onion) console.log(`\nonion skin: ${results.onion}`);
+  if (results.strip) console.log(`${results.onion ? '' : '\n'}filmstrip: ${results.strip}`);
   else console.log(`\nframes in: ${outDir}`);
 
   if (empty.length === results.length) {

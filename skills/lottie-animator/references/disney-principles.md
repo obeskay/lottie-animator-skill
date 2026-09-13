@@ -2,6 +2,9 @@
 
 This reference guides AI agents in applying Disney's classical 12 animation principles directly within Lottie JSON schemas. It maps qualitative design rules to concrete Lottie properties (`ks`, `s`, `p`, `r`, `o`, `ti`, `to`).
 
+> [!IMPORTANT]
+> Staging, timing, arcs, secondary action and follow-through apply in every register. **Squash and stretch, anticipation and exaggeration are playful-register tools**: the house default in [motion-taste.md](motion-taste.md) is zero overshoot and nothing growing from a point. Use them when the brief asks for character or play.
+
 ---
 
 ## 1. Squash and Stretch (Volume Preservation)
@@ -92,7 +95,8 @@ Offset each sibling's first keyframe, and move its `ip` and `st` with it, to cre
 
 ### Spring Easing (Simulated Physics)
 To simulate overlapping drag, apply easing curves with high exit speed and a soft settle (Overshoot):
-- **Overshoot Out Easing**: `o: {"x": [0.34], "y": [1.56]}, i: {"x": [0.64], "y": [1.0]}`
+- **Default**: no overshoot — let siblings settle at different times instead (`out`, staggered 3 frames).
+- **Playful register only**: `o: {"x": [0.34], "y": [1.56]}, i: {"x": [0.64], "y": [1.0]}`
 
 ---
 
@@ -183,4 +187,4 @@ Vector animations are inherently 2D, but we can fake 3D depth to make them feel 
 Animations must have an elegant flow, satisfying timings, and absolute clarity.
 
 - Avoid clutter. Keep the **Simplicity Threshold**: animate at most **two** concurrent properties per layer (e.g. Position + Scale, or Position + Opacity).
-- Ensure color palettes match premium standards: clamp RGB color vectors to balanced, soft pastel or HSL-matched palettes.
+- Hold to one accent colour from a warm, low-chroma palette (`motion.PALETTE`); no purple gradients, no neon on black. See [motion-taste.md](motion-taste.md#art-direction).
