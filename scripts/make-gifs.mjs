@@ -27,13 +27,13 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = join(ROOT, 'assets');
 
 /** Presentation per example: background, frame stride, output width, tail hold (seconds). */
+const PAPER = '#F3EEE6';
 const PRESETS = {
-  'rocket-launch': { bg: '#0d1117', step: 2, width: 280, hold: 0.6 },
-  'logo-draw-on': { bg: '#0d1117', step: 2, width: 280, hold: 0.6 },
-  'shape-morph': { bg: '#0d1117', step: 2, width: 280, hold: 0 },
-  // The panda is a black-and-white character: on the dark card its chest and
-  // ears disappear into the background. It gets a light card, deliberately.
-  'panda-loader': { bg: '#f6f8fa', step: 2, width: 280, hold: 0 },
+  'rocket-launch': { bg: PAPER, step: 2, width: 280, hold: 0.6 },
+  'logo-draw-on': { bg: PAPER, step: 2, width: 280, hold: 0.6 },
+  'shape-morph': { bg: PAPER, step: 2, width: 280, hold: 0 },
+  // Ink art on a dark card vanishes; every example sits on paper.
+  'panda-loader': { bg: PAPER, step: 2, width: 280, hold: 0 },
 };
 
 function sh(cmd, args, opts = {}) {
@@ -62,7 +62,7 @@ function isFlat(png) {
 
 function build(name) {
   const src = join(ROOT, 'examples', `${name}.json`);
-  const preset = PRESETS[name] ?? { bg: '#0d1117', step: 2, width: 280, hold: 0 };
+  const preset = PRESETS[name] ?? { bg: PAPER, step: 2, width: 280, hold: 0 };
   const comp = JSON.parse(readFileSync(src, 'utf8'));
   const ip = Math.round(comp.ip);
   const op = Math.round(comp.op);

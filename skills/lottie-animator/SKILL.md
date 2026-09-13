@@ -32,6 +32,8 @@ python3 scripts/svg2lottie.py logo.svg -o build/logo.json --size 512
 python3 scripts/lottie_lint.py build/logo.json --allow-static
 node scripts/render.mjs build/logo.json
 # then Read the filmstrip PNG it prints and actually look at it
+node scripts/render.mjs build/logo.json --bg "#F3EEE6" --onion
+# the taste pass: Read onion.png and judge the motion, not just the pixels
 ```
 
 The scripts live in this skill's `scripts/` directory; from another project, call
@@ -41,7 +43,10 @@ holds the repository's `package.json`.
 `render.mjs` writes `filmstrip.png`: labelled frames across the timeline, each with a
 shape count and canvas coverage. Read that image. It reports `EMPTY FRAME` when
 nothing paints, `off canvas` when the art has left the frame, and `clipped` when it
-runs past an edge.
+runs past an edge. That proves the animation is not broken. Whether it is good is a
+second look: `--onion` writes `onion.png`, sampled frames stacked oldest-faintest, where
+the spacing between ghosts is the easing and their path is the arc. Judge it against the
+taste pass in [references/motion-taste.md](references/motion-taste.md).
 
 If the tools are unavailable (another repository, no Node), say so and fall back to
 `python3 -c "import json; json.load(open('a.json'))"` — but tell the user the result
@@ -55,7 +60,7 @@ linear/radial gradients into Lottie shape layers. Each element becomes its own n
 layer anchored at its own centre, so scale and rotation pivot correctly.
 
 ```bash
-python3 scripts/svg2lottie.py icon.svg -o icon.json --size 512 --current-color "#a855f7"
+python3 scripts/svg2lottie.py icon.svg -o icon.json --size 512 --current-color "#1E1B18"
 ```
 
 Icon sets paint with `currentColor`; pass `--current-color` or the art comes out
@@ -70,23 +75,27 @@ Answer these before touching a keyframe. It takes thirty seconds and prevents mo
 revision cycles:
 
 1. **Feeling** — what should the viewer feel? (trust, delight, urgency, calm)
-2. **Personality** — pick exactly one: Playful, Premium, Corporate, or Energetic.
-   See [references/motion-personality.md](references/motion-personality.md).
-3. **Hero property** — one of position, scale, rotation, opacity. One. The rest support it.
-4. **Timing** — functional feedback under 150 ms; expressive motion 300–600 ms.
-5. **Easing** — entrance eases out, exit eases in, loop eases in-out.
-6. **Staging** — the hero enters 100–200 ms after its background.
+2. **Register** — quiet and precise unless the brief says otherwise: zero overshoot,
+   nothing grows from a point. Playful, with bounce, only when asked.
+3. **Hero property** — one of position, scale, rotation, opacity, shape. One. The rest
+   support it at under a third of the amplitude.
+4. **Timing** — feedback 6–10 frames at 60 fps, entrances 18–30, stagger 3, and a hold
+   of at least 12 before a loop repeats.
+5. **Easing** — `out` for arrivals, `in-out` for travel and loops, `in` only for exits.
+6. **Palette** — one accent. No purple gradients, no neon on black.
 
-Motion that competes with the subject is noise. Cut it.
+Motion that competes with the subject is noise. Cut it. The full doctrine, the tokens
+and the taste pass are in [references/motion-taste.md](references/motion-taste.md);
+`scripts/motion.py` turns them into keyframes, colours and squircle paths.
 
 ## Technique by intent
 
 | Intent | Technique | Reference |
 |---|---|---|
 | Stroke icon draws itself | Trim path (`tm`) | [shape-modifiers.md](references/shape-modifiers.md) |
-| Logo or button appears | Scale + opacity, overshoot | [disney-principles.md](references/disney-principles.md) |
-| Icon becomes another icon | Path keyframes, equal vertex counts | [professional-techniques.md](references/professional-techniques.md) |
-| Several elements arrive | Staggered `ip` and keyframe offsets | [disney-principles.md](references/disney-principles.md) |
+| Logo or button appears | Opacity + scale from 94%, `out` ease | [motion-taste.md](references/motion-taste.md) |
+| Icon becomes another icon | Path keyframes, equal vertex counts, holds at both rests | [professional-techniques.md](references/professional-techniques.md) |
+| Several elements arrive | 3-frame cascade in keyframes and `ip` | [motion-taste.md](references/motion-taste.md) |
 | Spinner or loader | Rotation 0→360, or trim path offset | [shape-modifiers.md](references/shape-modifiers.md) |
 | Character or mascot | Parenting and bone hierarchy | [professional-techniques.md](references/professional-techniques.md) |
 | Walk or run cycle | Per-pose layers switched via `ip`/`op` | [professional-techniques.md](references/professional-techniques.md) |
@@ -96,14 +105,16 @@ Motion that competes with the subject is noise. Cut it.
 Structure, property names, and worked JSON:
 [lottie-structure.md](references/lottie-structure.md) ·
 [svg-to-lottie.md](references/svg-to-lottie.md) ·
-[bezier-easing.md](references/bezier-easing.md) ·
+[motion-taste.md](references/motion-taste.md) ·
+[disney-principles.md](references/disney-principles.md) ·
 [examples.md](references/examples.md) ·
 [lottie-tools-ecosystem.md](references/lottie-tools-ecosystem.md)
 
 ## Easing
 
 Handles belong **inside a keyframe**, never on the property that holds them. `x` must
-stay within 0–1; `y` may overshoot, and that overshoot is exactly what makes a bounce.
+stay within 0–1; `y` may exceed it, which is how overshoot is made — and why the house
+default keeps `y` within 0–1.
 Handles on keyframe *n* shape the segment from *n* to *n+1* — putting them on the
 wrong keyframe eases the wrong half of the move.
 
@@ -112,13 +123,14 @@ linear. A keyframe without them is not "linear" in lottie-web: the player throws
 while interpolating, the render pass aborts, and the canvas freezes on the previous
 frame with nothing in the console. Hold keyframes (`h: 1`) are the one exception.
 
-| Use | out (`o`) | in (`i`) |
-|---|---|---|
-| Entrance (ease out) | `{"x":[0.33],"y":[0]}` | `{"x":[0.67],"y":[1]}` |
-| Exit (ease in) | `{"x":[0.55],"y":[0.055]}` | `{"x":[0.675],"y":[0.19]}` |
-| Loop (ease in-out) | `{"x":[0.645],"y":[0.045]}` | `{"x":[0.355],"y":[1]}` |
-| Bounce | `{"x":[0.34],"y":[1.56]}` | `{"x":[0.64],"y":[1]}` |
-| Linear (spinners, progress) | `{"x":[0.333],"y":[0.333]}` | `{"x":[0.667],"y":[0.667]}` |
+| Token (`motion.py`) | Use | out (`o`) | in (`i`) |
+|---|---|---|---|
+| `out` | arrivals, feedback | `{"x":[0.23],"y":[1]}` | `{"x":[0.32],"y":[1]}` |
+| `in-out` | travel, morphs, loops | `{"x":[0.77],"y":[0]}` | `{"x":[0.175],"y":[1]}` |
+| `glide` | large surfaces | `{"x":[0.32],"y":[0.72]}` | `{"x":[0],"y":[1]}` |
+| `in` | exits only | `{"x":[0.55],"y":[0]}` | `{"x":[1],"y":[0.45]}` |
+| `linear` | spinners, progress | `{"x":[0.333],"y":[0.333]}` | `{"x":[0.667],"y":[0.667]}` |
+| `playful` | overshoot, on request only | `{"x":[0.34],"y":[1.56]}` | `{"x":[0.64],"y":[1]}` |
 
 ## The defects that render blank
 
@@ -158,6 +170,9 @@ Before saying it is done:
 - `lottie_lint.py` reports no errors (use `--strict` to fail on warnings too).
 - `render.mjs` shows the intended motion at the start, middle, and end.
 - For a loop, the first and last frames match — check the filmstrip, not the numbers.
+- The taste pass in [motion-taste.md](references/motion-taste.md) was run on
+  `onion.png`: spacing eases, long travel arcs, nothing grows from a point, one hero,
+  a readable hold, one accent colour.
 - Nothing is clipped or off canvas unless that was the intent.
 - If the host has a dark mode, render once per background (`--bg`). Art drawn in
   the ink colour disappears on a background of the same value — not low contrast,

@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### Taste
+
+The tools proved an animation was not broken; nothing helped make it good, and the
+shipped examples were the purple gradients and bouncy scale-from-zero entrances that
+read as generated.
+
+- **`references/motion-taste.md`**: the house style. Zero overshoot, nothing grows from
+  a point, one hero property, rests as part of the motion; easing tokens, timing in
+  frames, choreography, art direction, and an eight-question taste pass. Aligned with
+  the Emil Kowalski / smooth-as-butter doctrine. Replaces `motion-personality.md` and
+  `bezier-easing.md`, whose defaults (overshoot on everything, entrances from `[0, 0]`)
+  contradicted it; bounce survives as an opt-in `playful` register.
+- **`scripts/motion.py`**: those defaults as code — `track()` (handles on every
+  keyframe but the last, so `KF012` cannot happen), six easing tokens, a warm palette,
+  `rgba()`, and `squircle()`, a continuous-curvature corner Lottie has no primitive for.
+- **`render.mjs --onion`**: sampled frames stacked oldest-faintest into `onion.png`.
+  The spacing between ghosts is the easing and their path is the arc, which a filmstrip
+  cannot show. The contact sheet chrome is neutral instead of violet.
+- **Examples re-authored** with the tokens: warm palette on paper, cascade entrances,
+  a squircle ↔ circle morph with holds, a draw-on that no longer shows a dot before the
+  stroke starts. `references/examples.md` is regenerated the same way, each composition
+  read as an onion skin first. GIFs rebuilt on paper.
+- `disney-principles.md` marks squash, anticipation and exaggeration as playful-register
+  tools; SKILL.md's easing table is the token table.
+- Three tests pin `motion.py`; the suite is at 112 stdlib-only unit tests.
+
 ### Fixed
 
 - **A keyframe without easing handles froze the render, and the linter called it
@@ -29,7 +55,7 @@
 
 ### Added
 
-- Five linter tests pinning `KF012`; the suite is at 109.
+- Five linter tests pinning `KF012`; the suite was at 109.
 - SKILL.md: render once per background when the host has a dark mode. Art in the ink
   colour disappears on a background of the same value, and only a render shows it.
 
@@ -51,7 +77,7 @@
   static and unrotated, and the covered geometry must fall inside the *inscribed*
   box of the covering shape rather than its bounding box, since an ellipse leaves
   its corners visible. Paths, repeaters, nested groups and anything animated are
-  left alone. Brings the suite to 109 stdlib-only unit tests.
+  left alone. Brings the suite to 112 stdlib-only unit tests.
 - **`scripts/make-gifs.mjs`** — builds the README's animated GIFs from the examples
   using `render.mjs`, so the documentation shows motion rather than stills. Drops the
   leading empty frame an entrance starts on (a flash on every loop) and appends a hold

@@ -1,12 +1,12 @@
 # Lottie Animation Examples
 
-Eight complete compositions to start from. Every one of them is linted by the test suite and was rendered before it was written down, so what you copy is what plays.
+Eight complete compositions, written with `scripts/motion.py` in the house style of [motion-taste.md](motion-taste.md): warm palette, strong ease-out, zero overshoot (the bouncing ball is the labelled exception), holds at rest. Each one is linted by the test suite and was rendered and read as an onion skin before it was written down.
 
-Every keyframe except the last carries `o` and `i` handles, even where the motion is linear. That is not style: a keyframe without them freezes lottie-web mid-render (`KF012`).
+Every keyframe except the last carries `o` and `i` handles, even where the motion is linear. That is not style: a keyframe without them freezes lottie-web mid-render (`KF012`). `track()` does it for you.
 
-## 1. Logo fade + scale entrance
+## 1. Card entrance
 
-The classic entrance: pop in with a small overshoot while fading up. The layer's anchor and position both sit at the centre, so the scale pivots there.
+The house entrance: a squircle card fades up from 94% scale with a strong ease-out and a small rise. Opacity finishes at half the duration, so the card is solid while it settles. No overshoot.
 
 ```json
 {
@@ -14,9 +14,9 @@ The classic entrance: pop in with a small overshoot while fading up. The layer's
   "fr": 60,
   "ip": 0,
   "op": 60,
-  "w": 512,
-  "h": 512,
-  "nm": "Logo Entrance",
+  "w": 320,
+  "h": 240,
+  "nm": "Card Entrance",
   "ddd": 0,
   "assets": [],
   "layers": [
@@ -24,25 +24,30 @@ The classic entrance: pop in with a small overshoot while fading up. The layer's
       "ddd": 0,
       "ty": 4,
       "ind": 1,
-      "nm": "Logo",
+      "nm": "Card",
       "sr": 1,
       "ks": {
         "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {"a": 0, "k": [256, 256, 0]},
+        "p": {
+          "a": 1,
+          "k": [
+            {"t": 0, "s": [160, 128, 0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 28, "s": [160, 120, 0]}
+          ]
+        },
         "s": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [0, 0, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
-            {"t": 30, "s": [105, 105, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-            {"t": 45, "s": [100, 100, 100]}
+            {"t": 0, "s": [94, 94, 100], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 28, "s": [100, 100, 100]}
           ]
         },
         "r": {"a": 0, "k": 0},
         "o": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-            {"t": 30, "s": [100]}
+            {"t": 0, "s": [0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 14, "s": [100]}
           ]
         }
       },
@@ -50,10 +55,36 @@ The classic entrance: pop in with a small overshoot while fading up. The layer's
       "shapes": [
         {
           "ty": "gr",
-          "nm": "Circle",
+          "nm": "Card",
           "it": [
-            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [200, 200]}},
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.2, 0.4, 1, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "sh",
+              "nm": "Path",
+              "ks": {
+                "a": 0,
+                "k": {
+                  "c": true,
+                  "v": [
+                    [53.14, -66.0],
+                    [100.0, -19.14],
+                    [100.0, 19.14],
+                    [53.14, 66.0],
+                    [-53.14, 66.0],
+                    [-100.0, 19.14],
+                    [-100.0, -19.14],
+                    [-53.14, -66.0]
+                  ],
+                  "i": [[0, 0], [0.0, -46.86], [0, 0], [46.86, 0.0], [0, 0], [0.0, 46.86], [0, 0], [-46.86, 0.0]],
+                  "o": [[46.86, 0.0], [0, 0], [0.0, 46.86], [0, 0], [-46.86, 0.0], [0, 0], [0.0, -46.86], [0, 0]]
+                }
+              }
+            },
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.7843, 0.3216, 0.1686, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
@@ -73,19 +104,19 @@ The classic entrance: pop in with a small overshoot while fading up. The layer's
 }
 ```
 
-## 2. Continuous pulse loop
+## 2. Breathing status dot
 
-A status dot that breathes. The last keyframe lands at `op` on the first keyframe's value, so the wrap is seamless.
+An ambient loop: 4% of scale, `in-out`, and a hold at rest on both ends of the cycle so it breathes instead of pulsing.
 
 ```json
 {
   "v": "5.12.1",
   "fr": 60,
   "ip": 0,
-  "op": 60,
-  "w": 200,
-  "h": 200,
-  "nm": "Pulse Loop",
+  "op": 120,
+  "w": 120,
+  "h": 120,
+  "nm": "Status Loop",
   "ddd": 0,
   "assets": [],
   "layers": [
@@ -93,17 +124,19 @@ A status dot that breathes. The last keyframe lands at `op` on the first keyfram
       "ddd": 0,
       "ty": 4,
       "ind": 1,
-      "nm": "Pulse",
+      "nm": "Dot",
       "sr": 1,
       "ks": {
         "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {"a": 0, "k": [100, 100, 0]},
+        "p": {"a": 0, "k": [60, 60, 0]},
         "s": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [100, 100, 100], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 30, "s": [110, 110, 100], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 60, "s": [100, 100, 100]}
+            {"t": 0, "s": [100, 100, 100], "h": 1},
+            {"t": 15, "s": [100, 100, 100], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
+            {"t": 60, "s": [104, 104, 100], "h": 1},
+            {"t": 75, "s": [104, 104, 100], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
+            {"t": 120, "s": [100, 100, 100]}
           ]
         },
         "r": {"a": 0, "k": 0},
@@ -115,85 +148,12 @@ A status dot that breathes. The last keyframe lands at `op` on the first keyfram
           "ty": "gr",
           "nm": "Dot",
           "it": [
-            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [50, 50]}},
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.3, 0.8, 0.4, 1]}, "o": {"a": 0, "k": 100}},
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [36, 36]}},
             {
-              "ty": "tr",
-              "a": {"a": 0, "k": [0, 0]},
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.4353, 0.5059, 0.3882, 1.0]},
               "o": {"a": 0, "k": 100}
-            }
-          ]
-        }
-      ],
-      "ip": 0,
-      "op": 60,
-      "st": 0
-    }
-  ]
-}
-```
-
-## 3. Spinner
-
-A trimmed stroke rotating a full turn. Linear handles are correct here: a spinner must not slow down. 0° and 360° are the same pose, so the loop closes.
-
-```json
-{
-  "v": "5.12.1",
-  "fr": 60,
-  "ip": 0,
-  "op": 120,
-  "w": 100,
-  "h": 100,
-  "nm": "Spinner",
-  "ddd": 0,
-  "assets": [],
-  "layers": [
-    {
-      "ddd": 0,
-      "ty": 4,
-      "ind": 1,
-      "nm": "Spinner",
-      "sr": 1,
-      "ks": {
-        "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {"a": 0, "k": [50, 50, 0]},
-        "s": {"a": 0, "k": [100, 100, 100]},
-        "r": {
-          "a": 1,
-          "k": [
-            {"t": 0, "s": [0], "o": {"x": [0.333], "y": [0.333]}, "i": {"x": [0.667], "y": [0.667]}},
-            {"t": 120, "s": [360]}
-          ]
-        },
-        "o": {"a": 0, "k": 100}
-      },
-      "ao": 0,
-      "shapes": [
-        {
-          "ty": "gr",
-          "nm": "Arc",
-          "it": [
-            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [60, 60]}},
-            {
-              "ty": "st",
-              "nm": "Stroke",
-              "c": {"a": 0, "k": [0.2, 0.4, 1, 1]},
-              "o": {"a": 0, "k": 100},
-              "w": {"a": 0, "k": 4},
-              "lc": 2,
-              "lj": 2
-            },
-            {
-              "ty": "tm",
-              "nm": "Trim",
-              "s": {"a": 0, "k": 0},
-              "e": {"a": 0, "k": 75},
-              "o": {"a": 0, "k": 0},
-              "m": 1
             },
             {
               "ty": "tr",
@@ -214,9 +174,87 @@ A trimmed stroke rotating a full turn. Linear handles are correct here: a spinne
 }
 ```
 
+## 3. Spinner
+
+A trimmed stroke turning at a constant rate. `linear` is right here — a loader must never appear to slow down — and 0° and 360° are the same pose, so the loop closes.
+
+```json
+{
+  "v": "5.12.1",
+  "fr": 60,
+  "ip": 0,
+  "op": 60,
+  "w": 96,
+  "h": 96,
+  "nm": "Spinner",
+  "ddd": 0,
+  "assets": [],
+  "layers": [
+    {
+      "ddd": 0,
+      "ty": 4,
+      "ind": 1,
+      "nm": "Spinner",
+      "sr": 1,
+      "ks": {
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [48, 48, 0]},
+        "s": {"a": 0, "k": [100, 100, 100]},
+        "r": {
+          "a": 1,
+          "k": [
+            {"t": 0, "s": [0], "o": {"x": [0.333], "y": [0.333]}, "i": {"x": [0.667], "y": [0.667]}},
+            {"t": 60, "s": [360]}
+          ]
+        },
+        "o": {"a": 0, "k": 100}
+      },
+      "ao": 0,
+      "shapes": [
+        {
+          "ty": "gr",
+          "nm": "Arc",
+          "it": [
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [56, 56]}},
+            {
+              "ty": "st",
+              "nm": "Stroke",
+              "c": {"a": 0, "k": [0.1176, 0.1059, 0.0941, 1.0]},
+              "o": {"a": 0, "k": 100},
+              "w": {"a": 0, "k": 6},
+              "lc": 2,
+              "lj": 2
+            },
+            {
+              "ty": "tm",
+              "nm": "Trim",
+              "s": {"a": 0, "k": 0},
+              "e": {"a": 0, "k": 28},
+              "o": {"a": 0, "k": 0},
+              "m": 1
+            },
+            {
+              "ty": "tr",
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100}
+            }
+          ]
+        }
+      ],
+      "ip": 0,
+      "op": 60,
+      "st": 0
+    }
+  ]
+}
+```
+
 ## 4. Heartbeat
 
-A lub-dub: two quick beats, a rest, and a small rotational wobble as secondary action. The path came out of `svg2lottie.py`, not from hand-typed tangents.
+A lub-dub: a strong beat, a smaller one, then a long rest. Every move is an `out` or an `in-out`; the rhythm comes from the rest, not from bounce. The path came out of `svg2lottie.py`.
 
 ```json
 {
@@ -226,7 +264,7 @@ A lub-dub: two quick beats, a rest, and a small rotational wobble as secondary a
   "op": 60,
   "w": 200,
   "h": 200,
-  "nm": "Organic Heart",
+  "nm": "Heartbeat Loop",
   "ddd": 0,
   "assets": [],
   "layers": [
@@ -239,26 +277,19 @@ A lub-dub: two quick beats, a rest, and a small rotational wobble as secondary a
       "ks": {
         "a": {"a": 0, "k": [100.0, 100.0, 0]},
         "p": {"a": 0, "k": [100.0, 100.0, 0]},
+        "r": {"a": 0, "k": 0},
+        "o": {"a": 0, "k": 100},
         "s": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [100, 100, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-            {"t": 8, "s": [115, 115, 100], "o": {"x": [0.55], "y": [0.055]}, "i": {"x": [0.675], "y": [0.19]}},
-            {"t": 12, "s": [95, 95, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-            {"t": 18, "s": [105, 105, 100], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 35, "s": [100, 100, 100]}
+            {"t": 0, "s": [100, 100, 100], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 7, "s": [107, 107, 100], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
+            {"t": 14, "s": [100, 100, 100], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 20, "s": [104, 104, 100], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
+            {"t": 30, "s": [100, 100, 100], "h": 1},
+            {"t": 59, "s": [100, 100, 100]}
           ]
-        },
-        "r": {
-          "a": 1,
-          "k": [
-            {"t": 0, "s": [0], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 8, "s": [-2], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 18, "s": [1], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 35, "s": [0]}
-          ]
-        },
-        "o": {"a": 0, "k": 100}
+        }
       },
       "ao": 0,
       "shapes": [
@@ -282,7 +313,7 @@ A lub-dub: two quick beats, a rest, and a small rotational wobble as secondary a
             {
               "ty": "fl",
               "nm": "Fill",
-              "c": {"a": 0, "k": [0.902, 0.2235, 0.2745, 1]},
+              "c": {"a": 0, "k": [0.7843, 0.3216, 0.1686, 1.0]},
               "o": {"a": 0, "k": 100.0},
               "r": 1
             },
@@ -307,9 +338,9 @@ A lub-dub: two quick beats, a rest, and a small rotational wobble as secondary a
 }
 ```
 
-## 5. Bounce with squash and stretch
+## 5. Bouncing ball (playful register)
 
-Ease in on the way down (gravity), ease out on the way up. Scale squashes on contact and overshoots on the rebound; the products stay near 100 × 100 so the volume reads as constant.
+Physics, on request only: gravity eases in on the way down and out on the way up, and the ball squashes on contact with volume preserved (100 × 100 ≈ 118 × 85). This is the one example that overshoots, because the brief would have asked for it.
 
 ```json
 {
@@ -319,7 +350,7 @@ Ease in on the way down (gravity), ease out on the way up. Scale squashes on con
   "op": 60,
   "w": 200,
   "h": 300,
-  "nm": "Bouncy Ball",
+  "nm": "Bouncing Ball",
   "ddd": 0,
   "assets": [],
   "layers": [
@@ -330,23 +361,22 @@ Ease in on the way down (gravity), ease out on the way up. Scale squashes on con
       "nm": "Ball",
       "sr": 1,
       "ks": {
-        "a": {"a": 0, "k": [0, 0, 0]},
+        "a": {"a": 0, "k": [0, 30, 0]},
         "p": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [100, 50, 0], "o": {"x": [0.55], "y": [0.055]}, "i": {"x": [0.675], "y": [0.19]}},
-            {"t": 20, "s": [100, 250, 0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-            {"t": 40, "s": [100, 100, 0], "o": {"x": [0.55], "y": [0.055]}, "i": {"x": [0.675], "y": [0.19]}},
-            {"t": 60, "s": [100, 250, 0]}
+            {"t": 0, "s": [100, 70, 0], "o": {"x": [0.55], "y": [0.0]}, "i": {"x": [1.0], "y": [0.45]}},
+            {"t": 26, "s": [100, 250, 0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 60, "s": [100, 70, 0]}
           ]
         },
         "s": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [100, 100, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-            {"t": 18, "s": [90, 110, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-            {"t": 20, "s": [120, 80, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
-            {"t": 28, "s": [100, 100, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
+            {"t": 0, "s": [100, 100, 100], "o": {"x": [0.55], "y": [0.0]}, "i": {"x": [1.0], "y": [0.45]}},
+            {"t": 24, "s": [94, 106, 100], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 26, "s": [118, 85, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1.0]}},
+            {"t": 36, "s": [100, 100, 100], "h": 1},
             {"t": 60, "s": [100, 100, 100]}
           ]
         },
@@ -360,7 +390,12 @@ Ease in on the way down (gravity), ease out on the way up. Scale squashes on con
           "nm": "Ball",
           "it": [
             {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [60, 60]}},
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [1, 0.5, 0, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.7843, 0.3216, 0.1686, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
@@ -380,9 +415,9 @@ Ease in on the way down (gravity), ease out on the way up. Scale squashes on con
 }
 ```
 
-## 6. Staggered elements
+## 6. Staggered list
 
-Three dots arriving five frames apart. Keyframe times are composition frames, so the delay lives in the keyframes; each layer's `ip` and `st` move with its first keyframe so a dot is not on screen before its entrance begins.
+Three rows arriving 3 frames apart (50 ms) in reading order. Each layer's `ip` moves with its first keyframe so a row is not on screen before its entrance begins.
 
 ```json
 {
@@ -390,8 +425,8 @@ Three dots arriving five frames apart. Keyframe times are composition frames, so
   "fr": 60,
   "ip": 0,
   "op": 90,
-  "w": 400,
-  "h": 100,
+  "w": 320,
+  "h": 220,
   "nm": "Stagger",
   "ddd": 0,
   "assets": [],
@@ -400,29 +435,61 @@ Three dots arriving five frames apart. Keyframe times are composition frames, so
       "ddd": 0,
       "ty": 4,
       "ind": 1,
-      "nm": "Dot 1",
+      "nm": "Row 1",
       "sr": 1,
       "ks": {
         "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {"a": 0, "k": [100, 50, 0]},
-        "s": {
+        "p": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [0, 0, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
-            {"t": 20, "s": [100, 100, 100]}
+            {"t": 0, "s": [160, 70, 0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 24, "s": [160, 60, 0]}
           ]
         },
+        "s": {"a": 0, "k": [100, 100, 100]},
         "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100}
+        "o": {
+          "a": 1,
+          "k": [
+            {"t": 0, "s": [0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 12, "s": [100]}
+          ]
+        }
       },
       "ao": 0,
       "shapes": [
         {
           "ty": "gr",
-          "nm": "Dot",
+          "nm": "Row",
           "it": [
-            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [40, 40]}},
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.55, 0.36, 0.96, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "sh",
+              "nm": "Path",
+              "ks": {
+                "a": 0,
+                "k": {
+                  "c": true,
+                  "v": [
+                    [100.0, -20.0],
+                    [120.0, 0.0],
+                    [120.0, 0.0],
+                    [100.0, 20.0],
+                    [-100.0, 20.0],
+                    [-120.0, 0.0],
+                    [-120.0, 0.0],
+                    [-100.0, -20.0]
+                  ],
+                  "i": [[0, 0], [0.0, -20.0], [0, 0], [20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0]],
+                  "o": [[20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0], [0, 0], [0.0, -20.0], [0, 0]]
+                }
+              }
+            },
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.4353, 0.5059, 0.3882, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
@@ -442,29 +509,61 @@ Three dots arriving five frames apart. Keyframe times are composition frames, so
       "ddd": 0,
       "ty": 4,
       "ind": 2,
-      "nm": "Dot 2",
+      "nm": "Row 2",
       "sr": 1,
       "ks": {
         "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {"a": 0, "k": [200, 50, 0]},
-        "s": {
+        "p": {
           "a": 1,
           "k": [
-            {"t": 5, "s": [0, 0, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
-            {"t": 25, "s": [100, 100, 100]}
+            {"t": 3, "s": [160, 122, 0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 27, "s": [160, 112, 0]}
           ]
         },
+        "s": {"a": 0, "k": [100, 100, 100]},
         "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100}
+        "o": {
+          "a": 1,
+          "k": [
+            {"t": 3, "s": [0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 15, "s": [100]}
+          ]
+        }
       },
       "ao": 0,
       "shapes": [
         {
           "ty": "gr",
-          "nm": "Dot",
+          "nm": "Row",
           "it": [
-            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [40, 40]}},
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.55, 0.36, 0.96, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "sh",
+              "nm": "Path",
+              "ks": {
+                "a": 0,
+                "k": {
+                  "c": true,
+                  "v": [
+                    [100.0, -20.0],
+                    [120.0, 0.0],
+                    [120.0, 0.0],
+                    [100.0, 20.0],
+                    [-100.0, 20.0],
+                    [-120.0, 0.0],
+                    [-120.0, 0.0],
+                    [-100.0, -20.0]
+                  ],
+                  "i": [[0, 0], [0.0, -20.0], [0, 0], [20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0]],
+                  "o": [[20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0], [0, 0], [0.0, -20.0], [0, 0]]
+                }
+              }
+            },
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.8941, 0.851, 0.7765, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
@@ -476,37 +575,69 @@ Three dots arriving five frames apart. Keyframe times are composition frames, so
           ]
         }
       ],
-      "ip": 5,
+      "ip": 3,
       "op": 90,
-      "st": 5
+      "st": 0
     },
     {
       "ddd": 0,
       "ty": 4,
       "ind": 3,
-      "nm": "Dot 3",
+      "nm": "Row 3",
       "sr": 1,
       "ks": {
         "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {"a": 0, "k": [300, 50, 0]},
-        "s": {
+        "p": {
           "a": 1,
           "k": [
-            {"t": 10, "s": [0, 0, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
-            {"t": 30, "s": [100, 100, 100]}
+            {"t": 6, "s": [160, 174, 0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 30, "s": [160, 164, 0]}
           ]
         },
+        "s": {"a": 0, "k": [100, 100, 100]},
         "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100}
+        "o": {
+          "a": 1,
+          "k": [
+            {"t": 6, "s": [0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
+            {"t": 18, "s": [100]}
+          ]
+        }
       },
       "ao": 0,
       "shapes": [
         {
           "ty": "gr",
-          "nm": "Dot",
+          "nm": "Row",
           "it": [
-            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [40, 40]}},
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.55, 0.36, 0.96, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "sh",
+              "nm": "Path",
+              "ks": {
+                "a": 0,
+                "k": {
+                  "c": true,
+                  "v": [
+                    [100.0, -20.0],
+                    [120.0, 0.0],
+                    [120.0, 0.0],
+                    [100.0, 20.0],
+                    [-100.0, 20.0],
+                    [-120.0, 0.0],
+                    [-120.0, 0.0],
+                    [-100.0, -20.0]
+                  ],
+                  "i": [[0, 0], [0.0, -20.0], [0, 0], [20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0]],
+                  "o": [[20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0], [0, 0], [0.0, -20.0], [0, 0]]
+                }
+              }
+            },
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.8941, 0.851, 0.7765, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
@@ -518,27 +649,27 @@ Three dots arriving five frames apart. Keyframe times are composition frames, so
           ]
         }
       ],
-      "ip": 10,
+      "ip": 6,
       "op": 90,
-      "st": 10
+      "st": 0
     }
   ]
 }
 ```
 
-## 7. Liquid fill with a track matte
+## 7. Progress fill with a track matte
 
-A rising rectangle seen through a circular matte. The matte layer (`td: 1`) sits directly above the layer it masks (`tt: 1`); Lottie pairs them by adjacency.
+A level rising inside a squircle matte on a `glide` ease. The matte layer (`td: 1`) sits directly above the layer it masks (`tt: 1`); Lottie pairs them by adjacency.
 
 ```json
 {
   "v": "5.12.1",
   "fr": 60,
   "ip": 0,
-  "op": 120,
+  "op": 90,
   "w": 200,
   "h": 200,
-  "nm": "Liquid Fill",
+  "nm": "Progress Fill",
   "ddd": 0,
   "assets": [],
   "layers": [
@@ -546,7 +677,7 @@ A rising rectangle seen through a circular matte. The matte layer (`td: 1`) sits
       "ddd": 0,
       "ty": 4,
       "ind": 1,
-      "nm": "Matte Circle",
+      "nm": "Matte",
       "sr": 1,
       "ks": {
         "a": {"a": 0, "k": [0, 0, 0]},
@@ -559,10 +690,36 @@ A rising rectangle seen through a circular matte. The matte layer (`td: 1`) sits
       "shapes": [
         {
           "ty": "gr",
-          "nm": "Disc",
+          "nm": "Plate",
           "it": [
-            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [180, 180]}},
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [1, 1, 1, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "sh",
+              "nm": "Path",
+              "ks": {
+                "a": 0,
+                "k": {
+                  "c": true,
+                  "v": [
+                    [4.71, -75.0],
+                    [75.0, -4.71],
+                    [75.0, 4.71],
+                    [4.71, 75.0],
+                    [-4.71, 75.0],
+                    [-75.0, 4.71],
+                    [-75.0, -4.71],
+                    [-4.71, -75.0]
+                  ],
+                  "i": [[0, 0], [0.0, -70.29], [0, 0], [70.29, 0.0], [0, 0], [0.0, 70.29], [0, 0], [-70.29, 0.0]],
+                  "o": [[70.29, 0.0], [0, 0], [0.0, 70.29], [0, 0], [-70.29, 0.0], [0, 0], [0.0, -70.29], [0, 0]]
+                }
+              }
+            },
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.9529, 0.9333, 0.902, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
@@ -575,7 +732,7 @@ A rising rectangle seen through a circular matte. The matte layer (`td: 1`) sits
         }
       ],
       "ip": 0,
-      "op": 120,
+      "op": 90,
       "st": 0,
       "td": 1
     },
@@ -583,15 +740,15 @@ A rising rectangle seen through a circular matte. The matte layer (`td: 1`) sits
       "ddd": 0,
       "ty": 4,
       "ind": 2,
-      "nm": "Liquid",
+      "nm": "Level",
       "sr": 1,
       "ks": {
         "a": {"a": 0, "k": [0, 0, 0]},
         "p": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [100, 330, 0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
-            {"t": 119, "s": [100, 140, 0]}
+            {"t": 0, "s": [100, 290, 0], "o": {"x": [0.32], "y": [0.72]}, "i": {"x": [0.0], "y": [1.0]}},
+            {"t": 60, "s": [100, 140, 0]}
           ]
         },
         "s": {"a": 0, "k": [100, 100, 100]},
@@ -602,16 +759,21 @@ A rising rectangle seen through a circular matte. The matte layer (`td: 1`) sits
       "shapes": [
         {
           "ty": "gr",
-          "nm": "Wave",
+          "nm": "Level",
           "it": [
             {
               "ty": "rc",
               "nm": "Rectangle",
               "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [220, 260]},
+              "s": {"a": 0, "k": [220, 200]},
               "r": {"a": 0, "k": 0}
             },
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.2, 0.6, 1, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.4353, 0.5059, 0.3882, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
@@ -624,27 +786,89 @@ A rising rectangle seen through a circular matte. The matte layer (`td: 1`) sits
         }
       ],
       "ip": 0,
-      "op": 120,
+      "op": 90,
       "st": 0,
       "tt": 1
+    },
+    {
+      "ddd": 0,
+      "ty": 4,
+      "ind": 3,
+      "nm": "Well",
+      "sr": 1,
+      "ks": {
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [100, 100, 0]},
+        "s": {"a": 0, "k": [100, 100, 100]},
+        "r": {"a": 0, "k": 0},
+        "o": {"a": 0, "k": 100}
+      },
+      "ao": 0,
+      "shapes": [
+        {
+          "ty": "gr",
+          "nm": "Well",
+          "it": [
+            {
+              "ty": "sh",
+              "nm": "Path",
+              "ks": {
+                "a": 0,
+                "k": {
+                  "c": true,
+                  "v": [
+                    [4.71, -75.0],
+                    [75.0, -4.71],
+                    [75.0, 4.71],
+                    [4.71, 75.0],
+                    [-4.71, 75.0],
+                    [-75.0, 4.71],
+                    [-75.0, -4.71],
+                    [-4.71, -75.0]
+                  ],
+                  "i": [[0, 0], [0.0, -70.29], [0, 0], [70.29, 0.0], [0, 0], [0.0, 70.29], [0, 0], [-70.29, 0.0]],
+                  "o": [[70.29, 0.0], [0, 0], [0.0, 70.29], [0, 0], [-70.29, 0.0], [0, 0], [0.0, -70.29], [0, 0]]
+                }
+              }
+            },
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.8941, 0.851, 0.7765, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
+            {
+              "ty": "tr",
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100}
+            }
+          ]
+        }
+      ],
+      "ip": 0,
+      "op": 90,
+      "st": 0
     }
   ]
 }
 ```
 
-## 8. Character arm wave (parenting)
+## 8. Arm wave (parenting)
 
-Upper arm → forearm → hand, each parented to the one above and pivoting at its joint. Rotate the shoulder and the whole chain swings. `parent` names the parent's `ind`, not its array position.
+Upper arm → forearm → hand, each parented to the one above and pivoting at its joint, all on `in-out`. The forearm and hand move a third as far as the shoulder and a few degrees behind it — overlap, not wobble. `parent` names the parent's `ind`.
 
 ```json
 {
   "v": "5.12.1",
   "fr": 60,
   "ip": 0,
-  "op": 60,
-  "w": 500,
-  "h": 500,
-  "nm": "Arm Wave",
+  "op": 90,
+  "w": 400,
+  "h": 400,
+  "nm": "Arm Wave Loop",
   "ddd": 0,
   "assets": [],
   "layers": [
@@ -661,9 +885,9 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
         "r": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [-10], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 30, "s": [10], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 60, "s": [-10]}
+            {"t": 0, "s": [-4], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
+            {"t": 45, "s": [4], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
+            {"t": 90, "s": [-4]}
           ]
         },
         "o": {"a": 0, "k": 100}
@@ -675,7 +899,12 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
           "nm": "Hand",
           "it": [
             {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 12]}, "s": {"a": 0, "k": [34, 34]}},
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.96, 0.76, 0.6, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.8941, 0.851, 0.7765, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
@@ -688,7 +917,7 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
         }
       ],
       "ip": 0,
-      "op": 60,
+      "op": 90,
       "st": 0,
       "parent": 2
     },
@@ -700,14 +929,14 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
       "sr": 1,
       "ks": {
         "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {"a": 0, "k": [0, 120, 0]},
+        "p": {"a": 0, "k": [0, 110, 0]},
         "s": {"a": 0, "k": [100, 100, 100]},
         "r": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [5], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 30, "s": [-5], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 60, "s": [5]}
+            {"t": 0, "s": [3], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
+            {"t": 45, "s": [-3], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
+            {"t": 90, "s": [3]}
           ]
         },
         "o": {"a": 0, "k": 100}
@@ -725,7 +954,12 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
               "s": {"a": 0, "k": [26, 100]},
               "r": {"a": 0, "k": 13}
             },
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.2, 0.55, 0.9, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.4353, 0.5059, 0.3882, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
@@ -738,7 +972,7 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
         }
       ],
       "ip": 0,
-      "op": 60,
+      "op": 90,
       "st": 0,
       "parent": 3
     },
@@ -750,14 +984,14 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
       "sr": 1,
       "ks": {
         "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {"a": 0, "k": [250, 200, 0]},
+        "p": {"a": 0, "k": [200, 110, 0]},
         "s": {"a": 0, "k": [100, 100, 100]},
         "r": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [0], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 30, "s": [15], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
-            {"t": 60, "s": [0]}
+            {"t": 0, "s": [0], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
+            {"t": 45, "s": [12], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
+            {"t": 90, "s": [0]}
           ]
         },
         "o": {"a": 0, "k": 100}
@@ -775,7 +1009,12 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
               "s": {"a": 0, "k": [30, 120]},
               "r": {"a": 0, "k": 15}
             },
-            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.15, 0.45, 0.8, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.1176, 0.1059, 0.0941, 1.0]},
+              "o": {"a": 0, "k": 100}
+            },
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
@@ -788,7 +1027,7 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
         }
       ],
       "ip": 0,
-      "op": 60,
+      "op": 90,
       "st": 0
     }
   ]
@@ -797,8 +1036,7 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
 
 ## Using them
 
-1. **Copy and modify.** Change colours, timings and sizes; keep the structure.
-2. **Combine.** Stagger + bounce, matte + trim path.
-3. **Scale.** Adjust `w`, `h` and every position proportionally.
-4. **Retime.** `fr` and `op` set the duration: `(op - ip) / fr` seconds.
-5. **Verify.** `lottie_lint.py`, then `render.mjs`, then look at the filmstrip. Nothing else counts as checked.
+1. **Copy the structure, keep the discipline.** Change colours within one accent, change timings within the table in motion-taste.md.
+2. **Generate rather than type.** `track((t, value, ease), ...)`, `squircle(w, h, r)` and `rgba(PALETTE[...])` from `scripts/motion.py`.
+3. **Retime.** `(op - ip) / fr` seconds. At 30 fps halve every frame count.
+4. **Verify, then judge.** `lottie_lint.py`, `render.mjs`, then `render.mjs --onion` and the taste pass.
