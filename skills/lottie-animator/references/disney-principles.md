@@ -11,7 +11,7 @@ Used to convey weight, speed, and flexibility. When a shape squashes horizontall
 ### Mathematical Volume Rule
 To keep volume looking constant, the product of X and Y scale coordinates must equal approximately `10,000` (representing 100% * 100%).
 
-$$\text{Scale}_X \times \text{Scale}_Y \approx 10,000$$
+`scaleX × scaleY ≈ 10,000`
 
 ### Playful Scale Keyframes (lub-dub impact)
 ```json
@@ -19,8 +19,8 @@ $$\text{Scale}_X \times \text{Scale}_Y \approx 10,000$$
   "a": 1,
   "k": [
     { "t": 0, "s": [100, 100], "o": { "x": [0.34], "y": [1.56] }, "i": { "x": [0.64], "y": [1] } },
-    { "t": 10, "s": [120, 83.3] },  // Stretch: 120 * 83.33 = 10,000
-    { "t": 20, "s": [85, 117.6] },  // Squash: 85 * 117.6 = 10,000
+    { "t": 10, "s": [120, 83.3], "o": { "x": [0.33], "y": [0] }, "i": { "x": [0.67], "y": [1] } },  // Stretch: 120 * 83.33 = 10,000
+    { "t": 20, "s": [85, 117.6], "o": { "x": [0.33], "y": [0] }, "i": { "x": [0.67], "y": [1] } },  // Squash: 85 * 117.6 = 10,000
     { "t": 30, "s": [100, 100] }
   ]
 }
@@ -47,7 +47,7 @@ Before expanding upwards, the button shifts slightly downwards and squishes down
   "a": 1,
   "k": [
     { "t": 0, "s": [256, 256], "o": { "x": [0.5], "y": [-0.1] }, "i": { "x": [0.5], "y": [1] } },
-    { "t": 10, "s": [256, 266] },   // Anticipation: moves 10px down first
+    { "t": 10, "s": [256, 266], "o": { "x": [0.33], "y": [0] }, "i": { "x": [0.67], "y": [1] } },   // Anticipation: moves 10px down first
     { "t": 35, "s": [256, 120] }    // Main Action: shoots up to target y=120
   ]
 }
@@ -80,7 +80,7 @@ For premium wiggles or loaders, use **Straight Ahead** keyframing by calculating
 Follow through means parts of the body continue moving after the main character stops. Overlapping action means different parts move at different rates.
 
 ### Lottie Stagger (Sibling Delay)
-Offset the Start Time (`st`) or In Point (`ip`) of sibling layers to create a flowing entrance.
+Offset each sibling's first keyframe, and move its `ip` and `st` with it, to create a flowing entrance. Keyframe times are composition frames, so the delay lives in the keyframes; `ip`/`st` only keep the layer off screen until then.
 ```json
 // Layer 1: Parent
 { "ind": 1, "nm": "Base Card", "st": 0, "ip": 0 }

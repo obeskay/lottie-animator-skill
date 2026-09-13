@@ -1,6 +1,6 @@
 # Motion Personality & Brand Archetypes in Lottie JSON
 
-This reference defines the four primary motion personality archetypes and outlines how to implement their timing, curves, and characteristics inside Lottie JSON animations. Enforce exactly **one** archetype per animation composition to maintain brand cohesion.
+This reference defines the four primary motion personality archetypes and outlines how to implement their timing, curves, and characteristics inside Lottie JSON animations. Enforce exactly **one** archetype per animation composition to maintain brand cohesion. The curves here are the same ones [bezier-easing.md](bezier-easing.md) and the SKILL.md easing table use; do not invent a fifth.
 
 ---
 
@@ -22,8 +22,8 @@ This reference defines the four primary motion personality archetypes and outlin
   "a": 1,
   "k": [
     { "t": 0, "s": [0, 0], "o": { "x": [0.34], "y": [1.56] }, "i": { "x": [0.64], "y": [1] } },
-    { "t": 12, "s": [115, 87] }, // Overshoot & Volume Squash
-    { "t": 20, "s": [93, 107.5] }, // Rebound Settle
+    { "t": 12, "s": [115, 87], "o": { "x": [0.33], "y": [0] }, "i": { "x": [0.67], "y": [1] } }, // Overshoot & Volume Squash
+    { "t": 20, "s": [93, 107.5], "o": { "x": [0.33], "y": [0] }, "i": { "x": [0.67], "y": [1] } }, // Rebound Settle
     { "t": 28, "s": [100, 100] }
   ]
 }
@@ -94,7 +94,7 @@ This reference defines the four primary motion personality archetypes and outlin
 - **Paths**: Direct straight routes, sharp shifts.
 - **Squash & Stretch**: Permitted for impact emphasis.
 - **Signature Curve**: Explosive exponential ease-out.
-  - **Out/In Tangents**: `o: {"x": [0.15], "y": [1.0]}, i: {"x": [0.15], "y": [1.0]}`
+  - **Out/In Tangents**: `o: {"x": [0.16], "y": [1.0]}, i: {"x": [0.3], "y": [1.0]}` (expo out)
 
 #### Energetic Snap Position & Scale
 ```json
@@ -102,14 +102,14 @@ This reference defines the four primary motion personality archetypes and outlin
   "p": {
     "a": 1,
     "k": [
-      { "t": 0, "s": [256, 400], "o": { "x": [0.15], "y": [1] }, "i": { "x": [0.15], "y": [1] } },
+      { "t": 0, "s": [256, 400], "o": { "x": [0.16], "y": [1] }, "i": { "x": [0.3], "y": [1] } },
       { "t": 10, "s": [256, 256] }
     ]
   },
   "s": {
     "a": 1,
     "k": [
-      { "t": 0, "s": [50, 150], "o": { "x": [0.15], "y": [1] }, "i": { "x": [0.15], "y": [1] } },
+      { "t": 0, "s": [50, 150], "o": { "x": [0.16], "y": [1] }, "i": { "x": [0.3], "y": [1] } },
       { "t": 10, "s": [100, 100] }
     ]
   }

@@ -563,18 +563,31 @@ class Linter:
                     "This motion never plays.",
                 )
 
-        # Easing handles: x must stay inside [0,1] or the curve is not a function
-        # of time. y may overshoot -- that is what produces a bounce.
+        # Every keyframe but the last needs both easing handles unless it is a
+        # hold. lottie-web reads them unconditionally while interpolating, so a
+        # keyframe without them throws inside the render pass; the pass aborts
+        # and the canvas keeps whatever was drawn last. No console error, no
+        # missing layer -- just motion that never happens. Measured on
+        # lottie-web 5.12.2: position and rotation keyframes without handles
+        # produced byte-identical frames at 0%, 50% and 100%.
+        # Handles that are present must have x inside [0,1] or the curve is not
+        # a function of time. y may overshoot -- that is what produces a bounce.
         linear = 0
         for i, kf in enumerate(keyframes[:-1]):
             if kf.get("h"):  # hold keyframe: no interpolation by design
                 continue
-            if kf.get("i") is None or kf.get("o") is None:
-                linear += 1
+            if not isinstance(kf.get("i"), dict) or not isinstance(kf.get("o"), dict):
+                self.add(
+                    "KF012", ERROR, "%s.k[%d]" % (path, i),
+                    "keyframe has no easing handles; lottie-web freezes the render "
+                    "on this segment",
+                    'Every keyframe except the last needs "o" and "i", even for '
+                    'linear motion: "o":{"x":[0.333],"y":[0.333]},'
+                    '"i":{"x":[0.667],"y":[0.667]}. Hold keyframes (h:1) are exempt.',
+                )
+                continue
             for handle in ("i", "o"):
-                spec = kf.get(handle)
-                if spec is None:
-                    continue
+                spec = kf[handle]
                 for axis in ("x", "y"):
                     for value in _as_list(spec.get(axis)):
                         v = _num(value)
@@ -589,6 +602,8 @@ class Linter:
                                 "easing handle x is %g; must be within [0, 1]" % v,
                                 "Only y may overshoot 1 (that is how you get a bounce).",
                             )
+            if _is_linear(kf["o"], kf["i"]):
+                linear += 1
 
         if linear:
             self.linear_properties.append(path)
@@ -915,6 +930,22 @@ def _collect_shape_types(node, out):
     elif isinstance(node, list):
         for value in node:
             _collect_shape_types(value, out)
+
+
+def _is_linear(out_handle, in_handle, tolerance=0.02):
+    """Handles on the diagonal (x == y on every axis) interpolate at a constant rate."""
+    for spec in (out_handle, in_handle):
+        xs = [_num(v) for v in _as_list(spec.get("x"))]
+        ys = [_num(v) for v in _as_list(spec.get("y"))]
+        if not xs or not ys:
+            return False
+        # lottie-web reads a missing axis entry from index 0, so broadcast the same way.
+        for k in range(max(len(xs), len(ys))):
+            x = xs[k] if k < len(xs) else xs[0]
+            y = ys[k] if k < len(ys) else ys[0]
+            if x is None or y is None or abs(x - y) > tolerance:
+                return False
+    return True
 
 
 def _is_rotation(path):

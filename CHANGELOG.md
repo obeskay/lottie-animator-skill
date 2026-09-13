@@ -4,6 +4,37 @@
 
 ### Fixed
 
+- **A keyframe without easing handles froze the render, and the linter called it
+  "linear".** lottie-web reads `o`/`i` unconditionally while interpolating; a keyframe
+  without them throws inside the render pass, the pass aborts, and the canvas keeps the
+  previous frame. No console error, no missing layer. Measured on lottie-web 5.12.2:
+  position and rotation keyframes without handles rendered byte-identical frames at 0%,
+  50% and 100%. It is now `KF012`, an error. `KF007` is kept for handles that are
+  explicitly linear, which is a taste note.
+- **`examples/panda-loader.json` shipped that defect** on the ring's trim path at frame 0.
+  Handles added; the ring now eases both halves of the cycle, and the GIF is rebuilt.
+- **Nine snippets in the references carried bare keyframes** — the spinner, the heart,
+  the arm wave, the walk-cycle shadow, the loader ring, the offset path, the squash, the
+  anticipation and the playful settle. A reader copying any of them would have produced
+  a frozen canvas. `references/examples.md` is regenerated from eight compositions the
+  suite lints, each rendered before being written down (the heart is real geometry from
+  `svg2lottie.py`, the arm and the stagger are complete rather than `[...]`). The other
+  fragments carry handles now, and `tests/test_docs.py` refuses a bare keyframe in any
+  snippet, brace-wrapped fragments included.
+- Easing curves that disagreed between references (Playful, Energetic) now match the
+  table in SKILL.md.
+- `lottie-gsap-integration.md` no longer recommends a `lazy` option lottie-web does not
+  have, nor reaching into `renderer.elements[n].finalTransform`, which is private and
+  breaks between minor versions. The parallax example drives the container instead.
+
+### Added
+
+- Five linter tests pinning `KF012`; the suite is at 109.
+- SKILL.md: render once per background when the host has a dark mode. Art in the ink
+  colour disappears on a background of the same value, and only a render shows it.
+
+#### Earlier in this release
+
 - **`examples/panda-loader.json` painted its own face and then covered it.** The head
   and body groups were authored back-to-front — `Face Base` sat above the pupils,
   eyebrows, blush, nose and mouth, and `Chest & Arms` sat above `White Belly`. Lottie
@@ -20,7 +51,7 @@
   static and unrotated, and the covered geometry must fall inside the *inscribed*
   box of the covering shape rather than its bounding box, since an ellipse leaves
   its corners visible. Paths, repeaters, nested groups and anything animated are
-  left alone. Brings the suite to 104 stdlib-only unit tests.
+  left alone. Brings the suite to 109 stdlib-only unit tests.
 - **`scripts/make-gifs.mjs`** — builds the README's animated GIFs from the examples
   using `render.mjs`, so the documentation shows motion rather than stills. Drops the
   leading empty frame an entrance starts on (a flash on every loop) and appends a hold

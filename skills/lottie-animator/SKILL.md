@@ -34,6 +34,10 @@ node scripts/render.mjs build/logo.json
 # then Read the filmstrip PNG it prints and actually look at it
 ```
 
+The scripts live in this skill's `scripts/` directory; from another project, call
+them by absolute path. The renderer needs `npm install` once, in the directory that
+holds the repository's `package.json`.
+
 `render.mjs` writes `filmstrip.png`: labelled frames across the timeline, each with a
 shape count and canvas coverage. Read that image. It reports `EMPTY FRAME` when
 nothing paints, `off canvas` when the art has left the frame, and `clipped` when it
@@ -103,12 +107,18 @@ stay within 0–1; `y` may overshoot, and that overshoot is exactly what makes a
 Handles on keyframe *n* shape the segment from *n* to *n+1* — putting them on the
 wrong keyframe eases the wrong half of the move.
 
+Every keyframe except the last carries both handles, even when the motion is
+linear. A keyframe without them is not "linear" in lottie-web: the player throws
+while interpolating, the render pass aborts, and the canvas freezes on the previous
+frame with nothing in the console. Hold keyframes (`h: 1`) are the one exception.
+
 | Use | out (`o`) | in (`i`) |
 |---|---|---|
 | Entrance (ease out) | `{"x":[0.33],"y":[0]}` | `{"x":[0.67],"y":[1]}` |
 | Exit (ease in) | `{"x":[0.55],"y":[0.055]}` | `{"x":[0.675],"y":[0.19]}` |
 | Loop (ease in-out) | `{"x":[0.645],"y":[0.045]}` | `{"x":[0.355],"y":[1]}` |
 | Bounce | `{"x":[0.34],"y":[1.56]}` | `{"x":[0.64],"y":[1]}` |
+| Linear (spinners, progress) | `{"x":[0.333],"y":[0.333]}` | `{"x":[0.667],"y":[0.667]}` |
 
 ## The defects that render blank
 
@@ -124,7 +134,8 @@ check. The linter now catches all of them; the tests pin them.
 | Shape draws at zero size | Geometry left loose in `shapes` instead of inside a `gr` group |
 | Art lands in the wrong place | The same offset applied on both the layer transform and the group transform |
 | Visible jump each cycle | First and last keyframe values differ (`KF010`) |
-| Motion feels mechanical | No easing handles; everything interpolates linearly (`KF007`) |
+| Canvas frozen on one frame, no error | A keyframe other than the last has no `o`/`i` handles; lottie-web throws mid-render and the pass aborts (`KF012`) |
+| Motion feels mechanical | Explicit linear handles on everything (`KF007`, a note, not an error) |
 
 Every layer needs `ip`, `op`, and `st`. Miss any one and the layer is hidden at
 every frame.
@@ -148,6 +159,9 @@ Before saying it is done:
 - `render.mjs` shows the intended motion at the start, middle, and end.
 - For a loop, the first and last frames match — check the filmstrip, not the numbers.
 - Nothing is clipped or off canvas unless that was the intent.
+- If the host has a dark mode, render once per background (`--bg`). Art drawn in
+  the ink colour disappears on a background of the same value — not low contrast,
+  invisible — and only the render shows it.
 
 Report what you verified and what you did not. If you could not render it, say that
 plainly instead of implying the motion was checked.

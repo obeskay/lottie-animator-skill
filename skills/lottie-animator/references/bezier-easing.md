@@ -34,7 +34,7 @@ Align easing curves with the selected brand archetype. Do not mix curves from di
 
 | Archetype | Curve Name | Cubic Bezier Points | Lottie OUT Tangents (`o`) | Lottie IN Tangents (`i`) | Rationale |
 |---|---|---|---|---|---|
-| **Playful** | Back Out | `(0.175, 0.885, 0.32, 1.275)` | `{"x": [0.175], "y": [0.885]}` | `{"x": [0.32], "y": [1.275]}` | Reaches destination, overshoots by 27.5%, and settles back |
+| **Playful** | Back Out | `(0.34, 1.56, 0.64, 1)` | `{"x": [0.34], "y": [1.56]}` | `{"x": [0.64], "y": [1]}` | Shoots past the destination and settles back; the `y` above 1 is the overshoot |
 | **Premium** | Luxurious Ease | `(0.4, 0, 0.2, 1)` | `{"x": [0.4], "y": [0.0]}` | `{"x": [0.2], "y": [1.0]}` | Decelerates extremely smoothly with a long, slow settle phase |
 | **Corporate** | Precise Fast | `(0.2, 0, 0, 1)` | `{"x": [0.2], "y": [0.0]}` | `{"x": [0.0], "y": [1.0]}` | Immediate snap response with almost instant deceleration |
 | **Energetic** | Expo Out | `(0.16, 1, 0.3, 1)` | `{"x": [0.16], "y": [1.0]}` | `{"x": [0.3], "y": [1.0]}` | Explosive initial acceleration with quick stabilization |
@@ -46,14 +46,14 @@ Align easing curves with the selected brand archetype. Do not mix curves from di
 Motion duration must scale proportionally with the distance an element travels. A slide of 400px feels incredibly violent and jarring if compressed into the same duration as a subtle 50px hover shift.
 
 ### Distance Scaling Formula
-Let $D$ be the path distance in pixels. Let $T_{\text{base}}$ be the base duration for $100\text{px}$ travel.
-- **Base Distance**: $100\text{px} \rightarrow 1.0\times$ base duration.
-- **Medium Distance**: $200\text{px} \rightarrow 1.3\times$ base duration.
-- **Long Distance**: $400\text{px} \rightarrow 1.6\times$ base duration.
+Let D be the path distance in pixels and T_base the duration for 100 px of travel.
+- 100 px → 1.0× base duration
+- 200 px → 1.3× base duration
+- 400 px → 1.6× base duration
 
 ### Mathematical Scale Equation
 
-$$T_{\text{scale}} = T_{\text{base}} \times \left(\frac{D}{100}\right)^{0.38}$$
+`T = T_base × (D / 100) ^ 0.38`
 
 ### Rationale Table for UI timing
 Use these durations as absolute parameters for elements in your composition:
@@ -107,6 +107,6 @@ To code organic spring dynamics without a real physics engine, chain **three key
 ---
 
 ## Common Mistakes & Quality Rules
-1. **Never use Linear (`[0,0], [1,1]`)** for positional shifts. This looks robotic and cold. Use symmetric curves for loops, and snappy ease-outs for entrances.
+1. **Never use linear handles** for positional shifts; they read as robotic. Use symmetric curves for loops and snappy ease-outs for entrances. Linear is right for spinners, timers and progress bars — and there it is still written explicitly (`0.333/0.333 → 0.667/0.667`), because a keyframe with no handles at all freezes lottie-web.
 2. **Matching start/end curves for loops**: Ensure your loop starting frame tangents match the exit curves of the terminal frame to prevent sharp "hiccups" at the loop boundary.
 3. **Clamping overshoots**: Keep overshoot targets between `105%` and `125%` max. Values above `130%` look sloppy and unstable.

@@ -1,10 +1,12 @@
 # Lottie Animation Examples
 
-Complete examples ready to use as a base for professional animations.
+Eight complete compositions to start from. Every one of them is linted by the test suite and was rendered before it was written down, so what you copy is what plays.
 
-## 1. Logo Fade + Scale Entrance
+Every keyframe except the last carries `o` and `i` handles, even where the motion is linear. That is not style: a keyframe without them freezes lottie-web mid-render (`KF012`).
 
-Classic entrance animation with fade and scale.
+## 1. Logo fade + scale entrance
+
+The classic entrance: pop in with a small overshoot while fading up. The layer's anchor and position both sit at the centre, so the scale pivots there.
 
 ```json
 {
@@ -12,7 +14,6 @@ Classic entrance animation with fade and scale.
   "fr": 60,
   "ip": 0,
   "op": 60,
-  "st": 0,
   "w": 512,
   "h": 512,
   "nm": "Logo Entrance",
@@ -25,80 +26,56 @@ Classic entrance animation with fade and scale.
       "ind": 1,
       "nm": "Logo",
       "sr": 1,
-      "st": 0,
-      "ip": 0,
-      "op": 60,
-      "st": 0,
       "ks": {
-        "a": {"a": 0, "k": [256, 256]},
-        "p": {"a": 0, "k": [256, 256]},
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [256, 256, 0]},
         "s": {
           "a": 1,
           "k": [
-            {
-              "t": 0,
-              "s": [0, 0],
-              "o": {"x": [0.34], "y": [1.56]},
-              "i": {"x": [0.64], "y": [1]}
-            },
-            {
-              "t": 30,
-              "s": [105, 105],
-              "o": {"x": [0.33], "y": [0]},
-              "i": {"x": [0.67], "y": [1]}
-            },
-            {"t": 45, "s": [100, 100]}
+            {"t": 0, "s": [0, 0, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
+            {"t": 30, "s": [105, 105, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
+            {"t": 45, "s": [100, 100, 100]}
           ]
         },
         "r": {"a": 0, "k": 0},
         "o": {
           "a": 1,
           "k": [
-            {
-              "t": 0,
-              "s": [0],
-              "o": {"x": [0.33], "y": [0]},
-              "i": {"x": [0.67], "y": [1]}},
+            {"t": 0, "s": [0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
             {"t": 30, "s": [100]}
           ]
         }
       },
+      "ao": 0,
       "shapes": [
         {
           "ty": "gr",
           "nm": "Circle",
           "it": [
-            {
-              "ty": "el",
-              "nm": "Ellipse",
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [200, 200]}
-            },
-            {
-              "ty": "fl",
-              "nm": "Fill",
-              "c": {"a": 0, "k": [0.2, 0.4, 1, 1]},
-              "o": {"a": 0, "k": 100}
-            },
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [200, 200]}},
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.2, 0.4, 1, 1]}, "o": {"a": 0, "k": 100}},
             {
               "ty": "tr",
               "a": {"a": 0, "k": [0, 0]},
-              "p": {"a": 0, "k": [256, 256]},
+              "p": {"a": 0, "k": [0, 0]},
               "s": {"a": 0, "k": [100, 100]},
               "r": {"a": 0, "k": 0},
               "o": {"a": 0, "k": 100}
             }
           ]
         }
-      ]
+      ],
+      "ip": 0,
+      "op": 60,
+      "st": 0
     }
   ]
 }
 ```
 
-## 2. Continuous Pulse Loop
+## 2. Continuous pulse loop
 
-Infinite pulse loop for indicators or status lights.
+A status dot that breathes. The last keyframe lands at `op` on the first keyframe's value, so the wrap is seamless.
 
 ```json
 {
@@ -106,7 +83,6 @@ Infinite pulse loop for indicators or status lights.
   "fr": 60,
   "ip": 0,
   "op": 60,
-  "st": 0,
   "w": 200,
   "h": 200,
   "nm": "Pulse Loop",
@@ -119,67 +95,50 @@ Infinite pulse loop for indicators or status lights.
       "ind": 1,
       "nm": "Pulse",
       "sr": 1,
-      "st": 0,
-      "ip": 0,
-      "op": 60,
-      "st": 0,
       "ks": {
-        "a": {"a": 0, "k": [100, 100]},
-        "p": {"a": 0, "k": [100, 100]},
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [100, 100, 0]},
         "s": {
           "a": 1,
           "k": [
-            {
-              "t": 0,
-              "s": [100, 100],
-              "o": {"x": [0.645], "y": [0.045]},
-              "i": {"x": [0.355], "y": [1]}
-            },
-            {
-              "t": 30,
-              "s": [110, 110],
-              "o": {"x": [0.645], "y": [0.045]},
-              "i": {"x": [0.355], "y": [1]}
-            },
-            {"t": 60, "s": [100, 100]}
+            {"t": 0, "s": [100, 100, 100], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 30, "s": [110, 110, 100], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 60, "s": [100, 100, 100]}
           ]
         },
         "r": {"a": 0, "k": 0},
         "o": {"a": 0, "k": 100}
       },
+      "ao": 0,
       "shapes": [
         {
           "ty": "gr",
           "nm": "Dot",
           "it": [
-            {
-              "ty": "el",
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [50, 50]}
-            },
-            {
-              "ty": "fl",
-              "c": {"a": 0, "k": [0.3, 0.8, 0.4, 1]},
-              "o": {"a": 0, "k": 100}
-            },
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [50, 50]}},
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.3, 0.8, 0.4, 1]}, "o": {"a": 0, "k": 100}},
             {
               "ty": "tr",
-              "p": {"a": 0, "k": [100, 100]},
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
               "s": {"a": 0, "k": [100, 100]},
               "r": {"a": 0, "k": 0},
               "o": {"a": 0, "k": 100}
             }
           ]
         }
-      ]
+      ],
+      "ip": 0,
+      "op": 60,
+      "st": 0
     }
   ]
 }
 ```
 
-## 3. Continuous Rotation (Spinner)
+## 3. Spinner
 
-Loading spinner with continuous rotation.
+A trimmed stroke rotating a full turn. Linear handles are correct here: a spinner must not slow down. 0° and 360° are the same pose, so the loop closes.
 
 ```json
 {
@@ -199,34 +158,29 @@ Loading spinner with continuous rotation.
       "ind": 1,
       "nm": "Spinner",
       "sr": 1,
-      "st": 0,
-      "ip": 0,
-      "op": 120,
       "ks": {
-        "a": {"a": 0, "k": [50, 50]},
-        "p": {"a": 0, "k": [50, 50]},
-        "s": {"a": 0, "k": [100, 100]},
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [50, 50, 0]},
+        "s": {"a": 0, "k": [100, 100, 100]},
         "r": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [0]},
+            {"t": 0, "s": [0], "o": {"x": [0.333], "y": [0.333]}, "i": {"x": [0.667], "y": [0.667]}},
             {"t": 120, "s": [360]}
           ]
         },
         "o": {"a": 0, "k": 100}
       },
+      "ao": 0,
       "shapes": [
         {
           "ty": "gr",
           "nm": "Arc",
           "it": [
-            {
-              "ty": "el",
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [60, 60]}
-            },
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [60, 60]}},
             {
               "ty": "st",
+              "nm": "Stroke",
               "c": {"a": 0, "k": [0.2, 0.4, 1, 1]},
               "o": {"a": 0, "k": 100},
               "w": {"a": 0, "k": 4},
@@ -235,28 +189,34 @@ Loading spinner with continuous rotation.
             },
             {
               "ty": "tm",
+              "nm": "Trim",
               "s": {"a": 0, "k": 0},
               "e": {"a": 0, "k": 75},
-              "o": {"a": 0, "k": 0}
+              "o": {"a": 0, "k": 0},
+              "m": 1
             },
             {
               "ty": "tr",
-              "p": {"a": 0, "k": [50, 50]},
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
               "s": {"a": 0, "k": [100, 100]},
               "r": {"a": 0, "k": 0},
               "o": {"a": 0, "k": 100}
             }
           ]
         }
-      ]
+      ],
+      "ip": 0,
+      "op": 120,
+      "st": 0
     }
   ]
 }
 ```
 
-## 4. Advance Heart Beat (Organic)
+## 4. Heartbeat
 
-A realistic heart beat beat with "Lub-Dub" rhythm and secondary action.
+A lub-dub: two quick beats, a rest, and a small rotational wobble as secondary action. The path came out of `svg2lottie.py`, not from hand-typed tangents.
 
 ```json
 {
@@ -264,7 +224,6 @@ A realistic heart beat beat with "Lub-Dub" rhythm and secondary action.
   "fr": 60,
   "ip": 0,
   "op": 60,
-  "st": 0,
   "w": 200,
   "h": 200,
   "nm": "Organic Heart",
@@ -275,47 +234,82 @@ A realistic heart beat beat with "Lub-Dub" rhythm and secondary action.
       "ddd": 0,
       "ty": 4,
       "ind": 1,
-      "nm": "HeartShape",
+      "nm": "Heart",
       "sr": 1,
-      "st": 0,
-      "ip": 0,
-      "op": 60,
-      "st": 0,
       "ks": {
-        "a": {"a": 0, "k": [100, 100]},
-        "p": {"a": 0, "k": [100, 100]},
+        "a": {"a": 0, "k": [100.0, 100.0, 0]},
+        "p": {"a": 0, "k": [100.0, 100.0, 0]},
         "s": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [100, 100], "o": {"x": [0.17], "y": [0.17]}, "i": {"x": [0.83], "y": [0.83]}},
-            {"t": 8, "s": [115, 115], "o": {"x": [0.17], "y": [0.17]}, "i": {"x": [0.83], "y": [0.83]}}, 
-            {"t": 12, "s": [95, 95], "o": {"x": [0.17], "y": [0.17]}, "i": {"x": [0.83], "y": [0.83]}},
-            {"t": 18, "s": [105, 105], "o": {"x": [0.17], "y": [0.17]}, "i": {"x": [0.83], "y": [0.83]}},
-            {"t": 35, "s": [100, 100]}
+            {"t": 0, "s": [100, 100, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
+            {"t": 8, "s": [115, 115, 100], "o": {"x": [0.55], "y": [0.055]}, "i": {"x": [0.675], "y": [0.19]}},
+            {"t": 12, "s": [95, 95, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
+            {"t": 18, "s": [105, 105, 100], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 35, "s": [100, 100, 100]}
           ]
         },
         "r": {
-           "a": 1, 
-           "k": [
-             {"t": 0, "s": [0]},
-             {"t": 8, "s": [-2]},
-             {"t": 18, "s": [1]},
-             {"t": 35, "s": [0]}
-           ]
+          "a": 1,
+          "k": [
+            {"t": 0, "s": [0], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 8, "s": [-2], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 18, "s": [1], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 35, "s": [0]}
+          ]
         },
         "o": {"a": 0, "k": 100}
       },
+      "ao": 0,
       "shapes": [
-        // ... (Path definition for Heart) ...
-      ]
+        {
+          "ty": "gr",
+          "nm": "path 1",
+          "it": [
+            {
+              "ty": "sh",
+              "nm": "Path",
+              "ks": {
+                "a": 0,
+                "k": {
+                  "i": [[42.0, -30.0], [0.0, 42.0], [-22.0, 0.0], [-7.0, -16.0], [-17.0, 0.0], [0.0, -26.0]],
+                  "o": [[-42.0, -30.0], [0.0, -26.0], [17.0, 0.0], [7.0, -16.0], [22.0, 0.0], [0.0, 42.0]],
+                  "v": [[100.0, 172.0], [18.0, 70.0], [62.0, 28.0], [100.0, 54.0], [138.0, 28.0], [182.0, 70.0]],
+                  "c": true
+                }
+              }
+            },
+            {
+              "ty": "fl",
+              "nm": "Fill",
+              "c": {"a": 0, "k": [0.902, 0.2235, 0.2745, 1]},
+              "o": {"a": 0, "k": 100.0},
+              "r": 1
+            },
+            {
+              "ty": "tr",
+              "p": {"a": 0, "k": [0, 0]},
+              "a": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100},
+              "sk": {"a": 0, "k": 0},
+              "sa": {"a": 0, "k": 0}
+            }
+          ]
+        }
+      ],
+      "ip": 0,
+      "op": 60,
+      "st": 0
     }
   ]
 }
 ```
 
-## 5. Bounce with Squash & Stretch
+## 5. Bounce with squash and stretch
 
-Organic animation with deformation.
+Ease in on the way down (gravity), ease out on the way up. Scale squashes on contact and overshoots on the rebound; the products stay near 100 × 100 so the volume reads as constant.
 
 ```json
 {
@@ -323,7 +317,6 @@ Organic animation with deformation.
   "fr": 60,
   "ip": 0,
   "op": 60,
-  "st": 0,
   "w": 200,
   "h": 300,
   "nm": "Bouncy Ball",
@@ -336,101 +329,60 @@ Organic animation with deformation.
       "ind": 1,
       "nm": "Ball",
       "sr": 1,
-      "st": 0,
-      "ip": 0,
-      "op": 60,
-      "st": 0,
       "ks": {
-        "a": {"a": 0, "k": [100, 250]},
+        "a": {"a": 0, "k": [0, 0, 0]},
         "p": {
           "a": 1,
           "k": [
-            {
-              "t": 0,
-              "s": [100, 50],
-              "o": {"x": [0.55], "y": [0.055]},
-              "i": {"x": [0.675], "y": [0.19]}
-            },
-            {
-              "t": 20,
-              "s": [100, 250],
-              "o": {"x": [0.33], "y": [0]},
-              "i": {"x": [0.67], "y": [1]}
-            },
-            {
-              "t": 40,
-              "s": [100, 100],
-              "o": {"x": [0.55], "y": [0.055]},
-              "i": {"x": [0.675], "y": [0.19]}
-            },
-            {"t": 60, "s": [100, 250]}
+            {"t": 0, "s": [100, 50, 0], "o": {"x": [0.55], "y": [0.055]}, "i": {"x": [0.675], "y": [0.19]}},
+            {"t": 20, "s": [100, 250, 0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
+            {"t": 40, "s": [100, 100, 0], "o": {"x": [0.55], "y": [0.055]}, "i": {"x": [0.675], "y": [0.19]}},
+            {"t": 60, "s": [100, 250, 0]}
           ]
         },
         "s": {
           "a": 1,
           "k": [
-            {
-              "t": 0,
-              "s": [100, 100],
-              "o": {"x": [0.33], "y": [0]},
-              "i": {"x": [0.67], "y": [1]}
-            },
-            {
-              "t": 18,
-              "s": [90, 110],
-              "o": {"x": [0.33], "y": [0]},
-              "i": {"x": [0.67], "y": [1]}
-            },
-            {
-              "t": 20,
-              "s": [120, 80],
-              "o": {"x": [0.34], "y": [1.56]},
-              "i": {"x": [0.64], "y": [1]}
-            },
-            {
-              "t": 28,
-              "s": [100, 100],
-              "o": {"x": [0.33], "y": [0]},
-              "i": {"x": [0.67], "y": [1]}
-            },
-            {"t": 60, "s": [100, 100]}
+            {"t": 0, "s": [100, 100, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
+            {"t": 18, "s": [90, 110, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
+            {"t": 20, "s": [120, 80, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
+            {"t": 28, "s": [100, 100, 100], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
+            {"t": 60, "s": [100, 100, 100]}
           ]
         },
         "r": {"a": 0, "k": 0},
         "o": {"a": 0, "k": 100}
       },
+      "ao": 0,
       "shapes": [
         {
           "ty": "gr",
+          "nm": "Ball",
           "it": [
-            {
-              "ty": "el",
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [60, 60]}
-            },
-            {
-              "ty": "fl",
-              "c": {"a": 0, "k": [1, 0.5, 0, 1]},
-              "o": {"a": 0, "k": 100}
-            },
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [60, 60]}},
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [1, 0.5, 0, 1]}, "o": {"a": 0, "k": 100}},
             {
               "ty": "tr",
-              "p": {"a": 0, "k": [100, 250]},
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
               "s": {"a": 0, "k": [100, 100]},
               "r": {"a": 0, "k": 0},
               "o": {"a": 0, "k": 100}
             }
           ]
         }
-      ]
+      ],
+      "ip": 0,
+      "op": 60,
+      "st": 0
     }
   ]
 }
 ```
 
-## 6. Staggered Elements
+## 6. Staggered elements
 
-Multiple elements with staggered delays.
+Three dots arriving five frames apart. Keyframe times are composition frames, so the delay lives in the keyframes; each layer's `ip` and `st` move with its first keyframe so a dot is not on screen before its entrance begins.
 
 ```json
 {
@@ -449,46 +401,134 @@ Multiple elements with staggered delays.
       "ty": 4,
       "ind": 1,
       "nm": "Dot 1",
-      "st": 0,
-      "ip": 0,
-      "op": 90,
+      "sr": 1,
       "ks": {
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [100, 50, 0]},
         "s": {
           "a": 1,
           "k": [
-            {"t": 0, "s": [0, 0], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
-            {"t": 20, "s": [100, 100]}
+            {"t": 0, "s": [0, 0, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
+            {"t": 20, "s": [100, 100, 100]}
+          ]
+        },
+        "r": {"a": 0, "k": 0},
+        "o": {"a": 0, "k": 100}
+      },
+      "ao": 0,
+      "shapes": [
+        {
+          "ty": "gr",
+          "nm": "Dot",
+          "it": [
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [40, 40]}},
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.55, 0.36, 0.96, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "tr",
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100}
+            }
           ]
         }
-      },
-      "shapes": [...]
+      ],
+      "ip": 0,
+      "op": 90,
+      "st": 0
     },
     {
       "ddd": 0,
       "ty": 4,
       "ind": 2,
       "nm": "Dot 2",
-      "st": 5, // 5 frame offset
-      "ip": 5,
-      "op": 90,
+      "sr": 1,
       "ks": {
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [200, 50, 0]},
         "s": {
           "a": 1,
           "k": [
-            {"t": 5, "s": [0, 0], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
-            {"t": 25, "s": [100, 100]}
+            {"t": 5, "s": [0, 0, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
+            {"t": 25, "s": [100, 100, 100]}
+          ]
+        },
+        "r": {"a": 0, "k": 0},
+        "o": {"a": 0, "k": 100}
+      },
+      "ao": 0,
+      "shapes": [
+        {
+          "ty": "gr",
+          "nm": "Dot",
+          "it": [
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [40, 40]}},
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.55, 0.36, 0.96, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "tr",
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100}
+            }
           ]
         }
+      ],
+      "ip": 5,
+      "op": 90,
+      "st": 5
+    },
+    {
+      "ddd": 0,
+      "ty": 4,
+      "ind": 3,
+      "nm": "Dot 3",
+      "sr": 1,
+      "ks": {
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [300, 50, 0]},
+        "s": {
+          "a": 1,
+          "k": [
+            {"t": 10, "s": [0, 0, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1]}},
+            {"t": 30, "s": [100, 100, 100]}
+          ]
+        },
+        "r": {"a": 0, "k": 0},
+        "o": {"a": 0, "k": 100}
       },
-      "shapes": [...]
+      "ao": 0,
+      "shapes": [
+        {
+          "ty": "gr",
+          "nm": "Dot",
+          "it": [
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [40, 40]}},
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.55, 0.36, 0.96, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "tr",
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100}
+            }
+          ]
+        }
+      ],
+      "ip": 10,
+      "op": 90,
+      "st": 10
     }
   ]
 }
 ```
 
-## 7. Organic Loader with Matte (Liquid Fill)
+## 7. Liquid fill with a track matte
 
-Simulates a liquid filling a circle using a Track Matte.
+A rising rectangle seen through a circular matte. The matte layer (`td: 1`) sits directly above the layer it masks (`tt: 1`); Lottie pairs them by adjacency.
 
 ```json
 {
@@ -504,43 +544,16 @@ Simulates a liquid filling a circle using a Track Matte.
   "layers": [
     {
       "ddd": 0,
-      "ind": 1,
       "ty": 4,
-      "nm": "Matte_Circle",
+      "ind": 1,
+      "nm": "Matte Circle",
       "sr": 1,
       "ks": {
-        "o": {
-          "a": 0,
-          "k": 100
-        },
-        "r": {
-          "a": 0,
-          "k": 0
-        },
-        "p": {
-          "a": 0,
-          "k": [
-            100,
-            100,
-            0
-          ]
-        },
-        "a": {
-          "a": 0,
-          "k": [
-            0,
-            0,
-            0
-          ]
-        },
-        "s": {
-          "a": 0,
-          "k": [
-            100,
-            100,
-            100
-          ]
-        }
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [100, 100, 0]},
+        "s": {"a": 0, "k": [100, 100, 100]},
+        "r": {"a": 0, "k": 0},
+        "o": {"a": 0, "k": 100}
       },
       "ao": 0,
       "shapes": [
@@ -548,80 +561,15 @@ Simulates a liquid filling a circle using a Track Matte.
           "ty": "gr",
           "nm": "Disc",
           "it": [
-            {
-              "ty": "el",
-              "nm": "Disc",
-              "p": {
-                "a": 0,
-                "k": [
-                  0,
-                  0
-                ]
-              },
-              "s": {
-                "a": 0,
-                "k": [
-                  180,
-                  180
-                ]
-              }
-            },
-            {
-              "ty": "fl",
-              "nm": "Fill",
-              "c": {
-                "a": 0,
-                "k": [
-                  1,
-                  1,
-                  1,
-                  1
-                ]
-              },
-              "o": {
-                "a": 0,
-                "k": 100
-              }
-            },
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [180, 180]}},
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [1, 1, 1, 1]}, "o": {"a": 0, "k": 100}},
             {
               "ty": "tr",
-              "p": {
-                "a": 0,
-                "k": [
-                  0,
-                  0
-                ]
-              },
-              "a": {
-                "a": 0,
-                "k": [
-                  0,
-                  0
-                ]
-              },
-              "s": {
-                "a": 0,
-                "k": [
-                  100,
-                  100
-                ]
-              },
-              "r": {
-                "a": 0,
-                "k": 0
-              },
-              "o": {
-                "a": 0,
-                "k": 100
-              },
-              "sk": {
-                "a": 0,
-                "k": 0
-              },
-              "sa": {
-                "a": 0,
-                "k": 0
-              }
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100}
             }
           ]
         }
@@ -629,77 +577,26 @@ Simulates a liquid filling a circle using a Track Matte.
       "ip": 0,
       "op": 120,
       "st": 0,
-      "bm": 0,
       "td": 1
     },
     {
       "ddd": 0,
-      "ind": 2,
       "ty": 4,
-      "nm": "Liquid_Wave",
+      "ind": 2,
+      "nm": "Liquid",
       "sr": 1,
       "ks": {
-        "o": {
-          "a": 0,
-          "k": 100
-        },
-        "r": {
-          "a": 0,
-          "k": 0
-        },
+        "a": {"a": 0, "k": [0, 0, 0]},
         "p": {
           "a": 1,
           "k": [
-            {
-              "t": 0,
-              "s": [
-                100,
-                330,
-                0
-              ],
-              "o": {
-                "x": [
-                  0.33
-                ],
-                "y": [
-                  0
-                ]
-              },
-              "i": {
-                "x": [
-                  0.67
-                ],
-                "y": [
-                  1
-                ]
-              }
-            },
-            {
-              "t": 119,
-              "s": [
-                100,
-                140,
-                0
-              ]
-            }
+            {"t": 0, "s": [100, 330, 0], "o": {"x": [0.33], "y": [0]}, "i": {"x": [0.67], "y": [1]}},
+            {"t": 119, "s": [100, 140, 0]}
           ]
         },
-        "a": {
-          "a": 0,
-          "k": [
-            0,
-            0,
-            0
-          ]
-        },
-        "s": {
-          "a": 0,
-          "k": [
-            100,
-            100,
-            100
-          ]
-        }
+        "s": {"a": 0, "k": [100, 100, 100]},
+        "r": {"a": 0, "k": 0},
+        "o": {"a": 0, "k": 100}
       },
       "ao": 0,
       "shapes": [
@@ -709,82 +606,19 @@ Simulates a liquid filling a circle using a Track Matte.
           "it": [
             {
               "ty": "rc",
-              "nm": "Wave",
-              "p": {
-                "a": 0,
-                "k": [
-                  0,
-                  0
-                ]
-              },
-              "s": {
-                "a": 0,
-                "k": [
-                  220,
-                  260
-                ]
-              },
-              "r": {
-                "a": 0,
-                "k": 0
-              }
+              "nm": "Rectangle",
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [220, 260]},
+              "r": {"a": 0, "k": 0}
             },
-            {
-              "ty": "fl",
-              "nm": "Fill",
-              "c": {
-                "a": 0,
-                "k": [
-                  0.2,
-                  0.6,
-                  1,
-                  1
-                ]
-              },
-              "o": {
-                "a": 0,
-                "k": 100
-              }
-            },
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.2, 0.6, 1, 1]}, "o": {"a": 0, "k": 100}},
             {
               "ty": "tr",
-              "p": {
-                "a": 0,
-                "k": [
-                  0,
-                  0
-                ]
-              },
-              "a": {
-                "a": 0,
-                "k": [
-                  0,
-                  0
-                ]
-              },
-              "s": {
-                "a": 0,
-                "k": [
-                  100,
-                  100
-                ]
-              },
-              "r": {
-                "a": 0,
-                "k": 0
-              },
-              "o": {
-                "a": 0,
-                "k": 100
-              },
-              "sk": {
-                "a": 0,
-                "k": 0
-              },
-              "sa": {
-                "a": 0,
-                "k": 0
-              }
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100}
             }
           ]
         }
@@ -792,16 +626,15 @@ Simulates a liquid filling a circle using a Track Matte.
       "ip": 0,
       "op": 120,
       "st": 0,
-      "bm": 0,
       "tt": 1
     }
   ]
 }
 ```
 
-## 8. Character Arm Wave (Parenting)
+## 8. Character arm wave (parenting)
 
-Hierarchical animation: Body -> Upper Arm -> Forearm -> Hand.
+Upper arm → forearm → hand, each parented to the one above and pivoting at its joint. Rotate the shoulder and the whole chain swings. `parent` names the parent's `ind`, not its array position.
 
 ```json
 {
@@ -809,7 +642,6 @@ Hierarchical animation: Body -> Upper Arm -> Forearm -> Hand.
   "fr": 60,
   "ip": 0,
   "op": 60,
-  "st": 0,
   "w": 500,
   "h": 500,
   "nm": "Arm Wave",
@@ -817,94 +649,156 @@ Hierarchical animation: Body -> Upper Arm -> Forearm -> Hand.
   "assets": [],
   "layers": [
     {
+      "ddd": 0,
+      "ty": 4,
       "ind": 1,
       "nm": "Hand",
-      "ty": 4,
+      "sr": 1,
+      "ks": {
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [0, 100, 0]},
+        "s": {"a": 0, "k": [100, 100, 100]},
+        "r": {
+          "a": 1,
+          "k": [
+            {"t": 0, "s": [-10], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 30, "s": [10], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 60, "s": [-10]}
+          ]
+        },
+        "o": {"a": 0, "k": 100}
+      },
+      "ao": 0,
+      "shapes": [
+        {
+          "ty": "gr",
+          "nm": "Hand",
+          "it": [
+            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 12]}, "s": {"a": 0, "k": [34, 34]}},
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.96, 0.76, 0.6, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "tr",
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100}
+            }
+          ]
+        }
+      ],
       "ip": 0,
       "op": 60,
       "st": 0,
-      "parent": 2,
-      "ks": {
-        "a": {"a": 0, "k": [0, 0]},
-        "p": {"a": 0, "k": [0, 100]}, 
-        "r": {
-           "a": 1,
-           "k": [
-              {"t": 0, "s": [-10]},
-              {"t": 30, "s": [10]},
-              {"t": 60, "s": [-10]}
-           ]
-        },
-        "s": {"a": 0, "k": [100, 100]},
-        "o": {"a": 0, "k": 100}
-      },
-      "shapes": [ ... ]   // your shape group here
+      "parent": 2
     },
     {
+      "ddd": 0,
+      "ty": 4,
       "ind": 2,
       "nm": "Forearm",
-      "ty": 4,
+      "sr": 1,
+      "ks": {
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [0, 120, 0]},
+        "s": {"a": 0, "k": [100, 100, 100]},
+        "r": {
+          "a": 1,
+          "k": [
+            {"t": 0, "s": [5], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 30, "s": [-5], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 60, "s": [5]}
+          ]
+        },
+        "o": {"a": 0, "k": 100}
+      },
+      "ao": 0,
+      "shapes": [
+        {
+          "ty": "gr",
+          "nm": "Forearm",
+          "it": [
+            {
+              "ty": "rc",
+              "nm": "Rectangle",
+              "p": {"a": 0, "k": [0, 50]},
+              "s": {"a": 0, "k": [26, 100]},
+              "r": {"a": 0, "k": 13}
+            },
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.2, 0.55, 0.9, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "tr",
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100}
+            }
+          ]
+        }
+      ],
       "ip": 0,
       "op": 60,
       "st": 0,
-      "parent": 3,
-      "ks": {
-        "a": {"a": 0, "k": [0, 0]},
-        "p": {"a": 0, "k": [0, 120]}, 
-        "r": {
-           "a": 1,
-           "k": [
-              {"t": 0, "s": [5]},
-              {"t": 30, "s": [-5]},
-              {"t": 60, "s": [5]}
-           ]
-        },
-        "s": {"a": 0, "k": [100, 100]},
-        "o": {"a": 0, "k": 100}
-      },
-      "shapes": [ ... ]   // your shape group here
+      "parent": 3
     },
     {
-      "ind": 3,
-      "nm": "UpperArm",
+      "ddd": 0,
       "ty": 4,
-      "ip": 0,
-      "op": 60,
-      "st": 0,
+      "ind": 3,
+      "nm": "Upper Arm",
+      "sr": 1,
       "ks": {
-        "a": {"a": 0, "k": [0, 0]},
-        "p": {"a": 0, "k": [250, 250]}, 
+        "a": {"a": 0, "k": [0, 0, 0]},
+        "p": {"a": 0, "k": [250, 200, 0]},
+        "s": {"a": 0, "k": [100, 100, 100]},
         "r": {
-           "a": 1,
-           "k": [
-              {"t": 0, "s": [0]},
-              {"t": 30, "s": [15]},
-              {"t": 60, "s": [0]}
-           ]
+          "a": 1,
+          "k": [
+            {"t": 0, "s": [0], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 30, "s": [15], "o": {"x": [0.645], "y": [0.045]}, "i": {"x": [0.355], "y": [1]}},
+            {"t": 60, "s": [0]}
+          ]
         },
-        "s": {"a": 0, "k": [100, 100]},
         "o": {"a": 0, "k": 100}
       },
-      "shapes": [ ... ]   // your shape group here
+      "ao": 0,
+      "shapes": [
+        {
+          "ty": "gr",
+          "nm": "Upper Arm",
+          "it": [
+            {
+              "ty": "rc",
+              "nm": "Rectangle",
+              "p": {"a": 0, "k": [0, 60]},
+              "s": {"a": 0, "k": [30, 120]},
+              "r": {"a": 0, "k": 15}
+            },
+            {"ty": "fl", "nm": "Fill", "c": {"a": 0, "k": [0.15, 0.45, 0.8, 1]}, "o": {"a": 0, "k": 100}},
+            {
+              "ty": "tr",
+              "a": {"a": 0, "k": [0, 0]},
+              "p": {"a": 0, "k": [0, 0]},
+              "s": {"a": 0, "k": [100, 100]},
+              "r": {"a": 0, "k": 0},
+              "o": {"a": 0, "k": 100}
+            }
+          ]
+        }
+      ],
+      "ip": 0,
+      "op": 60,
+      "st": 0
     }
   ]
 }
 ```
 
-## Tips for Using Examples
+## Using them
 
-1. **Copy and Modify**: Use these as a base and adjust colors, timings, sizes.
-2. **Combine**: Mix techniques (e.g., Stagger + Bounce).
-3. **Scale**: Adjust `w`, `h` and positions proportionally.
-4. **Timing**: Modify `fr` and `op` to change duration.
-5. **Validate**: Always verify in [LottieFiles Preview](https://lottiefiles.com/preview).
-
-## Duration Conversion
-
-```
-Duration (seconds) = (op - ip) / fr
-
-Example:
-- fr: 60, ip: 0, op: 120
-- Duration = 120 / 60 = 2 seconds
-```
+1. **Copy and modify.** Change colours, timings and sizes; keep the structure.
+2. **Combine.** Stagger + bounce, matte + trim path.
+3. **Scale.** Adjust `w`, `h` and every position proportionally.
+4. **Retime.** `fr` and `op` set the duration: `(op - ip) / fr` seconds.
+5. **Verify.** `lottie_lint.py`, then `render.mjs`, then look at the filmstrip. Nothing else counts as checked.
