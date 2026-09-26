@@ -204,7 +204,9 @@ fill keeps the fill from being swallowed by a thick contour.
 ### A coherent palette
 
 Five or six colours is usually enough for a character. Keep one dark tone for
-every outline so the silhouette stays consistent.
+every outline so the silhouette stays consistent. Derive them from palette roles rather
+than fixing hex values, and the rig re-skins with `--palette`; `examples/panda-loader.py`
+shows a character that stays a panda on light and dark grounds.
 
 ```json
 {

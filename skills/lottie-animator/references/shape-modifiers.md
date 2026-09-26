@@ -1,14 +1,17 @@
 # Shape Modifiers
 
 Modifiers transform the geometry that precedes them **inside the same group**. Order
-matters: a modifier only sees the shape items listed before it in `it`.
+matters between a modifier and its paths: a modifier only sees the shape items listed
+before it in `it`.
 
 ```
-"it": [ sh (paths) , tm (modifier) , st/fl (paint) , tr (transform) ]
+"it": [ sh (paths) , st/fl (paint) , tm (modifier) , tr (transform) ]
 ```
 
-Put the modifier after the paths it should affect and before the paint. A trim path
-placed after the stroke, or in a different group, silently does nothing.
+Whether the modifier sits before or after the paint makes no difference: both orders
+render identically in lottie-web, and After Effects exports put the trim after the
+stroke. A modifier listed *before* its path, though, silently does nothing. With
+`scripts/motion.py`: `group("Check", *svg(d), stroke(ink, 12), trim(0, 40))`.
 
 ---
 

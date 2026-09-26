@@ -596,6 +596,11 @@ def walk(element, inherited_style, inherited_matrix, out, warnings):
 
 
 def convert(svg_text, size=None, fps=60, frames=60, name=None, current_color=None):
+    """SVG text -> (Lottie document, warnings). `current_color` is what
+    currentColor paints: any CSS colour string ("#1E1B18") or an (r, g, b)
+    triple in 0..1."""
+    if isinstance(current_color, str):
+        current_color = parse_color(current_color)
     try:
         root = ET.fromstring(svg_text)
     except ET.ParseError as error:

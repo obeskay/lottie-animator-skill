@@ -1,15 +1,16 @@
 {
   "name": "lottie-animator-skill",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
-  "description": "Tooling for the Lottie Animator skill: headless rendering and visual inspection.",
+  "description": "Tooling for the Lottie Animator skill: headless rendering, GIFs and visual inspection.",
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "lint": "python3 scripts/lottie_lint.py examples/",
+    "lint": "python3 scripts/lottie_lint.py examples/ --strict",
     "test": "python3 -m unittest discover -s tests -v",
     "render": "node scripts/render.mjs",
-    "gifs": "node scripts/make-gifs.mjs"
+    "gifs": "node scripts/make-gifs.mjs",
+    "examples": "for f in examples/*.py; do python3 \"$f\" >/dev/null || exit 1; done"
   },
   "devDependencies": {
     "lottie-web": "5.13.0",

@@ -194,24 +194,15 @@ Full reference of the Lottie specification for professional animation generation
 }
 ```
 
-## Transition Presets
+## Easing
 
-Based on standard motion graphics principles:
+Use the house tokens rather than hand-typed handles: `out` for arrivals, `in-out` for
+travel and loops, `glide` for large surfaces, `in` for exits, `linear` for constant
+rotation, `playful` only when overshoot is asked for. The values and when to use each
+are in [motion-taste.md](motion-taste.md); `track()` in `scripts/motion.py` writes them,
+on every keyframe but the last:
 
 ```json
-// Linear
-"o": {"x": [0.33], "y": [0.33]},
-"i": {"x": [0.67], "y": [0.67]}
-
-// Ease (smooth)
-"o": {"x": [0.33], "y": [0]},
-"i": {"x": [0.67], "y": [1]}
-
-// Fast (snappy)
-"o": {"x": [0.17], "y": [0.33]},
-"i": {"x": [0.83], "y": [0.67]}
-
-// Overshoot (springy)
-"o": {"x": [0.67], "y": [-0.33]},
-"i": {"x": [0.33], "y": [1.33]}
+"o": {"x": [0.23], "y": [1]},
+"i": {"x": [0.32], "y": [1]}
 ```

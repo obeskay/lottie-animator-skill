@@ -1,10 +1,60 @@
-# Lottie Animation Examples
+# Recipes
 
-Eight complete compositions, written with `scripts/motion.py` in the house style of [motion-taste.md](motion-taste.md): warm palette, strong ease-out, zero overshoot (the bouncing ball is the labelled exception), holds at rest. Each one is linted by the test suite and was rendered and read as an onion skin before it was written down.
+Twenty-two generators live in `examples/` (linked beside this skill as `examples/`).
+Each writes one finished animation, and each was rendered, read as a filmstrip and an
+onion skin, and revised before it shipped. Start from the nearest one: the timing, the
+easing and the structure are already right.
 
-Every keyframe except the last carries `o` and `i` handles, even where the motion is linear. That is not style: a keyframe without them freezes lottie-web mid-render (`KF012`). `track()` does it for you.
+Each generator's docstring states its brief — the feeling, the register, the hero
+property — and `build(c)` takes a palette by role, so any of them renders in any of the
+nine palettes (`--palette NAME`). The table says what each one is worth stealing.
 
-## 1. Card entrance
+| Recipe | Palette | What it shows |
+|---|---|---|
+| [`success-check`](../../../examples/success-check.py) | `forest` | Disc settles, check writes itself, one quiet ripple. |
+| [`error-shake`](../../../examples/error-shake.py) | `mono` | Disc settles, X writes itself, then one crisp decaying shake. |
+| [`heart-like`](../../../examples/heart-like.py) | `berry` | Press, pop, burst: the one playful example, labelled as such. |
+| [`notification-bell`](../../../examples/notification-bell.py) | `citrus` | One ring that swings itself still, the clapper a beat behind. |
+| [`toggle-switch`](../../../examples/toggle-switch.py) | `night` | Off, on, off: the knob and both colours move on one curve. |
+| [`lock-unlock`](../../../examples/lock-unlock.py) | `sky` | The shackle lifts free and the colour follows; then it locks again. |
+| [`play-pause`](../../../examples/play-pause.py) | `dusk` | Each half of the play triangle squares off into a pause bar, and back. |
+| [`shape-morph`](../../../examples/shape-morph.py) | `sky` | A squircle softens into a circle and back, a quarter turn per cycle. |
+| [`spinner-arc`](../../../examples/spinner-arc.py) | `mono` | Head leads, tail follows, the ring turns: a seamless indeterminate spinner. |
+| [`typing-dots`](../../../examples/typing-dots.py) | `harbor` | A three-dot wave with a rest, so it reads as typing. |
+| [`panda-loader`](../../../examples/panda-loader.py) | `paper` | A panda chews bamboo inside a slow, breathing loading ring. |
+| [`download-progress`](../../../examples/download-progress.py) | `harbor` | Arrow into tray, a ring that fills at an uneven pace, then a check. |
+| [`battery-charge`](../../../examples/battery-charge.py) | `forest` | Charge climbs in eased steps, the bolt settles, then it drains. |
+| [`equalizer`](../../../examples/equalizer.py) | `night` | Five bars, each on its own tempo, bass slow and treble quick. |
+| [`location-ping`](../../../examples/location-ping.py) | `dusk` | A still pin; rings spread across the ground, thin and fade. |
+| [`weather-sun`](../../../examples/weather-sun.py) | `sky` | Rays turn slowly while a cloud drifts across the sun and back. |
+| [`paper-plane`](../../../examples/paper-plane.py) | `paper` | A paper plane cruises in on a curve, turning with it, and leaves a dashed trail. |
+| [`confetti-burst`](../../../examples/confetti-burst.py) | `berry` | Playful but restrained: one pop, fourteen pieces on ballistic arcs. |
+| [`card-stack`](../../../examples/card-stack.py) | `mono` | Three cards settle back to front; the content writes in; the chip lands last. |
+| [`logo-draw-on`](../../../examples/logo-draw-on.py) | `paper` | An SVG mark writes its lines; the sun rises out of the horizon, last. |
+| [`rocket-launch`](../../../examples/rocket-launch.py) | `paper` | An SVG icon, converted part by part, assembles and lifts off its own axis. |
+| [`bouncing-ball`](../../../examples/bouncing-ball.py) | `citrus` | Playful: squash and stretch at constant volume, spaced by gravity. |
+
+## Adapting a recipe
+
+1. **Read the brief first.** The docstring names the one idea that makes it work; keep
+   that idea when the geometry changes.
+2. **Copy, then point `sys.path` at this skill's `scripts/`.** Change geometry and beats;
+   keep the tokens (`track`, `delay`, the easing names) and the colour roles.
+3. **Retime in frames.** `(op - ip) / fr` seconds. Loops close exactly: first and last
+   values equal, cycle lengths that divide the loop.
+4. **Verify, then judge.** `lottie_lint.py --strict`, `render.mjs`, then
+   `render.mjs --onion` and the taste pass in [motion-taste.md](motion-taste.md), on
+   your palette and on a dark one.
+
+## Raw JSON, for reading and repair
+
+Three complete compositions, as the builders emit them. Read them to learn the
+structure of a file made elsewhere before repairing it; to make something new, start
+from a recipe instead. Every keyframe except the last carries `o` and `i` handles, even
+where the motion is linear: a keyframe without them freezes lottie-web mid-render
+(`KF012`).
+
+### Card entrance
 
 The house entrance: a squircle card fades up from 94% scale with a strong ease-out and a small rise. Opacity finishes at half the duration, so the card is solid while it settles. No overshoot.
 
@@ -104,560 +154,7 @@ The house entrance: a squircle card fades up from 94% scale with a strong ease-o
 }
 ```
 
-## 2. Breathing status dot
-
-An ambient loop: 4% of scale, `in-out`, and a hold at rest on both ends of the cycle so it breathes instead of pulsing.
-
-```json
-{
-  "v": "5.12.1",
-  "fr": 60,
-  "ip": 0,
-  "op": 120,
-  "w": 120,
-  "h": 120,
-  "nm": "Status Loop",
-  "ddd": 0,
-  "assets": [],
-  "layers": [
-    {
-      "ddd": 0,
-      "ty": 4,
-      "ind": 1,
-      "nm": "Dot",
-      "sr": 1,
-      "ks": {
-        "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {"a": 0, "k": [60, 60, 0]},
-        "s": {
-          "a": 1,
-          "k": [
-            {"t": 0, "s": [100, 100, 100], "h": 1},
-            {"t": 15, "s": [100, 100, 100], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
-            {"t": 60, "s": [104, 104, 100], "h": 1},
-            {"t": 75, "s": [104, 104, 100], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
-            {"t": 120, "s": [100, 100, 100]}
-          ]
-        },
-        "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100}
-      },
-      "ao": 0,
-      "shapes": [
-        {
-          "ty": "gr",
-          "nm": "Dot",
-          "it": [
-            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [36, 36]}},
-            {
-              "ty": "fl",
-              "nm": "Fill",
-              "c": {"a": 0, "k": [0.4353, 0.5059, 0.3882, 1.0]},
-              "o": {"a": 0, "k": 100}
-            },
-            {
-              "ty": "tr",
-              "a": {"a": 0, "k": [0, 0]},
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
-              "o": {"a": 0, "k": 100}
-            }
-          ]
-        }
-      ],
-      "ip": 0,
-      "op": 120,
-      "st": 0
-    }
-  ]
-}
-```
-
-## 3. Spinner
-
-A trimmed stroke turning at a constant rate. `linear` is right here — a loader must never appear to slow down — and 0° and 360° are the same pose, so the loop closes.
-
-```json
-{
-  "v": "5.12.1",
-  "fr": 60,
-  "ip": 0,
-  "op": 60,
-  "w": 96,
-  "h": 96,
-  "nm": "Spinner",
-  "ddd": 0,
-  "assets": [],
-  "layers": [
-    {
-      "ddd": 0,
-      "ty": 4,
-      "ind": 1,
-      "nm": "Spinner",
-      "sr": 1,
-      "ks": {
-        "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {"a": 0, "k": [48, 48, 0]},
-        "s": {"a": 0, "k": [100, 100, 100]},
-        "r": {
-          "a": 1,
-          "k": [
-            {"t": 0, "s": [0], "o": {"x": [0.333], "y": [0.333]}, "i": {"x": [0.667], "y": [0.667]}},
-            {"t": 60, "s": [360]}
-          ]
-        },
-        "o": {"a": 0, "k": 100}
-      },
-      "ao": 0,
-      "shapes": [
-        {
-          "ty": "gr",
-          "nm": "Arc",
-          "it": [
-            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [56, 56]}},
-            {
-              "ty": "st",
-              "nm": "Stroke",
-              "c": {"a": 0, "k": [0.1176, 0.1059, 0.0941, 1.0]},
-              "o": {"a": 0, "k": 100},
-              "w": {"a": 0, "k": 6},
-              "lc": 2,
-              "lj": 2
-            },
-            {
-              "ty": "tm",
-              "nm": "Trim",
-              "s": {"a": 0, "k": 0},
-              "e": {"a": 0, "k": 28},
-              "o": {"a": 0, "k": 0},
-              "m": 1
-            },
-            {
-              "ty": "tr",
-              "a": {"a": 0, "k": [0, 0]},
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
-              "o": {"a": 0, "k": 100}
-            }
-          ]
-        }
-      ],
-      "ip": 0,
-      "op": 60,
-      "st": 0
-    }
-  ]
-}
-```
-
-## 4. Heartbeat
-
-A lub-dub: a strong beat, a smaller one, then a long rest. Every move is an `out` or an `in-out`; the rhythm comes from the rest, not from bounce. The path came out of `svg2lottie.py`.
-
-```json
-{
-  "v": "5.12.1",
-  "fr": 60,
-  "ip": 0,
-  "op": 60,
-  "w": 200,
-  "h": 200,
-  "nm": "Heartbeat Loop",
-  "ddd": 0,
-  "assets": [],
-  "layers": [
-    {
-      "ddd": 0,
-      "ty": 4,
-      "ind": 1,
-      "nm": "Heart",
-      "sr": 1,
-      "ks": {
-        "a": {"a": 0, "k": [100.0, 100.0, 0]},
-        "p": {"a": 0, "k": [100.0, 100.0, 0]},
-        "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100},
-        "s": {
-          "a": 1,
-          "k": [
-            {"t": 0, "s": [100, 100, 100], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
-            {"t": 7, "s": [107, 107, 100], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
-            {"t": 14, "s": [100, 100, 100], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
-            {"t": 20, "s": [104, 104, 100], "o": {"x": [0.77], "y": [0.0]}, "i": {"x": [0.175], "y": [1.0]}},
-            {"t": 30, "s": [100, 100, 100], "h": 1},
-            {"t": 59, "s": [100, 100, 100]}
-          ]
-        }
-      },
-      "ao": 0,
-      "shapes": [
-        {
-          "ty": "gr",
-          "nm": "path 1",
-          "it": [
-            {
-              "ty": "sh",
-              "nm": "Path",
-              "ks": {
-                "a": 0,
-                "k": {
-                  "i": [[42.0, -30.0], [0.0, 42.0], [-22.0, 0.0], [-7.0, -16.0], [-17.0, 0.0], [0.0, -26.0]],
-                  "o": [[-42.0, -30.0], [0.0, -26.0], [17.0, 0.0], [7.0, -16.0], [22.0, 0.0], [0.0, 42.0]],
-                  "v": [[100.0, 172.0], [18.0, 70.0], [62.0, 28.0], [100.0, 54.0], [138.0, 28.0], [182.0, 70.0]],
-                  "c": true
-                }
-              }
-            },
-            {
-              "ty": "fl",
-              "nm": "Fill",
-              "c": {"a": 0, "k": [0.7843, 0.3216, 0.1686, 1.0]},
-              "o": {"a": 0, "k": 100.0},
-              "r": 1
-            },
-            {
-              "ty": "tr",
-              "p": {"a": 0, "k": [0, 0]},
-              "a": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
-              "o": {"a": 0, "k": 100},
-              "sk": {"a": 0, "k": 0},
-              "sa": {"a": 0, "k": 0}
-            }
-          ]
-        }
-      ],
-      "ip": 0,
-      "op": 60,
-      "st": 0
-    }
-  ]
-}
-```
-
-## 5. Bouncing ball (playful register)
-
-Physics, on request only: gravity eases in on the way down and out on the way up, and the ball squashes on contact with volume preserved (100 × 100 ≈ 118 × 85). This is the one example that overshoots, because the brief would have asked for it.
-
-```json
-{
-  "v": "5.12.1",
-  "fr": 60,
-  "ip": 0,
-  "op": 60,
-  "w": 200,
-  "h": 300,
-  "nm": "Bouncing Ball",
-  "ddd": 0,
-  "assets": [],
-  "layers": [
-    {
-      "ddd": 0,
-      "ty": 4,
-      "ind": 1,
-      "nm": "Ball",
-      "sr": 1,
-      "ks": {
-        "a": {"a": 0, "k": [0, 30, 0]},
-        "p": {
-          "a": 1,
-          "k": [
-            {"t": 0, "s": [100, 70, 0], "o": {"x": [0.55], "y": [0.0]}, "i": {"x": [1.0], "y": [0.45]}},
-            {"t": 26, "s": [100, 250, 0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
-            {"t": 60, "s": [100, 70, 0]}
-          ]
-        },
-        "s": {
-          "a": 1,
-          "k": [
-            {"t": 0, "s": [100, 100, 100], "o": {"x": [0.55], "y": [0.0]}, "i": {"x": [1.0], "y": [0.45]}},
-            {"t": 24, "s": [94, 106, 100], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
-            {"t": 26, "s": [118, 85, 100], "o": {"x": [0.34], "y": [1.56]}, "i": {"x": [0.64], "y": [1.0]}},
-            {"t": 36, "s": [100, 100, 100], "h": 1},
-            {"t": 60, "s": [100, 100, 100]}
-          ]
-        },
-        "r": {"a": 0, "k": 0},
-        "o": {"a": 0, "k": 100}
-      },
-      "ao": 0,
-      "shapes": [
-        {
-          "ty": "gr",
-          "nm": "Ball",
-          "it": [
-            {"ty": "el", "nm": "Ellipse", "p": {"a": 0, "k": [0, 0]}, "s": {"a": 0, "k": [60, 60]}},
-            {
-              "ty": "fl",
-              "nm": "Fill",
-              "c": {"a": 0, "k": [0.7843, 0.3216, 0.1686, 1.0]},
-              "o": {"a": 0, "k": 100}
-            },
-            {
-              "ty": "tr",
-              "a": {"a": 0, "k": [0, 0]},
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
-              "o": {"a": 0, "k": 100}
-            }
-          ]
-        }
-      ],
-      "ip": 0,
-      "op": 60,
-      "st": 0
-    }
-  ]
-}
-```
-
-## 6. Staggered list
-
-Three rows arriving 3 frames apart (50 ms) in reading order. Each layer's `ip` moves with its first keyframe so a row is not on screen before its entrance begins.
-
-```json
-{
-  "v": "5.12.1",
-  "fr": 60,
-  "ip": 0,
-  "op": 90,
-  "w": 320,
-  "h": 220,
-  "nm": "Stagger",
-  "ddd": 0,
-  "assets": [],
-  "layers": [
-    {
-      "ddd": 0,
-      "ty": 4,
-      "ind": 1,
-      "nm": "Row 1",
-      "sr": 1,
-      "ks": {
-        "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {
-          "a": 1,
-          "k": [
-            {"t": 0, "s": [160, 70, 0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
-            {"t": 24, "s": [160, 60, 0]}
-          ]
-        },
-        "s": {"a": 0, "k": [100, 100, 100]},
-        "r": {"a": 0, "k": 0},
-        "o": {
-          "a": 1,
-          "k": [
-            {"t": 0, "s": [0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
-            {"t": 12, "s": [100]}
-          ]
-        }
-      },
-      "ao": 0,
-      "shapes": [
-        {
-          "ty": "gr",
-          "nm": "Row",
-          "it": [
-            {
-              "ty": "sh",
-              "nm": "Path",
-              "ks": {
-                "a": 0,
-                "k": {
-                  "c": true,
-                  "v": [
-                    [100.0, -20.0],
-                    [120.0, 0.0],
-                    [120.0, 0.0],
-                    [100.0, 20.0],
-                    [-100.0, 20.0],
-                    [-120.0, 0.0],
-                    [-120.0, 0.0],
-                    [-100.0, -20.0]
-                  ],
-                  "i": [[0, 0], [0.0, -20.0], [0, 0], [20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0]],
-                  "o": [[20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0], [0, 0], [0.0, -20.0], [0, 0]]
-                }
-              }
-            },
-            {
-              "ty": "fl",
-              "nm": "Fill",
-              "c": {"a": 0, "k": [0.4353, 0.5059, 0.3882, 1.0]},
-              "o": {"a": 0, "k": 100}
-            },
-            {
-              "ty": "tr",
-              "a": {"a": 0, "k": [0, 0]},
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
-              "o": {"a": 0, "k": 100}
-            }
-          ]
-        }
-      ],
-      "ip": 0,
-      "op": 90,
-      "st": 0
-    },
-    {
-      "ddd": 0,
-      "ty": 4,
-      "ind": 2,
-      "nm": "Row 2",
-      "sr": 1,
-      "ks": {
-        "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {
-          "a": 1,
-          "k": [
-            {"t": 3, "s": [160, 122, 0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
-            {"t": 27, "s": [160, 112, 0]}
-          ]
-        },
-        "s": {"a": 0, "k": [100, 100, 100]},
-        "r": {"a": 0, "k": 0},
-        "o": {
-          "a": 1,
-          "k": [
-            {"t": 3, "s": [0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
-            {"t": 15, "s": [100]}
-          ]
-        }
-      },
-      "ao": 0,
-      "shapes": [
-        {
-          "ty": "gr",
-          "nm": "Row",
-          "it": [
-            {
-              "ty": "sh",
-              "nm": "Path",
-              "ks": {
-                "a": 0,
-                "k": {
-                  "c": true,
-                  "v": [
-                    [100.0, -20.0],
-                    [120.0, 0.0],
-                    [120.0, 0.0],
-                    [100.0, 20.0],
-                    [-100.0, 20.0],
-                    [-120.0, 0.0],
-                    [-120.0, 0.0],
-                    [-100.0, -20.0]
-                  ],
-                  "i": [[0, 0], [0.0, -20.0], [0, 0], [20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0]],
-                  "o": [[20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0], [0, 0], [0.0, -20.0], [0, 0]]
-                }
-              }
-            },
-            {
-              "ty": "fl",
-              "nm": "Fill",
-              "c": {"a": 0, "k": [0.8941, 0.851, 0.7765, 1.0]},
-              "o": {"a": 0, "k": 100}
-            },
-            {
-              "ty": "tr",
-              "a": {"a": 0, "k": [0, 0]},
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
-              "o": {"a": 0, "k": 100}
-            }
-          ]
-        }
-      ],
-      "ip": 3,
-      "op": 90,
-      "st": 0
-    },
-    {
-      "ddd": 0,
-      "ty": 4,
-      "ind": 3,
-      "nm": "Row 3",
-      "sr": 1,
-      "ks": {
-        "a": {"a": 0, "k": [0, 0, 0]},
-        "p": {
-          "a": 1,
-          "k": [
-            {"t": 6, "s": [160, 174, 0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
-            {"t": 30, "s": [160, 164, 0]}
-          ]
-        },
-        "s": {"a": 0, "k": [100, 100, 100]},
-        "r": {"a": 0, "k": 0},
-        "o": {
-          "a": 1,
-          "k": [
-            {"t": 6, "s": [0], "o": {"x": [0.23], "y": [1.0]}, "i": {"x": [0.32], "y": [1.0]}},
-            {"t": 18, "s": [100]}
-          ]
-        }
-      },
-      "ao": 0,
-      "shapes": [
-        {
-          "ty": "gr",
-          "nm": "Row",
-          "it": [
-            {
-              "ty": "sh",
-              "nm": "Path",
-              "ks": {
-                "a": 0,
-                "k": {
-                  "c": true,
-                  "v": [
-                    [100.0, -20.0],
-                    [120.0, 0.0],
-                    [120.0, 0.0],
-                    [100.0, 20.0],
-                    [-100.0, 20.0],
-                    [-120.0, 0.0],
-                    [-120.0, 0.0],
-                    [-100.0, -20.0]
-                  ],
-                  "i": [[0, 0], [0.0, -20.0], [0, 0], [20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0]],
-                  "o": [[20.0, 0.0], [0, 0], [0.0, 20.0], [0, 0], [-20.0, 0.0], [0, 0], [0.0, -20.0], [0, 0]]
-                }
-              }
-            },
-            {
-              "ty": "fl",
-              "nm": "Fill",
-              "c": {"a": 0, "k": [0.8941, 0.851, 0.7765, 1.0]},
-              "o": {"a": 0, "k": 100}
-            },
-            {
-              "ty": "tr",
-              "a": {"a": 0, "k": [0, 0]},
-              "p": {"a": 0, "k": [0, 0]},
-              "s": {"a": 0, "k": [100, 100]},
-              "r": {"a": 0, "k": 0},
-              "o": {"a": 0, "k": 100}
-            }
-          ]
-        }
-      ],
-      "ip": 6,
-      "op": 90,
-      "st": 0
-    }
-  ]
-}
-```
-
-## 7. Progress fill with a track matte
+### Progress fill with a track matte
 
 A level rising inside a squircle matte on a `glide` ease. The matte layer (`td: 1`) sits directly above the layer it masks (`tt: 1`); Lottie pairs them by adjacency.
 
@@ -856,7 +353,7 @@ A level rising inside a squircle matte on a `glide` ease. The matte layer (`td: 
 }
 ```
 
-## 8. Arm wave (parenting)
+### Arm wave (parenting)
 
 Upper arm → forearm → hand, each parented to the one above and pivoting at its joint, all on `in-out`. The forearm and hand move a third as far as the shoulder and a few degrees behind it — overlap, not wobble. `parent` names the parent's `ind`.
 
@@ -1033,10 +530,3 @@ Upper arm → forearm → hand, each parented to the one above and pivoting at i
   ]
 }
 ```
-
-## Using them
-
-1. **Copy the structure, keep the discipline.** Change colours within one accent, change timings within the table in motion-taste.md.
-2. **Generate rather than type.** `track((t, value, ease), ...)`, `squircle(w, h, r)` and `rgba(PALETTE[...])` from `scripts/motion.py`.
-3. **Retime.** `(op - ip) / fr` seconds. At 30 fps halve every frame count.
-4. **Verify, then judge.** `lottie_lint.py`, `render.mjs`, then `render.mjs --onion` and the taste pass.

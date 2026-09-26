@@ -14,9 +14,10 @@
  */
 import { createRequire } from 'node:module';
 import { mkdir, readFile, writeFile, rm } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { pathToFileURL } from 'node:url';
 
 const require = createRequire(import.meta.url);
 
@@ -44,7 +45,7 @@ function parseArgs(argv) {
     at: [0, 25, 50, 75, 100],
     frames: null,
     out: null,
-    bg: 'checker',
+    bg: null,
     scale: 1,
     width: null,
     strip: true,
@@ -111,7 +112,8 @@ const HELP = `Usage: node scripts/render.mjs <file.json> [options]
   --at A,B,C      timeline percentages to capture (default 0,25,50,75,100)
   --frames A,B,C  explicit frame numbers (overrides --at)
   --out DIR       output directory (default .lottie-preview/<name>)
-  --bg VALUE      checker | transparent | any CSS color (default checker)
+  --bg VALUE      checker | transparent | any CSS color (default: the file's
+                  meta.tc, the ground it was designed on, else checker)
   --width N       render width in px (default the composition width)
   --scale N       device pixel ratio (default 1)
   --no-strip      skip the contact sheet
@@ -120,14 +122,14 @@ const HELP = `Usage: node scripts/render.mjs <file.json> [options]
                   Spacing between ghosts is the easing; their path is the arc.
                   Samples 12 frames unless --at or --frames is given.`;
 
-function resolveChrome() {
+export function resolveChrome() {
   for (const candidate of CHROME_CANDIDATES) {
     if (candidate && existsSync(candidate)) return candidate;
   }
   return null;
 }
 
-function backgroundCss(bg) {
+export function backgroundCss(bg) {
   if (bg === 'transparent') return 'background:transparent';
   if (bg === 'checker') {
     // A checkerboard makes transparent regions obvious instead of guessable.
@@ -172,6 +174,11 @@ async function main() {
   } catch (error) {
     fail(`cannot read ${opts.input}: ${error.message}`);
   }
+
+  // A generator records the ground it designed for in meta.tc; judge the art on
+  // it unless asked otherwise. Only a plain hex colour is trusted into the CSS.
+  const themeColor = animation.meta && animation.meta.tc;
+  if (!opts.bg) opts.bg = /^#[0-9a-f]{3,8}$/i.test(themeColor || '') ? themeColor : 'checker';
 
   const ip = Number(animation.ip ?? 0);
   const op = Number(animation.op ?? 0);
@@ -250,14 +257,20 @@ async function main() {
     if (loaded) fail(`lottie-web could not load the animation: ${loaded}`);
 
     const stage = await page.$('#stage');
+    const shot = { omitBackground: opts.onion || opts.bg === 'transparent' };
+    // What the stage looks like with nothing on it. A frame that matches it
+    // pixel for pixel is empty, whatever the DOM holds: a layer hidden behind
+    // its track matte still has geometry, and so does the matte itself.
+    const blank = await stageBlank(page, stage, shot);
     for (const frame of frames) {
       await page.evaluate(seekFrame, frame);
-      const drawn = await page.evaluate(inspectFrame);
+      const drawn = await page.evaluate(inspectFrame, '#stage svg');
       if (drawn.error) fail(`could not inspect frame ${frame}: ${drawn.error}`);
 
       const label = `frame-${String(Math.round(frame)).padStart(4, '0')}`;
       const file = path.join(outDir, `${label}.png`);
-      await stage.screenshot({ path: file, omitBackground: opts.onion || opts.bg === 'transparent' });
+      const png = await stage.screenshot({ path: file, ...shot });
+      if (Buffer.from(png).equals(blank)) Object.assign(drawn, { painted: 0, coverage: 0, clipped: false, offCanvas: false });
       results.push({
         frame: Math.round(frame),
         time: ((frame - ip) / fr).toFixed(3),
@@ -296,6 +309,17 @@ async function main() {
 }
 
 /**
+ * A screenshot of the element with its content hidden: the empty frame, pixel
+ * for pixel, on whatever ground surrounds it.
+ */
+export async function stageBlank(page, element, shot = {}) {
+  await element.evaluate((el) => { el.style.visibility = 'hidden'; });
+  const png = await element.screenshot(shot);
+  await element.evaluate((el) => { el.style.visibility = ''; });
+  return Buffer.from(png);
+}
+
+/**
  * Runs inside the page. Seeks to a frame and lets the renderer flush.
  * lottie-web builds its SVG lazily, so measuring in the same tick as the seek
  * reads a stale document.
@@ -309,8 +333,8 @@ async function seekFrame(frame) {
  * Runs inside the page. Reports what is actually on screen using the same
  * layout Chrome uses for the screenshot, so the numbers and the picture agree.
  */
-function inspectFrame() {
-  const svg = document.querySelector('#stage svg');
+export function inspectFrame(selector) {
+  const svg = document.querySelector(selector);
   if (!svg) return { error: 'no SVG was rendered' };
   const stage = svg.getBoundingClientRect();
   if (!stage.width || !stage.height) return { error: 'the stage has no size' };
@@ -322,19 +346,54 @@ function inspectFrame() {
   let painted = 0;
 
   for (const node of svg.querySelectorAll('path,rect,circle,ellipse,image,text')) {
+    // Matte and mask geometry is a stencil, not paint.
+    if (node.closest('defs,mask,clipPath')) continue;
     const rect = node.getBoundingClientRect();
-    if (!rect.width || !rect.height) continue;
-    // Skip nodes that occupy space but paint nothing.
+    if (!rect.width && !rect.height) continue;
+    // Skip nodes that occupy space but paint nothing: no paint, or faded out by
+    // their own opacity or any ancestor's (layer and group opacity live there).
     const hasFill = node.getAttribute('fill') && node.getAttribute('fill') !== 'none';
     const hasStroke = node.getAttribute('stroke') && node.getAttribute('stroke') !== 'none';
     const fillOpacity = Number(node.getAttribute('fill-opacity') ?? 1);
     const strokeOpacity = Number(node.getAttribute('stroke-opacity') ?? 1);
+    let inherited = 1;
+    for (let el = node; el && el !== svg; el = el.parentElement) {
+      inherited *= Number(getComputedStyle(el).opacity);
+    }
+    if (inherited <= 0.01) continue;
     if (!((hasFill && fillOpacity > 0.01) || (hasStroke && strokeOpacity > 0.01))) continue;
     painted += 1;
-    minX = Math.min(minX, rect.x - stage.x);
-    minY = Math.min(minY, rect.y - stage.y);
-    maxX = Math.max(maxX, rect.right - stage.x);
-    maxY = Math.max(maxY, rect.bottom - stage.y);
+    const box = paintedBox(node, rect, hasStroke);
+    minX = Math.min(minX, box[0] - stage.x);
+    minY = Math.min(minY, box[1] - stage.y);
+    maxX = Math.max(maxX, box[2] - stage.x);
+    maxY = Math.max(maxY, box[3] - stage.y);
+  }
+
+  /**
+   * The box of what a path actually covers. getBoundingClientRect() boxes the
+   * element's local bounding box after transforming it, so a circle rotated 45
+   * degrees reports a square 1.41 times wider than the circle: a spinning ring
+   * was flagged as clipped on every frame that was not a quarter turn. Walking
+   * the outline through the screen matrix measures the shape itself.
+   */
+  function paintedBox(node, rect, hasStroke) {
+    const fallback = [rect.left, rect.top, rect.right, rect.bottom];
+    if (typeof node.getTotalLength !== 'function') return fallback;
+    const matrix = node.getScreenCTM();
+    const length = node.getTotalLength();
+    if (!matrix || !(length > 0)) return fallback;
+    const samples = Math.min(160, Math.max(24, Math.ceil(length / 3)));
+    let x0 = Infinity; let y0 = Infinity; let x1 = -Infinity; let y1 = -Infinity;
+    for (let k = 0; k <= samples; k += 1) {
+      const point = node.getPointAtLength((length * k) / samples);
+      const x = matrix.a * point.x + matrix.c * point.y + matrix.e;
+      const y = matrix.b * point.x + matrix.d * point.y + matrix.f;
+      x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y);
+    }
+    const width = hasStroke ? Number(node.getAttribute('stroke-width') ?? 1) : 0;
+    const pad = (width / 2) * Math.sqrt(Math.abs(matrix.a * matrix.d - matrix.b * matrix.c));
+    return [x0 - pad, y0 - pad, x1 + pad, y1 + pad];
   }
 
   if (!painted) return { painted: 0, coverage: 0, bbox: null, clipped: false, offCanvas: false };
@@ -458,7 +517,12 @@ function report(results, outDir, opts) {
   console.log('\nNow look at the filmstrip. Check the hero reads, the loop closes, and nothing clips.');
 }
 
-main().catch((error) => {
-  console.error(`render: ${error.stack || error}`);
-  process.exit(2);
-});
+// Importable: make-gifs.mjs reuses the browser setup and the frame inspection.
+// Compare real paths: run through the skill's symlink, argv[1] is the link and
+// import.meta.url the file it points to, and main() would silently never run.
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
+  main().catch((error) => {
+    console.error(`render: ${error.stack || error}`);
+    process.exit(2);
+  });
+}

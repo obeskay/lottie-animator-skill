@@ -18,6 +18,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 LINT = REPO / "scripts" / "lottie_lint.py"
 CONVERT = REPO / "scripts" / "svg2lottie.py"
+RECOLOR = REPO / "scripts" / "recolor.py"
 
 VALID_SVG = (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">'
@@ -140,6 +141,62 @@ class ConverterCliTest(unittest.TestCase):
             out = Path(tmp) / "out.json"
             self.assertEqual(run(CONVERT, svg, "-o", out).returncode, 0)
             self.assertEqual(run(LINT, out, "--allow-static").returncode, 0)
+
+
+def _colourful():
+    """A colour in every place one hides: static and animated paint, a gradient, a solid."""
+    red, black = [1, 0, 0, 1], [0, 0, 0, 1]
+    return {
+        "v": "5.12.1", "fr": 60, "ip": 0, "op": 60, "w": 10, "h": 10, "nm": "Colours",
+        "layers": [
+            {"ind": 1, "ty": 4, "nm": "Shape", "ip": 0, "op": 60, "st": 0, "ks": {}, "shapes": [
+                {"ty": "gr", "nm": "g", "it": [
+                    {"ty": "fl", "c": {"a": 0, "k": red}, "o": {"a": 0, "k": 100}},
+                    {"ty": "st", "c": {"a": 1, "k": [
+                        {"t": 0, "s": black, "o": {"x": [0.2], "y": [1]}, "i": {"x": [0.3], "y": [1]}},
+                        {"t": 30, "s": red}]}, "o": {"a": 0, "k": 100}, "w": {"a": 0, "k": 1}},
+                    {"ty": "gf", "o": {"a": 0, "k": 100}, "s": {"a": 0, "k": [0, 0]},
+                     "e": {"a": 0, "k": [1, 1]}, "t": 1,
+                     "g": {"p": 2, "k": {"a": 0, "k": [0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1]}}},
+                ]}]},
+            {"ind": 2, "ty": 1, "nm": "Solid", "sc": "#ff0000", "sw": 10, "sh": 10,
+             "ip": 0, "op": 60, "st": 0, "ks": {}},
+        ],
+    }
+
+
+class RecolorCliTest(unittest.TestCase):
+    def test_lists_every_colour_with_its_layers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "in.json"
+            path.write_text(json.dumps(_colourful()))
+            result = run(RECOLOR, path, "--list")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("#FF0000    4 uses  Shape, Solid", result.stdout)
+            self.assertIn("#000000    2 uses  Shape", result.stdout)
+
+    def test_replaces_a_colour_wherever_it_hides(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path, out = Path(tmp) / "in.json", Path(tmp) / "out.json"
+            path.write_text(json.dumps(_colourful()))
+            result = run(RECOLOR, path, "--map", "#F00=#C8522B", "-o", out)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            doc = json.loads(out.read_text())
+            clay = [0.7843, 0.3216, 0.1686]
+            items = doc["layers"][0]["shapes"][0]["it"]
+            self.assertEqual(items[0]["c"]["k"][:3], clay)
+            self.assertEqual(items[0]["c"]["k"][3], 1)            # alpha untouched
+            self.assertEqual(items[1]["c"]["k"][1]["s"][:3], clay)
+            self.assertEqual(items[1]["c"]["k"][0]["s"][:3], [0, 0, 0])
+            self.assertEqual(items[2]["g"]["k"]["k"][1:4], clay)  # first stop, offset kept
+            self.assertEqual(doc["layers"][1]["sc"], "#c8522b")
+
+    def test_a_colour_that_is_not_there_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "in.json"
+            path.write_text(json.dumps(_colourful()))
+            self.assertEqual(run(RECOLOR, path, "--map", "#123456=#000000").returncode, 1)
+            self.assertEqual(run(RECOLOR, path, "--map", "not-a-colour=#000000").returncode, 2)
 
 
 if __name__ == "__main__":

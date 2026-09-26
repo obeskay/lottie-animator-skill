@@ -1,22 +1,24 @@
 {
   "name": "lottie-animator",
-  "version": "2.0.0",
-  "description": "Create, inspect, and repair Lottie animations. SVG-to-Lottie conversion, structural linting, and headless rendering so motion is verified, not assumed.",
+  "version": "2.1.0",
+  "description": "Create, inspect, recolor, and repair Lottie animations: twenty-two recipes in nine palettes, SVG-to-Lottie conversion, structural linting, and headless rendering so motion is verified, not assumed.",
   "author": {
-    "name": "Obed Vargas",
-    "url": "https://obeskay.com",
-    "email": "hola@obeskay.com"
+    "name": "obeskay",
+    "url": "https://obeskay.com"
   },
   "repository": "https://github.com/obeskay/lottie-animator-skill",
   "license": "MIT",
   "keywords": [
-    "lottie",
-    "animation",
-    "svg",
-    "motion-graphics",
-    "bezier",
     "after-effects",
+    "animation",
+    "bezier",
+    "loaders",
     "logo-animation",
+    "lottie",
+    "micro-interactions",
+    "motion-graphics",
+    "palettes",
+    "svg",
     "ui-animation"
   ],
   "skills": "./skills/"

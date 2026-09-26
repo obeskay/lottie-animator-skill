@@ -202,19 +202,23 @@ Points:
 }
 ```
 
-## Helper Script: Parse SVG Path
+## In code
 
-```javascript
-// Extract vertices from path d
-function parsePathD(d) {
-  // Simplified logic
-  // 1. Split commands
-  // 2. Track current point
-  // 3. For C (cubic):
-  //    outTangents[last] = [c1.x - current.x, c1.y - current.y]
-  //    inTangents[next] = [c2.x - end.x, c2.y - end.y]
-  // 4. Update current point
-}
+Do not hand-convert paths. Two tools already do it, with arcs, smooth curves and
+relative commands pinned by tests:
+
+- A whole SVG file: `python3 scripts/svg2lottie.py icon.svg -o icon.json --size 240`,
+  or `convert(svg_text, size=240, current_color=ink)` from Python. Each element becomes
+  its own layer, anchored at its own centre.
+- One shape inside a generator: `svg(d, scale, center)` in `scripts/motion.py` returns
+  path items for every subpath of `d`, moved so `center` sits on 0,0 and pivots there;
+  `bezier()` returns the raw bezier dicts, for path morphs.
+
+```python
+from motion import group, svg, fill
+heart = group("Heart", *svg("M50 86 C24 68 8 52 8 34 C8 20 19 10 32 10 C40 10 46 14 50 21 "
+                            "C54 14 60 10 68 10 C81 10 92 20 92 34 C92 52 76 68 50 86 Z",
+                            scale=1.08, center=(50, 48)), fill("#B8325A"))
 ```
 
 ## Checklist for Conversion
