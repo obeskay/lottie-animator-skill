@@ -289,11 +289,76 @@ class KeyframeTest(unittest.TestCase):
     def test_eased_handles_are_not_reported_as_linear(self):
         self.assertNotIn("KF007", codes(base_animation()))
 
+    def test_constant_motion_is_not_reported_as_linear(self):
+        """A spinner turning whole revolutions and a marching dash are meant to be
+        linear. Flagging them taught generators to ease a spinner, which then
+        visibly slows at the loop point."""
+        linear = {"o": {"x": [0.333], "y": [0.333]}, "i": {"x": [0.667], "y": [0.667]}}
+        animation = base_animation()
+        layer = animation["layers"][0]
+        layer["ks"]["p"] = {"a": 0, "k": [50, 50, 0]}
+        layer["ks"]["r"] = {"a": 1, "k": [dict(linear, t=0, s=[0]), {"t": 59, "s": [360]}]}
+        stroke = {"ty": "st", "c": {"a": 0, "k": [0, 0, 0, 1]}, "o": {"a": 0, "k": 100},
+                  "w": {"a": 0, "k": 2}, "d": [
+                      {"n": "d", "nm": "dash", "v": {"a": 0, "k": 4}},
+                      {"n": "o", "nm": "offset", "v": {"a": 1, "k": [
+                          dict(linear, t=0, s=[0]), {"t": 59, "s": [-8]}]}}]}
+        layer["shapes"][0]["it"].insert(1, stroke)
+        self.assertNotIn("KF007", codes(animation))
+
+        # A rotation that stops short of a full turn is ordinary motion again.
+        layer["ks"]["r"]["k"][1]["s"] = [90]
+        self.assertIn("KF007", codes(animation))
+
+    def test_growing_from_a_point_is_a_taste_note(self):
+        """Scale from zero is the most common tell of generated motion."""
+        animation = base_animation()
+        eased = {"o": {"x": [0.23], "y": [1]}, "i": {"x": [0.32], "y": [1]}}
+        scale = animation["layers"][0]["ks"]["s"]
+        scale.update({"a": 1, "k": [dict(eased, t=0, s=[0, 0, 100]), {"t": 30, "s": [100, 100, 100]}]})
+        found = [f for f in Linter(animation).run() if f.code == "KF013"]
+        self.assertEqual([f.severity for f in found], ["info"])
+
+        scale["k"][0]["s"] = [94, 94, 100]
+        self.assertNotIn("KF013", codes(animation))
+        # Shrinking away on exit is how particles leave; only the entrance is flagged.
+        scale["k"] = [dict(eased, t=0, s=[100, 100, 100]), {"t": 30, "s": [0, 0, 100]}]
+        self.assertNotIn("KF013", codes(animation))
+
+    def test_overshooting_easing_is_a_taste_note(self):
+        animation = base_animation()
+        keyframe = animation["layers"][0]["ks"]["p"]["k"][0]
+        self.assertNotIn("KF014", codes(animation))
+        keyframe["o"] = {"x": [0.34], "y": [1.56]}
+        found = [f for f in Linter(animation).run() if f.code == "KF014"]
+        self.assertEqual([f.severity for f in found], ["info"])
+
+    def test_round_corners_is_a_known_modifier(self):
+        animation = base_animation()
+        animation["layers"][0]["shapes"][0]["it"].insert(1, {"ty": "rd", "nm": "Round", "r": {"a": 0, "k": 4}})
+        self.assertNotIn("SH002", codes(animation))
+
 
 class LoopTest(unittest.TestCase):
     def test_open_loop_warns_when_looping(self):
         animation = base_animation()
         animation["nm"] = "Spinner Loop"
+        self.assertIn("KF010", codes(animation))
+
+    def test_trim_offset_turning_whole_revolutions_closes(self):
+        """The After Effects spinner: a trim offset running 0 -> 720 degrees."""
+        animation = base_animation()
+        animation["nm"] = "Spinner Loop"
+        layer = animation["layers"][0]
+        layer["ks"]["p"] = {"a": 0, "k": [50, 50, 0]}
+        linear = {"o": {"x": [0.333], "y": [0.333]}, "i": {"x": [0.667], "y": [0.667]}}
+        trim = {"ty": "tm", "s": {"a": 0, "k": 0}, "e": {"a": 0, "k": 30}, "o": {"a": 1, "k": [
+            dict(linear, t=0, s=[0]), {"t": 59, "s": [720]}]}}
+        layer["shapes"][0]["it"].insert(1, trim)
+        found = codes(animation)
+        self.assertNotIn("KF010", found)
+        self.assertNotIn("KF007", found)
+        trim["o"]["k"][1]["s"] = [700]
         self.assertIn("KF010", codes(animation))
 
     def test_open_loop_ignored_for_one_shot(self):

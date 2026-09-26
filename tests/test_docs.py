@@ -155,6 +155,19 @@ class DocumentedExamplesTest(unittest.TestCase):
                 "documentation claims %d tests but the suite has %d" % (claimed, actual),
             )
 
+    def test_landing_page_matches_the_source(self):
+        """The page embeds the palettes and the example list rather than fetching
+        them, so it works on GitHub Pages; this keeps the copies honest."""
+        sys.path.insert(0, str(REPO / "scripts"))
+        from motion import PALETTES
+
+        page = (REPO / "docs" / "index.html").read_text(encoding="utf-8")
+        blocks = dict(re.findall(r'<script type="application/json" id="(\w+)">(.*?)</script>', page, re.S))
+        self.assertEqual(json.loads(blocks["palettes"]), PALETTES)
+        listed = json.loads(blocks["examples"])
+        self.assertEqual(len(listed), len(set(listed)), "an example is listed twice")
+        self.assertEqual(set(listed), {p.stem for p in (REPO / "examples").glob("*.py")})
+
     def test_every_reference_link_resolves(self):
         """SKILL.md linked shape-modifiers.md for months before it existed."""
         missing = []

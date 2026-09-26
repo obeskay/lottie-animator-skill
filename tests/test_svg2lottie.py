@@ -191,6 +191,17 @@ class ConvertTest(unittest.TestCase):
         errors = [f for f in Linter(animation, allow_static=True).run() if f.severity == "error"]
         self.assertEqual(errors, [], [f.message for f in errors])
 
+    def test_current_color_accepts_a_css_colour(self):
+        """From Python, convert() is called with a palette hex; the CLI parsed it
+        first, so a hex passed straight through used to crash on unpacking."""
+        svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" fill="currentColor">'
+               '<rect width="10" height="10"/></svg>')
+        for colour in ("#C8522B", (0.7843, 0.3216, 0.1686)):
+            animation, _ = convert(svg, current_color=colour)
+            fill = animation["layers"][0]["shapes"][0]["it"][1]
+            self.assertEqual(fill["ty"], "fl")
+            self.assertEqual([round(v, 3) for v in fill["c"]["k"][:3]], [0.784, 0.322, 0.169])
+
     def test_pivot_sits_at_the_element_centre(self):
         animation, _ = convert(self.RECT)
         anchor = animation["layers"][0]["ks"]["a"]["k"]

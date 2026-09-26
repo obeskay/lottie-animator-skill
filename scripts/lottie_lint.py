@@ -105,6 +105,8 @@ class Linter:
         self.findings = []
         self.stats = {}
         self.linear_properties = []
+        self.grows_from_point = []
+        self.overshoots = []
         self.allow_static = allow_static
         # Loop closure only matters if the animation is meant to loop. A rocket
         # launch is allowed to end somewhere other than where it started.
@@ -135,6 +137,7 @@ class Linter:
         self.check_layers()
         self.check_motion_presence()
         self.report_linear_easing()
+        self.report_taste()
         self.findings = _collapse(self.findings)
         self.findings.sort(key=lambda f: (_SEVERITY_ORDER[f.severity], f.code, f.where))
         return self.findings
@@ -470,7 +473,7 @@ class Linter:
                     "The specification requires this. lottie-web substitutes a "
                     "default, but other players are not guaranteed to.",
                 )
-        elif isinstance(ty, str) and ty not in SHAPE_NAMES and ty not in ("mm", "gr"):
+        elif isinstance(ty, str) and ty not in SHAPE_NAMES and ty not in ("mm", "gr", "rd"):
             self.add("SH002", WARN, where, "unknown shape item type %r" % ty)
 
         if isinstance(node.get("it"), list):
@@ -496,10 +499,10 @@ class Linter:
             lip = comp_ip
         if lop is None:
             lop = comp_op
-        for path, prop in _walk_properties(layer, base):
-            self._check_property(path, prop, label, lip, lop)
+        for path, prop, kind in _walk_properties(layer, base):
+            self._check_property(path, prop, label, lip, lop, kind)
 
-    def _check_property(self, path, prop, label, lip, lop):
+    def _check_property(self, path, prop, label, lip, lop, kind=None):
         # Easing handles belong to individual keyframes, never to the property
         # that holds them. Misplaced handles do not degrade gracefully: the
         # player throws mid-render and the whole frame comes out blank.
@@ -605,12 +608,27 @@ class Linter:
             if _is_linear(kf["o"], kf["i"]):
                 linear += 1
 
-        if linear:
+        # A spinner turning whole revolutions, or an offset that marches, is
+        # meant to run at one speed; only the rest is worth a taste note.
+        full_turn = _is_rotation(path) and len(keyframes) > 1 and _turns_full_circle(
+            keyframes[0].get("s"), keyframes[-1].get("s"))
+        if linear and kind not in ("constant", "turn") and not full_turn:
             self.linear_properties.append(path)
 
-        self._check_loop_closure(path, keyframes, times, label, lip, lop)
+        # Taste, not correctness: reported once per file as notes.
+        if kind == "scale":
+            first = keyframes[0].get("s")
+            later = [kf.get("s") for kf in keyframes[1:] if isinstance(kf.get("s"), list)]
+            if isinstance(first, list) and first and all(
+                    isinstance(v, (int, float)) and abs(v) <= 10 for v in first[:2]) and any(
+                    any(isinstance(v, (int, float)) and abs(v) >= 50 for v in value[:2]) for value in later):
+                self.grows_from_point.append(path)
+        if any(_overshoots(kf) for kf in keyframes[:-1]):
+            self.overshoots.append(path)
 
-    def _check_loop_closure(self, path, keyframes, times, label, lip, lop):
+        self._check_loop_closure(path, keyframes, times, label, lip, lop, kind)
+
+    def _check_loop_closure(self, path, keyframes, times, label, lip, lop, kind=None):
         """A looping property must end where it started or the wrap will jump."""
         if not self.loop or len(keyframes) < 2 or lop is None or lip is None or not times:
             return
@@ -623,8 +641,9 @@ class Linter:
             last = keyframes[-2].get("e", keyframes[-1].get("s"))
         if first is None or last is None:
             return
-        # A full turn is a closed loop: 0deg and 360deg are the same pose.
-        if _is_rotation(path) and _turns_full_circle(first, last):
+        # A full turn is a closed loop: 0deg and 360deg are the same pose, for a
+        # rotation and for a trim offset alike.
+        if (_is_rotation(path) or kind == "turn") and _turns_full_circle(first, last):
             return
         if not _values_close(first, last):
             self.add(
@@ -651,6 +670,23 @@ class Linter:
             "Linear motion reads as mechanical. Entrances want an ease-out, exits an "
             "ease-in, loops an ease-in-out. Affected: %s" % shown,
         )
+
+    def report_taste(self):
+        """The two tells of generated motion, as notes: they never fail a build."""
+        for code, paths, message, hint in (
+            ("KF013", self.grows_from_point, "%d scale propert%s grow%s from a point",
+             "Nothing appears from nothing: enter from 92-96%% with an opacity fade and a "
+             "strong ease-out (references/motion-taste.md). Affected: %s"),
+            ("KF014", self.overshoots, "%d propert%s overshoot%s through their easing",
+             "The house register has no overshoot; keep it for briefs that ask for "
+             "playful, once, at 8%% or less. Affected: %s"),
+        ):
+            if not paths:
+                continue
+            count = len(paths)
+            shown = ", ".join(paths[:3]) + (", +%d more" % (count - 3) if count > 3 else "")
+            self.add(code, INFO, "$", message % (count, "y" if count == 1 else "ies",
+                                                 "s" if count == 1 else ""), hint % shown)
 
     # -- whole-file motion -------------------------------------------------
     def check_motion_presence(self):
@@ -742,17 +778,31 @@ def _is_property(node):
     )
 
 
-def _walk_properties(node, path):
-    """Yield (json_path, property) for every animatable property under node."""
+def _walk_properties(node, path, owner=None, key=None):
+    """Yield (json_path, property, kind) for every animatable property under node.
+
+    `kind` is "constant" for channels built for constant motion — a repeater
+    offset, a dash — where linear interpolation is the right choice, "turn" for
+    a trim offset, which is constant motion measured in degrees (a whole turn
+    is the same pose), "scale" for a layer or group scale, and None otherwise.
+    """
     if _is_property(node):
-        yield path, node
+        kind = None
+        if isinstance(owner, dict):
+            if owner.get("ty") == "tm" and key == "o":
+                kind = "turn"
+            elif (owner.get("ty") == "rp" and key == "o") or ("n" in owner and key == "v"):
+                kind = "constant"
+            elif key == "s" and (owner.get("ty") == "tr" or path.endswith(".ks.s")):
+                kind = "scale"
+        yield path, node, kind
         return
     if isinstance(node, dict):
-        for key, value in node.items():
-            yield from _walk_properties(value, "%s.%s" % (path, key))
+        for name, value in node.items():
+            yield from _walk_properties(value, "%s.%s" % (path, name), node, name)
     elif isinstance(node, list):
         for index, value in enumerate(node):
-            yield from _walk_properties(value, "%s[%d]" % (path, index))
+            yield from _walk_properties(value, "%s[%d]" % (path, index), owner, key)
 
 
 def _collect_refids(node, out):
@@ -946,6 +996,18 @@ def _is_linear(out_handle, in_handle, tolerance=0.02):
             if x is None or y is None or abs(x - y) > tolerance:
                 return False
     return True
+
+
+def _overshoots(keyframe):
+    """Easing handles whose y leaves 0..1 carry the value past its target."""
+    for handle in ("o", "i"):
+        spec = keyframe.get(handle)
+        if isinstance(spec, dict):
+            for value in _as_list(spec.get("y")):
+                v = _num(value)
+                if v is not None and not -0.001 <= v <= 1.001:
+                    return True
+    return False
 
 
 def _is_rotation(path):

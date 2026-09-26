@@ -187,4 +187,4 @@ Vector animations are inherently 2D, but we can fake 3D depth to make them feel 
 Animations must have an elegant flow, satisfying timings, and absolute clarity.
 
 - Avoid clutter. Keep the **Simplicity Threshold**: animate at most **two** concurrent properties per layer (e.g. Position + Scale, or Position + Opacity).
-- Hold to one accent colour from a warm, low-chroma palette (`motion.PALETTE`); no purple gradients, no neon on black. See [motion-taste.md](motion-taste.md#art-direction).
+- Hold to one accent colour, by role from `motion.PALETTES`; no purple gradients, no neon on black. See [motion-taste.md](motion-taste.md#art-direction).

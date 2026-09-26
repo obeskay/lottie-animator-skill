@@ -1,6 +1,67 @@
 # Changelog
 
-## Unreleased
+## 2.1.0 — 2026-09-26
+
+### Recipes and palettes
+
+The skill knew how to verify an animation and what good motion looks like, but every
+request still started from a blank page and ended in one warm palette. Four examples
+could not show the range, and one of them duplicated another.
+
+- **Twenty-two examples, each a generator.** `examples/<name>.py` writes
+  `examples/<name>.json`: success, error, like, notification, toggle, lock, play/pause,
+  morph, spinner, typing, character loader, download, battery, equalizer, location,
+  weather, paper plane, confetti, card stack, logo draw-on, rocket, bouncing ball. Each
+  docstring states its brief (feeling, register, hero property), and each was rendered,
+  read as a filmstrip and an onion skin, and revised before it shipped. The four
+  originals are ported: the rocket now demonstrates `svg2lottie.convert()` from Python,
+  the logo draw-on is a real logo reveal instead of a second check mark, and the panda's
+  ring no longer overlaps its ears.
+- **Nine palettes by role.** `motion.PALETTES`: `paper`, `night`, `dusk`, `harbor`,
+  `citrus`, `berry`, `forest`, `mono`, `sky`, each with the same seven roles (ground,
+  surface, ink, muted, accent, on-accent, support). Every generator takes
+  `--palette NAME`, and the tests hold each palette to its contrast ratios.
+- **Builders in `motion.py`.** `comp`, `layer` (parents by name, mattes), `null`,
+  `group`, `ellipse`, `rect`, `star`, `path`, `svg`/`bezier` (SVG path data, centred on
+  its own pivot), `fill`, `stroke` (dashes), `trim`, `repeater`, `round_corners`,
+  `delay`, spatial tangents in `track`, and `main()` for the shared command line. Each
+  emits the properties whose absence drops a layer, so generated files cannot hit
+  `SH001`. The ground is stored as `meta.tc`.
+- **Taste notes in the linter.** `KF013` when a scale starts near zero (the thing grows
+  from a point) and `KF014` when easing handles overshoot: the two commonest tells of
+  generated motion, reported once per file as notes, never as failures.
+- **`scripts/recolor.py`.** Lists every colour in any Lottie with its uses and layers,
+  and maps them — static and animated paint, gradient stops, text and solid layers.
+- **SKILL.md starts from a recipe.** A table from request to the nearest example, the
+  generator API, palettes, and recolouring; `skills/lottie-animator/examples` links the
+  examples in beside `scripts`.
+- **GIFs rebuilt in one browser.** `make-gifs.mjs` discovers every example, renders it
+  on its own ground, starts entrances on their first painted frame and holds their
+  final pose, and builds `hero.gif` (eight examples, eight grounds), `palettes.gif` (one
+  example in all nine palettes) and the social card. The violet banner and the second
+  preview page are gone; the landing page plays every example live and re-skins them.
+
+### Fixed
+
+- The suite is at 132 stdlib-only unit tests.
+- **`render.mjs` called a spinning ring clipped.** `getBoundingClientRect()` boxes an
+  element's local bounds after transforming them, so a circle at 45° measured 1.41
+  times its width; the shipped panda was flagged on seven of twelve frames. The box is
+  now measured along the drawn outline through the screen matrix.
+- **`render.mjs` called a faded-out layer painted, and a straight line empty.** Layer
+  and group opacity live on ancestors, which were ignored; and a horizontal stroke has a
+  zero-height geometry box, which was skipped. Both now count as they look.
+- **`render.mjs` never ran through the skill's symlink.** Made importable for
+  `make-gifs.mjs`, it compares real paths before running `main()`.
+- **The linter called constant motion mechanical.** A spinner turning whole
+  revolutions, a trim or repeater offset and a marching dash are meant to be linear;
+  `KF007` no longer counts them. Round Corners (`rd`) is a known modifier, not `SH002`.
+- **`shape-modifiers.md` said a trim after the stroke does nothing.** Both orders render
+  identically in lottie-web, and After Effects exports put it after the stroke; what
+  fails is a modifier listed before its path. `lottie-structure.md` no longer teaches an
+  overshoot preset that contradicts the house tokens, and `svg-to-lottie.md` points to
+  the real converters instead of a stub.
+- `.claude-plugin` metadata names the public handle, like the licence and the site.
 
 ### Taste
 
@@ -26,7 +87,7 @@ read as generated.
   read as an onion skin first. GIFs rebuilt on paper.
 - `disney-principles.md` marks squash, anticipation and exaggeration as playful-register
   tools; SKILL.md's easing table is the token table.
-- Three tests pin `motion.py`; the suite is at 112 stdlib-only unit tests.
+- Three tests pin `motion.py`; the suite was at 112 tests then.
 
 ### Fixed
 
@@ -77,7 +138,7 @@ read as generated.
   static and unrotated, and the covered geometry must fall inside the *inscribed*
   box of the covering shape rather than its bounding box, since an ellipse leaves
   its corners visible. Paths, repeaters, nested groups and anything animated are
-  left alone. Brings the suite to 112 stdlib-only unit tests.
+  left alone. Brought the suite to 112 tests at the time.
 - **`scripts/make-gifs.mjs`** — builds the README's animated GIFs from the examples
   using `render.mjs`, so the documentation shows motion rather than stills. Drops the
   leading empty frame an entrance starts on (a flash on every loop) and appends a hold

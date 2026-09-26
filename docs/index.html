@@ -3,436 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lottie Animator — SVG to motion, verified</title>
-  <meta name="description" content="A Claude Code skill that converts SVG to Lottie, lints the defects that render blank, and renders the result in a real player.">
+  <title>Lottie Animator — motion that is looked at before it ships</title>
+  <meta name="description" content="A Claude Code skill for Lottie: twenty-two recipes in nine palettes, an SVG converter, a linter for the defects that render blank, and a renderer that makes the agent look.">
   <link rel="canonical" href="https://obeskay.github.io/lottie-animator-skill/">
-  <!-- Social preview. Raster, not the SVG banner: most platforms will not render SVG. -->
+  <!-- Social preview. Raster, not SVG: most platforms will not render SVG. -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Lottie Animator — SVG to motion, verified">
-  <meta property="og:description" content="Converts SVG to Lottie, lints the defects that render blank, and renders the result in a real player.">
+  <meta property="og:title" content="Lottie Animator — motion that is looked at before it ships">
+  <meta property="og:description" content="Twenty-two Lottie recipes in nine palettes, converted, linted and rendered before they ship.">
   <meta property="og:url" content="https://obeskay.github.io/lottie-animator-skill/">
   <meta property="og:image" content="https://raw.githubusercontent.com/obeskay/lottie-animator-skill/main/assets/readme-hero.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Lottie Animator — SVG to motion, verified">
-  <meta name="twitter:description" content="Converts SVG to Lottie, lints the defects that render blank, and renders the result in a real player.">
+  <meta name="twitter:title" content="Lottie Animator — motion that is looked at before it ships">
+  <meta name="twitter:description" content="Twenty-two Lottie recipes in nine palettes, converted, linted and rendered before they ship.">
   <meta name="twitter:image" content="https://raw.githubusercontent.com/obeskay/lottie-animator-skill/main/assets/readme-hero.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/lottie-web@5.13.0/build/player/lottie_light.min.js" defer></script>
   <style>
     :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --secondary: #22c55e;
-      --accent: #f97316;
-      --bg: #0f0f1a;
-      --bg-card: #1a1a2e;
-      --text: #e5e5e5;
-      --text-muted: #9ca3af;
+      --bg: #F3EEE6;
+      --raised: #FBF8F3;
+      --line: #E2D9CB;
+      --ink: #1E1B18;
+      --text: #3B3530;
+      --muted: #6A625A;
+      --accent: #C8522B;
+      --radius: 22px;
+      --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+      --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+      color-scheme: light dark;
     }
-    
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #171513; --raised: #201D1A; --line: #34302B; --ink: #F3EEE6; --text: #D8D0C3; --muted: #A39A8F; --accent: #E0A458; }
     }
-    
-    .gradient-bg {
-      position: fixed;
-      inset: 0;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(249, 115, 22, 0.05) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: -1;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-    
-    /* Hero Section */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 80px 24px;
-      position: relative;
-    }
-    
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: rgba(99, 102, 241, 0.1);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      border-radius: 100px;
-      font-size: 14px;
-      color: var(--primary);
-      margin-bottom: 32px;
-      animation: fadeInUp 0.6s ease-out;
-    }
-    
-    .badge::before {
-      content: '';
-      width: 8px;
-      height: 8px;
-      background: var(--secondary);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-    
-    h1 {
-      font-size: clamp(2.5rem, 8vw, 5rem);
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 24px;
-      animation: fadeInUp 0.6s ease-out 0.1s both;
-    }
-    
-    h1 .gradient-text {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 50%, var(--secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .subtitle {
-      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-      color: var(--text-muted);
-      max-width: 600px;
-      margin-bottom: 48px;
-      animation: fadeInUp 0.6s ease-out 0.2s both;
-    }
-    
-    .cta-group {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      justify-content: center;
-      animation: fadeInUp 0.6s ease-out 0.3s both;
-    }
-    
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 16px 32px;
-      font-size: 16px;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: 12px;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.4);
-    }
-    
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
-    
-    /* Animation Preview */
-    .animation-preview {
-      margin-top: 80px;
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      flex-wrap: wrap;
-      animation: fadeInUp 0.6s ease-out 0.4s both;
-    }
-    
-    .preview-item {
-      width: 120px;
-      height: 120px;
-      background: var(--bg-card);
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .preview-circle {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-    }
-    
-    .preview-item:nth-child(1) .preview-circle {
-      animation: bounce 1.5s ease-in-out infinite;
-    }
-    
-    .preview-item:nth-child(2) .preview-circle {
-      animation: pulse-scale 2s ease-in-out infinite;
-    }
-    
-    .preview-item:nth-child(3) .preview-circle {
-      animation: wiggle 1s ease-in-out infinite;
-    }
-    
-    .preview-item:nth-child(4) .preview-circle {
-      animation: rotate 3s linear infinite;
-    }
-    
-    /* Features */
-    .features {
-      padding: 120px 24px;
-    }
-    
-    .section-title {
-      text-align: center;
-      font-size: clamp(2rem, 5vw, 3rem);
-      margin-bottom: 64px;
-    }
-    
-    .features-grid {
-      display: grid;
-      /* Four cards, so hold two columns rather than leaving an orphan on row two. */
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 32px;
-      max-width: 780px;
-      margin: 0 auto;
-    }
-    
-    .feature-card {
-      background: var(--bg-card);
-      padding: 32px;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    
-    .feature-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
-    }
-    
-    .feature-icon {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      color: #fff;
-    }
-    .feature-icon svg {
-      width: 24px;
-      height: 24px;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
-    
-    .feature-card h3 {
-      font-size: 1.25rem;
-      margin-bottom: 12px;
-    }
-    
-    .feature-card p {
-      color: var(--text-muted);
-      font-size: 15px;
-    }
-    
-    /* Code Block */
-    .code-section {
-      padding: 80px 24px;
-      text-align: center;
-    }
-    
-    .code-block {
-      background: #1e1e2e;
-      border-radius: 16px;
-      padding: 32px;
-      max-width: 600px;
-      margin: 32px auto 0;
-      text-align: left;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 14px;
-      line-height: 1.8;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .code-block .comment { color: #6b7280; }
-    .code-block .command { color: var(--secondary); }
-    .code-block .string { color: var(--accent); }
-    
-    /* Footer */
-    footer {
-      padding: 48px 24px;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-    
-    footer a {
-      color: var(--primary);
-      text-decoration: none;
-    }
-    
-    /* Animations */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
-    }
-    
-    @keyframes pulse-scale {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-    }
-    
-    @keyframes wiggle {
-      0%, 100% { transform: rotate(-3deg); }
-      50% { transform: rotate(3deg); }
-    }
-    
-    @keyframes rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.5); }
-    }
-    
-    /* Responsive */
-    @media (max-width: 640px) {
-      .hero { padding: 60px 16px; }
-      .cta-group { flex-direction: column; width: 100%; }
-      .btn { width: 100%; justify-content: center; }
-      .animation-preview { gap: 16px; }
-      .preview-item { width: 80px; height: 80px; }
-      .preview-circle { width: 40px; height: 40px; }
-    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--sans); }
+    a { color: inherit; }
+    main { max-width: 1160px; margin: 0 auto; padding: 0 24px 96px; }
+
+    header { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+    .mark { font-weight: 650; color: var(--ink); text-decoration: none; letter-spacing: -0.01em; }
+    nav a { color: var(--muted); text-decoration: none; font-size: 15px; margin-left: 22px; }
+    nav a:hover { color: var(--ink); }
+
+    .hero { padding: 72px 0 40px; max-width: 760px; }
+    h1 { color: var(--ink); font-size: clamp(40px, 6.4vw, 76px); line-height: 0.98; letter-spacing: -0.045em; margin: 0 0 24px; font-weight: 700; }
+    .lede { font-size: clamp(18px, 2.1vw, 21px); line-height: 1.5; margin: 0 0 32px; max-width: 620px; }
+    .install { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .install code { font: 14px/1 var(--mono); background: var(--raised); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; color: var(--ink); }
+    .button { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; text-decoration: none; color: var(--bg); background: var(--ink); border-radius: 12px; padding: 13px 18px; transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1); }
+    .button:active { transform: scale(0.97); }
+    .button svg { width: 18px; height: 18px; }
+
+    .palettes { position: sticky; top: 0; z-index: 2; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 14px 0; margin: 24px 0 8px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .palettes span { font-size: 13px; color: var(--muted); margin-right: 6px; }
+    .chip { font: 600 12px/1 var(--mono); letter-spacing: 0.02em; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--raised); color: var(--text); border-radius: 999px; padding: 8px 12px 8px 8px; cursor: pointer; transition: border-color 160ms, transform 160ms cubic-bezier(0.23, 1, 0.32, 1); }
+    .chip:active { transform: scale(0.96); }
+    .chip[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); }
+    .chip i { width: 16px; height: 16px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12); }
+    .chip:focus-visible, .button:focus-visible, .card a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; padding-top: 18px; }
+    .card { margin: 0; }
+    .stage { aspect-ratio: 1; border-radius: var(--radius); overflow: hidden; transition: background-color 260ms cubic-bezier(0.23, 1, 0.32, 1); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04); }
+    .stage > div { width: 100%; height: 100%; }
+    .card figcaption { padding: 12px 4px 0; }
+    .card a { font: 600 13px/1.3 var(--mono); color: var(--ink); text-decoration: none; }
+    .card a:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .card p { margin: 4px 0 0; font-size: 14px; line-height: 1.45; color: var(--muted); }
+
+    section.how { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; margin-top: 96px; padding-top: 40px; border-top: 1px solid var(--line); }
+    section.how h2 { grid-column: 1 / -1; color: var(--ink); font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -0.03em; line-height: 1.1; margin: 0; font-weight: 700; }
+    section.how h3 { color: var(--ink); font-size: 16px; margin: 0 0 6px; letter-spacing: -0.01em; }
+    section.how p { margin: 0; font-size: 15px; color: var(--muted); }
+    section.how code { font: 13px var(--mono); color: var(--text); }
+    footer { max-width: 1160px; margin: 0 auto; padding: 32px 24px 48px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+    footer a { color: var(--text); }
   </style>
 </head>
 <body>
-  <div class="gradient-bg"></div>
-  
+<main>
+  <header>
+    <a class="mark" href="https://github.com/obeskay/lottie-animator-skill">Lottie Animator</a>
+    <nav><a href="#gallery">Gallery</a><a href="#how">How it works</a><a href="https://github.com/obeskay/lottie-animator-skill">GitHub</a></nav>
+  </header>
+
   <section class="hero">
-    <div class="badge">Open Source • Claude Code Plugin</div>
-    <h1>
-      <span class="gradient-text">Lottie Animator</span><br>
-      SVG to motion, verified
-    </h1>
-    <p class="subtitle">
-      A broken Lottie still parses. This skill converts SVG to Lottie, lints the
-      defects that render blank, and renders the result in a real player — so the
-      animation is looked at before it ships.
-    </p>
-    <div class="cta-group">
-      <a href="https://github.com/obeskay/lottie-animator-skill" class="btn btn-primary">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-        View on GitHub
-      </a>
-      <a href="#install" class="btn btn-secondary">Quick Install</a>
-    </div>
-    
-    <div class="animation-preview">
-      <div class="preview-item"><div class="preview-circle"></div></div>
-      <div class="preview-item"><div class="preview-circle"></div></div>
-      <div class="preview-item"><div class="preview-circle"></div></div>
-      <div class="preview-item"><div class="preview-circle"></div></div>
+    <h1>Motion that is looked at before it ships.</h1>
+    <p class="lede">A Claude Code skill for Lottie. Twenty-two recipes that re-skin in nine palettes, a converter
+      that does the bezier arithmetic, a linter for the defects that render blank, and a renderer that makes the
+      agent look at every frame it claims is done.</p>
+    <div class="install">
+      <code>/plugin marketplace add obeskay/lottie-animator-skill</code>
+      <a class="button" href="https://github.com/obeskay/lottie-animator-skill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+        View on GitHub</a>
     </div>
   </section>
-  
-  <section class="features">
-    <div class="container">
-      <h2 class="section-title">What it actually does</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/></svg>
-          </div>
-          <h3>Real SVG conversion</h3>
-          <p>Full path grammar including elliptical arcs, plus groups, nested transforms, strokes and gradients. No hand-written vertex maths.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
-          </div>
-          <h3>Linting that finds blanks</h3>
-          <p>Missing shape properties, easing handles on the wrong object, dead layers, unpainted geometry, loops that never close.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-          </div>
-          <h3>Headless rendering</h3>
-          <p>Loads the file in real lottie-web and writes a labelled filmstrip, flagging empty, clipped and off-canvas frames.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/><path d="m7.5 4.27 9 5.15"/></svg>
-          </div>
-          <h3>Standard Lottie out</h3>
-          <p>Plain Lottie JSON for web, iOS, Android and React Native. Python tooling has no dependencies at all.</p>
-        </div>
-      </div>
-    </div>
+
+  <div class="palettes" id="gallery" role="toolbar" aria-label="Palette">
+    <span>Palette</span>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <section class="how" id="how">
+    <h2>Build, lint, render, look.</h2>
+    <div><h3>Recipes, not blank pages</h3><p>Each example is a short Python generator. Copy the nearest one, change the beats,
+      keep the timing. <code>--palette night</code> re-skins it.</p></div>
+    <div><h3>Taste as tokens</h3><p><code>motion.py</code> holds the house style: strong ease-out, zero overshoot, holds at
+      rest, colour by role. Every keyframe it writes carries its easing handles.</p></div>
+    <div><h3>A linter for silent failures</h3><p>A broken Lottie still parses. The linter catches the defects that
+      render blank: missing properties, misplaced handles, layers that never play.</p></div>
+    <div><h3>Then it looks</h3><p>A headless lottie-web renders a filmstrip and an onion skin. The agent reads them and
+      judges spacing, arcs and rest before it says done.</p></div>
   </section>
-  
-  <section class="code-section" id="install">
-    <h2 class="section-title">Get Started in Seconds</h2>
-    <div class="code-block">
-      <span class="comment"># Add the marketplace</span><br>
-      <span class="command">/plugin marketplace add</span> <span class="string">obeskay/lottie-animator-skill</span><br><br>
-      <span class="comment"># Install the plugin</span><br>
-      <span class="command">/plugin install</span> <span class="string">lottie-animator</span><br><br>
-      <span class="comment"># Start animating!</span><br>
-      <span class="string">"Animate my logo with a bounce effect"</span>
-    </div>
-  </section>
-  
-  <footer>
-    <p>
-      Made by <a href="https://github.com/obeskay">obeskay</a> • 
-      <a href="https://github.com/obeskay/lottie-animator-skill">GitHub</a> • 
-      MIT License
-    </p>
-  </footer>
+</main>
+<footer>
+  Made by <a href="https://github.com/obeskay">obeskay</a> · <a href="https://github.com/obeskay/lottie-animator-skill">Source</a> · MIT License
+</footer>
+
+<!-- Kept equal to scripts/motion.py PALETTES by tests/test_docs.py. -->
+<script type="application/json" id="palettes">
+{"paper": {"bg": "#F3EEE6", "surface": "#E4D9C6", "ink": "#1E1B18", "muted": "#8A8178", "accent": "#C8522B", "on_accent": "#F3EEE6", "support": "#6F8163"}, "night": {"bg": "#171513", "surface": "#2A2622", "ink": "#F3EEE6", "muted": "#8F867C", "accent": "#E0A458", "on_accent": "#171513", "support": "#7FA39A"}, "dusk": {"bg": "#121A26", "surface": "#1F2A3A", "ink": "#EDE6DA", "muted": "#7F8DA3", "accent": "#F0A04B", "on_accent": "#121A26", "support": "#6FA3C7"}, "harbor": {"bg": "#EAF1F2", "surface": "#D2E1E4", "ink": "#10242C", "muted": "#5F7C87", "accent": "#1E6E86", "on_accent": "#F4F8F8", "support": "#E07A5F"}, "citrus": {"bg": "#FBF5E6", "surface": "#F2E5C2", "ink": "#2A2211", "muted": "#8C7F5C", "accent": "#E4572E", "on_accent": "#FBF5E6", "support": "#E9A91B"}, "berry": {"bg": "#FBEFF1", "surface": "#F3DADF", "ink": "#2B1519", "muted": "#93717A", "accent": "#B8325A", "on_accent": "#FBEFF1", "support": "#F0A35E"}, "forest": {"bg": "#EDF1EA", "surface": "#D7E0D0", "ink": "#17231A", "muted": "#6C7F68", "accent": "#2F6B4F", "on_accent": "#EDF1EA", "support": "#D9A441"}, "mono": {"bg": "#F4F4F2", "surface": "#E3E3DF", "ink": "#121212", "muted": "#85857F", "accent": "#E5484D", "on_accent": "#F4F4F2", "support": "#B5B5AF"}, "sky": {"bg": "#EDF3FA", "surface": "#D6E3F2", "ink": "#14202E", "muted": "#687D96", "accent": "#3569C9", "on_accent": "#F5F8FC", "support": "#F2B544"}}
+</script>
+<!-- Kept equal to examples/*.py by tests/test_docs.py. -->
+<script type="application/json" id="examples">
+["success-check", "error-shake", "heart-like", "notification-bell", "toggle-switch", "lock-unlock",
+ "play-pause", "shape-morph", "spinner-arc", "typing-dots", "panda-loader", "download-progress",
+ "battery-charge", "equalizer", "location-ping", "weather-sun", "paper-plane", "confetti-burst",
+ "card-stack", "logo-draw-on", "rocket-launch", "bouncing-ball"]
+</script>
+<script>
+  const REPO = 'https://github.com/obeskay/lottie-animator-skill/blob/main/examples/';
+  // Served from the repository (python3 -m http.server), read the files beside the page;
+  // on GitHub Pages only docs/ is published, so read them from the repository instead.
+  const SOURCE = location.hostname.endsWith('github.io')
+    ? 'https://raw.githubusercontent.com/obeskay/lottie-animator-skill/main/examples/'
+    : '../examples/';
+  const PALETTES = JSON.parse(document.getElementById('palettes').textContent);
+  const NAMES = JSON.parse(document.getElementById('examples').textContent);
+  const LOOP = /loop|loader|loading|spinner|pulse|idle|cycle/i;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cards = [];
+
+  const hex = (rgb) => '#' + rgb.slice(0, 3).map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join('').toUpperCase();
+  const rgb = (h) => [1, 3, 5].map((i) => Math.round((parseInt(h.slice(i, i + 2), 16) / 255) * 1e4) / 1e4);
+
+  /** Swap every fill and stroke colour from one palette's role to another's. */
+  function reskin(data, from, to) {
+    const map = {};
+    for (const role of Object.keys(from)) map[from[role]] = to[role];
+    const swap = (v) => { const h = hex(v); if (map[h]) v.splice(0, 3, ...rgb(map[h])); };
+    (function walk(node) {
+      if (Array.isArray(node)) return node.forEach(walk);
+      if (!node || typeof node !== 'object') return;
+      if ((node.ty === 'fl' || node.ty === 'st') && node.c) {
+        if (node.c.a) node.c.k.forEach((key) => key.s && swap(key.s));
+        else swap(node.c.k);
+      }
+      Object.values(node).forEach(walk);
+    })(data);
+    return data;
+  }
+
+  function play(card) {
+    if (card.anim) card.anim.destroy();
+    const data = card.palette ? reskin(structuredClone(card.data), card.home, PALETTES[card.palette]) : structuredClone(card.data);
+    const loop = LOOP.test(card.data.nm || '');
+    card.anim = lottie.loadAnimation({ container: card.slot, renderer: 'svg', loop, autoplay: !reduced && card.visible, animationData: data });
+    // A one-shot rests on its final pose, then plays again.
+    if (!loop) card.anim.addEventListener('complete', () => setTimeout(() => card.visible && card.anim.goToAndPlay(0, true), 1400));
+    if (reduced) card.anim.addEventListener('DOMLoaded', () => card.anim.goToAndStop(card.anim.totalFrames - 1, true));
+    card.stage.style.background = (card.palette ? PALETTES[card.palette] : card.home).bg;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      const card = cards.find((c) => c.stage === entry.target);
+      card.visible = entry.isIntersecting;
+      if (card.anim && !reduced) card.visible ? card.anim.play() : card.anim.pause();
+    }
+  }, { rootMargin: '120px' });
+
+  function choose(name) {
+    document.querySelectorAll('.chip').forEach((chip) => chip.setAttribute('aria-pressed', String(chip.dataset.name === name)));
+    for (const card of cards) {
+      card.palette = name === 'own' ? null : name;
+      if (card.data) play(card);
+      card.command.textContent = `python3 examples/${card.name}.py${card.palette ? ` --palette ${card.palette}` : ''}`;
+    }
+  }
+
+  function chip(name, bg, accent, label) {
+    const button = document.createElement('button');
+    button.className = 'chip';
+    button.dataset.name = name;
+    button.setAttribute('aria-pressed', String(name === 'own'));
+    button.innerHTML = `<i style="background:linear-gradient(135deg, ${bg} 50%, ${accent} 50%)"></i>${label}`;
+    button.addEventListener('click', () => choose(name));
+    return button;
+  }
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    const bar = document.querySelector('.palettes');
+    bar.append(chip('own', '#F3EEE6', '#1E1B18', 'as designed'));
+    for (const [name, p] of Object.entries(PALETTES)) bar.append(chip(name, p.bg, p.accent, name));
+
+    const grid = document.getElementById('grid');
+    for (const name of NAMES) {
+      const figure = document.createElement('figure');
+      figure.className = 'card';
+      figure.innerHTML = `<div class="stage"><div></div></div><figcaption>
+        <a href="${REPO}${name}.py">${name}</a><p></p><p><code></code></p></figcaption>`;
+      grid.append(figure);
+      const card = { name, stage: figure.querySelector('.stage'), slot: figure.querySelector('.stage > div'),
+        caption: figure.querySelector('p'), command: figure.querySelector('code'), visible: false };
+      card.command.textContent = `python3 examples/${name}.py`;
+      cards.push(card);
+      observer.observe(card.stage);
+    }
+    await Promise.all(cards.map(async (card) => {
+      try {
+        card.data = await (await fetch(`${SOURCE}${card.name}.json`)).json();
+      } catch {
+        card.caption.textContent = 'Could not load the animation.';
+        return;
+      }
+      const tc = (card.data.meta && card.data.meta.tc) || '#F3EEE6';
+      card.home = Object.values(PALETTES).find((p) => p.bg === tc) || PALETTES.paper;
+      card.caption.textContent = (card.data.meta && card.data.meta.d) || '';
+      play(card);
+    }));
+  });
+</script>
 </body>
 </html>

@@ -25,6 +25,13 @@ yarn-error.log*
 *.temp
 *.log
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+
 # Build artifacts
 dist/
 build/

@@ -33,8 +33,8 @@ Every change must satisfy three gates, in this order:
 
 ```bash
 python3 -m unittest discover -s tests   # unit tests
-python3 scripts/lottie_lint.py examples/
-npm install && node scripts/render.mjs examples/<your-file>.json
+python3 scripts/lottie_lint.py examples/ --strict
+npm install && node scripts/render.mjs examples/<your-file>.json --onion
 ```
 
 The third one is not optional and not automatable away: **open the filmstrip and look
@@ -47,18 +47,22 @@ rule, add a test that fails without it.
 lottie-animator-skill/
 ├── .claude-plugin/       # Plugin configuration
 ├── .github/workflows/    # CI: tests, lint, and a real render
-├── assets/               # preview.html, the README hero, and the example GIFs
-├── docs/                 # Landing page
-├── examples/             # Sample animations and their SVG sources
+├── assets/               # README GIFs, the palette board, the social card
+├── docs/                 # Landing page with the live gallery (GitHub Pages)
+├── examples/             # <name>.py generators, the <name>.json they write, SVG sources
 ├── scripts/
+│   ├── motion.py         # Easing tokens, palettes, shape builders
 │   ├── svg2lottie.py     # SVG -> Lottie shape layers
 │   ├── svgpath.py        # Path grammar -> cubic beziers
 │   ├── lottie_lint.py    # Structural and motion linting
-│   ├── render.mjs        # Headless render + filmstrip
-│   └── make-gifs.mjs     # README GIFs, built from the same renderer
+│   ├── render.mjs        # Headless render, filmstrip, onion skin
+│   ├── recolor.py        # List and map the colours of any Lottie
+│   └── make-gifs.mjs     # README GIFs and boards, in the same player
 ├── skills/
 │   └── lottie-animator/
 │       ├── SKILL.md      # Main skill definition
+│       ├── examples/     # -> ../../examples
+│       ├── scripts/      # -> ../../scripts
 │       └── references/   # Technical documentation
 └── tests/                # Unit tests (stdlib only)
 ```
@@ -80,16 +84,26 @@ lottie-animator-skill/
 
 ### New Examples
 
-1. Prefer generating geometry with `svg2lottie.py` over hand-writing vertices
-2. Create the Lottie JSON in `examples/`, keeping the SVG source alongside it
-3. Confirm `lottie_lint.py` is clean and the filmstrip shows the intended motion
-4. Document in `references/examples.md`
+An example is a generator, `examples/<name>.py`, plus the JSON it writes. The test
+suite rebuilds every generator and fails if the committed JSON differs, lints it in
+every palette, and refuses hex literals in the source, so an example cannot drift or
+work in only one palette.
+
+1. Start from the closest existing generator and keep its shape: a docstring whose
+   first line is the caption and whose "Brief:" names the feeling, the register and
+   the hero property; `build(c)` using palette roles; `main(build, __file__,
+   palette=...)` at the end. Geometry comes from `svg()`/`bezier()` or `svg2lottie`,
+   never hand-typed vertices.
+2. `python3 examples/<name>.py`, then lint `--strict`, render, and look at the
+   filmstrip and the onion skin on your palette and on `night`.
+3. `node scripts/make-gifs.mjs <name>` and add it to the README gallery and to
+   `references/examples.md`.
 
 ## Style Guidelines
 
 ### Lottie JSON
 
-- Use 2-space indentation
+- Write it with `scripts/motion.py`; hand-edit only to repair a file from elsewhere
 - Include meaningful `nm` (name) properties on layers and shape groups
 - Easing handles belong inside a keyframe, never on the property holding it
 - Give every layer explicit `ip` and `op`
@@ -113,13 +127,15 @@ python3 scripts/lottie_lint.py examples/ --strict
 node scripts/render.mjs examples/panda-loader.json
 ```
 
-For a browser preview, serve over HTTP — `file://` cannot fetch the JSON:
+For a browser preview, serve the repository over HTTP — `file://` cannot fetch the
+JSON:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then open `http://localhost:8000/assets/preview.html`, or drop a file on
+Then open `http://localhost:8000/docs/`, the landing page, which plays every example
+live and re-skins them in any palette. Or drop a file on
 [LottieFiles Preview](https://lottiefiles.com/preview).
 
 ## Questions?
