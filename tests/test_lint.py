@@ -281,6 +281,17 @@ class KeyframeTest(unittest.TestCase):
         errors = {f.code for f in Linter(animation).run() if f.severity == "error"}
         self.assertEqual(errors, {"KF012"})
 
+    def test_missing_asset_inside_a_precomp_is_an_error(self):
+        """A refId that names no asset renders empty inside a precomp too."""
+        animation = base_animation()
+        precomp = {
+            "ddd": 0, "ty": 0, "refId": "comp_0", "sr": 1, "w": 100, "h": 100,
+            "ks": {"o": {"a": 0, "k": 100}}, "ip": 0, "op": 60, "st": 0, "bm": 0,
+        }
+        animation["assets"] = [{"id": "comp_0", "layers": [dict(precomp, ind=1, refId="gone")]}]
+        animation["layers"].append(dict(precomp, ind=99))
+        self.assertIn("AS006", codes(animation))
+
     def test_hold_keyframe_needs_no_handles(self):
         animation = base_animation()
         keyframe = animation["layers"][0]["ks"]["p"]["k"][0]

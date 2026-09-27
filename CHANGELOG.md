@@ -8,8 +8,9 @@
   checked, so a keyframe without handles in a precomp, the `KF012` freeze, passed
   `--strict` while the file rendered blank; and a file whose only motion lived in
   precomps, as exported files often do, failed as a static image (`MQ001`). Layers in
-  `assets[].layers` now get the same checks, except the composition range, which a
-  precomp takes from the layers that use it. The suite is at 133 stdlib-only unit tests.
+  `assets[].layers` now get the same checks, a `refId` there that names no asset
+  included (`AS006`), except the composition range, which a
+  precomp takes from the layers that use it. The suite is at 134 stdlib-only unit tests.
 - **`render.mjs` sampled a file whose `ip` is not 0 that many frames late.** lottie-web's
   `goToAndStop` counts from the first frame and the renderer passed frames on the
   composition's clock, so the samples past the end came out as `EMPTY FRAME`: a valid

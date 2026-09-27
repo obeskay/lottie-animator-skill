@@ -838,6 +838,7 @@ def referenced_pairs(data):
                 walk(value, "%s[%d]" % (path, index))
 
     walk(data.get("layers"), "$.layers")
+    walk(data.get("assets"), "$.assets")  # precomps reference assets too
     return out
 
 

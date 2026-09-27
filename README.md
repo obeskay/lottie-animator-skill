@@ -16,7 +16,7 @@ and a renderer that makes the agent look at every frame it calls done.
 [Gallery](#gallery) · [Palettes](#palettes) · [What to ask for](#what-to-ask-for) · [Tools](#tools) · [Install](#install) · [Live page](https://obeskay.github.io/lottie-animator-skill/)
 
 ![Lottie](https://img.shields.io/badge/Lottie-5.12-C8522B?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-133-6F8163?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-134-6F8163?style=flat-square)
 ![Dependencies](https://img.shields.io/badge/python%20deps-none-8A8178?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-1E1B18?style=flat-square)
 
@@ -326,7 +326,7 @@ renderer. Copied without them, the skill degrades to guidance only and says so.
 ## Development
 
 ```bash
-python3 -m unittest discover -s tests -v   # 133 tests, stdlib only
+python3 -m unittest discover -s tests -v   # 134 tests, stdlib only
 python3 scripts/lottie_lint.py examples/ --strict
 npm install && node scripts/render.mjs examples/success-check.json
 node scripts/make-gifs.mjs                  # every GIF, the hero, the palette board
