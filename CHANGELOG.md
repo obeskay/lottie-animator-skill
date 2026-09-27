@@ -15,6 +15,10 @@
   composition's clock, so the samples past the end came out as `EMPTY FRAME`: a valid
   file starting at frame 60 was reported empty on three of five frames. It now renders
   frame for frame like the same animation starting at 0.
+- **The landing page loaded nothing where `docs/` was the site root on any host but
+  `github.io`**, such as a server started inside `docs/`. It picked the examples' source
+  by host name and asked for `../examples/`: 22 404s and an empty grid. It now reads the
+  files beside it only when it is served from the repository, at `/docs/`.
 
 ## 2.1.0 — 2026-09-26
 

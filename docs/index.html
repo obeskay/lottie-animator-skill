@@ -134,11 +134,13 @@
 </script>
 <script>
   const REPO = 'https://github.com/obeskay/lottie-animator-skill/blob/main/examples/';
-  // Served from the repository (python3 -m http.server), read the files beside the page;
-  // on GitHub Pages only docs/ is published, so read them from the repository instead.
-  const SOURCE = location.hostname.endsWith('github.io')
-    ? 'https://raw.githubusercontent.com/obeskay/lottie-animator-skill/main/examples/'
-    : '../examples/';
+  // Served from the repository (python3 -m http.server), the page is at /docs/ and reads the
+  // files beside it; wherever docs/ is the site root (GitHub Pages under
+  // /lottie-animator-skill/, or a server started inside docs/) there is no ../examples/,
+  // so it reads them from the repository instead.
+  const SOURCE = /\/docs\/(index\.html)?$/.test(location.pathname)
+    ? '../examples/'
+    : 'https://raw.githubusercontent.com/obeskay/lottie-animator-skill/main/examples/';
   const PALETTES = JSON.parse(document.getElementById('palettes').textContent);
   const NAMES = JSON.parse(document.getElementById('examples').textContent);
   const LOOP = /loop|loader|loading|spinner|pulse|idle|cycle/i;
