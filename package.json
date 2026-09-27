@@ -1,6 +1,6 @@
 {
   "name": "lottie-animator-skill",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "private": true,
   "description": "Tooling for the Lottie Animator skill: headless rendering, GIFs and visual inspection.",
   "type": "module",

@@ -1,6 +1,6 @@
 {
   "name": "lottie-animator",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Create, inspect, recolor, and repair Lottie animations: twenty-two recipes in nine palettes, SVG-to-Lottie conversion, structural linting, and headless rendering so motion is verified, not assumed.",
   "author": {
     "name": "obeskay",

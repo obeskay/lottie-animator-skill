@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Marketplace for Lottie Animator plugin - Generate professional Lottie animations from SVGs",
-    "version": "2.1.0"
+    "version": "2.1.1"
   },
   "plugins": [
     {
       "name": "lottie-animator",
       "source": "./",
       "description": "Twenty-two Lottie recipes you can re-skin in nine palettes, plus a converter, a linter for the defects that render blank, and a headless renderer for visual verification.",
-      "version": "2.1.0",
+      "version": "2.1.1",
       "author": {
         "name": "obeskay"
       },
