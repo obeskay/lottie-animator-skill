@@ -19,6 +19,9 @@
   `github.io`**, such as a server started inside `docs/`. It picked the examples' source
   by host name and asked for `../examples/`: 22 404s and an empty grid. It now reads the
   files beside it only when it is served from the repository, at `/docs/`.
+- **A palette switch on the landing page could restart a one-shot mid-play.** The replay
+  timer of the animation it replaced still fired, 1.4 s after that one had finished, and
+  sent the new one back to frame 0. A timer now restarts only its own animation.
 
 ## 2.1.0 — 2026-09-26
 

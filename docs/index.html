@@ -171,9 +171,9 @@
     if (card.anim) card.anim.destroy();
     const data = card.palette ? reskin(structuredClone(card.data), card.home, PALETTES[card.palette]) : structuredClone(card.data);
     const loop = LOOP.test(card.data.nm || '');
-    card.anim = lottie.loadAnimation({ container: card.slot, renderer: 'svg', loop, autoplay: !reduced && card.visible, animationData: data });
-    // A one-shot rests on its final pose, then plays again.
-    if (!loop) card.anim.addEventListener('complete', () => setTimeout(() => card.visible && card.anim.goToAndPlay(0, true), 1400));
+    const anim = card.anim = lottie.loadAnimation({ container: card.slot, renderer: 'svg', loop, autoplay: !reduced && card.visible, animationData: data });
+    // A one-shot rests on its final pose, then plays again, unless a palette switch replaced it.
+    if (!loop) anim.addEventListener('complete', () => setTimeout(() => card.visible && card.anim === anim && anim.goToAndPlay(0, true), 1400));
     if (reduced) card.anim.addEventListener('DOMLoaded', () => card.anim.goToAndStop(card.anim.totalFrames - 1, true));
     card.stage.style.background = (card.palette ? PALETTES[card.palette] : card.home).bg;
   }
