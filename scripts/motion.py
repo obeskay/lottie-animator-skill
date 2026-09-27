@@ -19,7 +19,7 @@ freeze cannot happen, and every builder emits the properties whose absence
 makes a player drop the layer. The curves are the house defaults: strong
 ease-out, zero overshoot; `playful` exists for briefs that ask for bounce.
 See references/motion-taste.md for when to use which, and examples/*.py for
-twenty generators written this way.
+twenty-two generators written this way.
 
 Dependency-free. Python 3.8+.
 """
