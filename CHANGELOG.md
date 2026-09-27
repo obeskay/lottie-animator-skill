@@ -10,6 +10,11 @@
   precomps, as exported files often do, failed as a static image (`MQ001`). Layers in
   `assets[].layers` now get the same checks, except the composition range, which a
   precomp takes from the layers that use it. The suite is at 133 stdlib-only unit tests.
+- **`render.mjs` sampled a file whose `ip` is not 0 that many frames late.** lottie-web's
+  `goToAndStop` counts from the first frame and the renderer passed frames on the
+  composition's clock, so the samples past the end came out as `EMPTY FRAME`: a valid
+  file starting at frame 60 was reported empty on three of five frames. It now renders
+  frame for frame like the same animation starting at 0.
 
 ## 2.1.0 — 2026-09-26
 

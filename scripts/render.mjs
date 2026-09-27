@@ -322,10 +322,12 @@ export async function stageBlank(page, element, shot = {}) {
 /**
  * Runs inside the page. Seeks to a frame and lets the renderer flush.
  * lottie-web builds its SVG lazily, so measuring in the same tick as the seek
- * reads a stale document.
+ * reads a stale document. `frame` is on the composition's clock; goToAndStop
+ * counts from its first frame (ip), so a file whose ip is not 0 would be
+ * sampled that many frames late.
  */
 async function seekFrame(frame) {
-  window.__anim.goToAndStop(frame, true);
+  window.__anim.goToAndStop(frame - window.__anim.firstFrame, true);
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 }
 
