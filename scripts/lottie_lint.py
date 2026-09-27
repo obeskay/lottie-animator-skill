@@ -251,31 +251,38 @@ class Linter:
         layers = self.data.get("layers")
         if not isinstance(layers, list):
             return
-        comp_ip = _num(self.data.get("ip")) or 0
-        comp_op = _num(self.data.get("op"))
         self.stats["layers"] = len(layers)
+        comps = [("$.layers", layers, _num(self.data.get("ip")) or 0, _num(self.data.get("op")))]
+        # A precomp's layers break in the same ways, and exported files usually
+        # keep their motion there. Its range is set by the layers that use it,
+        # so only the root composition holds its layers to one.
+        assets = self.data.get("assets")
+        for number, asset in enumerate(assets if isinstance(assets, list) else []):
+            if isinstance(asset, dict) and isinstance(asset.get("layers"), list):
+                comps.append(("$.assets[%d].layers" % number, asset["layers"], 0, None))
 
-        by_ind = {}
-        for index, layer in enumerate(layers):
-            if not isinstance(layer, dict):
-                self.add("LY001", ERROR, "$.layers[%d]" % index, "layer must be an object")
-                continue
-            ind = layer.get("ind")
-            if ind is not None:
-                if ind in by_ind:
-                    self.add(
-                        "LY002", ERROR, "$.layers[%d].ind" % index,
-                        "duplicate layer ind %r (also at index %d)" % (ind, by_ind[ind]),
-                        "Parenting resolves by ind; duplicates make it ambiguous.",
-                    )
-                by_ind[ind] = index
+        for base, layers, comp_ip, comp_op in comps:
+            by_ind = {}
+            for index, layer in enumerate(layers):
+                if not isinstance(layer, dict):
+                    self.add("LY001", ERROR, "%s[%d]" % (base, index), "layer must be an object")
+                    continue
+                ind = layer.get("ind")
+                if ind is not None:
+                    if ind in by_ind:
+                        self.add(
+                            "LY002", ERROR, "%s[%d].ind" % (base, index),
+                            "duplicate layer ind %r (also at index %d)" % (ind, by_ind[ind]),
+                            "Parenting resolves by ind; duplicates make it ambiguous.",
+                        )
+                    by_ind[ind] = index
 
-        for index, layer in enumerate(layers):
-            if isinstance(layer, dict):
-                self.check_layer(index, layer, comp_ip, comp_op, by_ind, layers)
+            for index, layer in enumerate(layers):
+                if isinstance(layer, dict):
+                    self.check_layer(index, layer, comp_ip, comp_op, by_ind, layers, base)
 
-    def check_layer(self, index, layer, comp_ip, comp_op, by_ind, layers):
-        where = "$.layers[%d]" % index
+    def check_layer(self, index, layer, comp_ip, comp_op, by_ind, layers, base):
+        where = "%s[%d]" % (base, index)
         name = layer.get("nm")
         label = "%s (%s)" % (where, name) if name else where
 

@@ -264,6 +264,23 @@ class KeyframeTest(unittest.TestCase):
         del keyframe["i"]
         self.assertIn("KF012", codes(animation))
 
+    def test_layers_inside_a_precomp_are_checked(self):
+        """Exported files keep their motion in precomps. The same bare keyframe
+        inside one rendered blank on every frame while the file passed, and a
+        file animated only there was called a static image (MQ001)."""
+        animation = base_animation()
+        inner = animation["layers"][0]
+        del inner["ks"]["p"]["k"][0]["o"]
+        del inner["ks"]["p"]["k"][0]["i"]
+        animation["assets"] = [{"id": "comp_0", "layers": [inner]}]
+        animation["layers"] = [{
+            "ddd": 0, "ind": 1, "ty": 0, "nm": "Precomp", "refId": "comp_0", "sr": 1,
+            "w": 100, "h": 100, "ks": {"o": {"a": 0, "k": 100}},
+            "ip": 0, "op": 60, "st": 0, "bm": 0,
+        }]
+        errors = {f.code for f in Linter(animation).run() if f.severity == "error"}
+        self.assertEqual(errors, {"KF012"})
+
     def test_hold_keyframe_needs_no_handles(self):
         animation = base_animation()
         keyframe = animation["layers"][0]["ks"]["p"]["k"][0]

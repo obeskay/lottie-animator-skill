@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- **The linter never looked inside a precomp.** Only the root composition's layers were
+  checked, so a keyframe without handles in a precomp, the `KF012` freeze, passed
+  `--strict` while the file rendered blank; and a file whose only motion lived in
+  precomps, as exported files often do, failed as a static image (`MQ001`). Layers in
+  `assets[].layers` now get the same checks, except the composition range, which a
+  precomp takes from the layers that use it. The suite is at 133 stdlib-only unit tests.
+
 ## 2.1.0 — 2026-09-26
 
 ### Recipes and palettes
@@ -43,7 +54,7 @@ could not show the range, and one of them duplicated another.
 
 ### Fixed
 
-- The suite is at 132 stdlib-only unit tests.
+- The suite was at 132 tests.
 - **`render.mjs` called a spinning ring clipped.** `getBoundingClientRect()` boxes an
   element's local bounds after transforming them, so a circle at 45° measured 1.41
   times its width; the shipped panda was flagged on seven of twelve frames. The box is
