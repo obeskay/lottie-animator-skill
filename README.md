@@ -30,8 +30,7 @@ and a renderer that shows the agent every frame it ships.
 In Claude Code:
 
 ```bash
-/plugin marketplace add obeskay/lottie-animator-skill
-/plugin install lottie-animator
+/plugin install lottie-animator --marketplace obeskay/lottie-animator-skill
 ```
 
 Then ask for *"a success animation for our checkout, in the forest palette"*. Any other
@@ -386,9 +385,10 @@ keyframes, written with the same tokens and checked the same way.
 ### As a Claude Code plugin
 
 ```bash
-/plugin marketplace add obeskay/lottie-animator-skill
-/plugin install lottie-animator
+/plugin install lottie-animator --marketplace obeskay/lottie-animator-skill
 ```
+
+That needs Claude Code 2.1.275 or later. On older versions: `/plugin marketplace add obeskay/lottie-animator-skill`, then `/plugin install lottie-animator@lottie-animator-marketplace`.
 
 ### As a plain skill
 
