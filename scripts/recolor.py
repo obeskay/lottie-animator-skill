@@ -153,7 +153,9 @@ def main(argv=None):
             docs = read_archive(source)
         else:
             docs = {source.stem: json.loads(source.read_text(encoding="utf-8"))}
-    except (OSError, ValueError, BadZipFile) as error:
+        if not all(isinstance(doc, dict) for doc in docs.values()):
+            raise ValueError("not a Lottie animation")
+    except (OSError, ValueError, BadZipFile, RecursionError) as error:
         print("recolor: cannot read %s: %s" % (args.input, error), file=sys.stderr)
         return 2
 

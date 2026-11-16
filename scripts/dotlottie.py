@@ -63,7 +63,9 @@ def _read_member(zf, candidates):
 
 
 def _inline_images(zf, doc):
-    for asset in doc.get("assets", []):
+    for asset in doc.get("assets") or []:
+        if not isinstance(asset, dict):
+            continue
         filename = asset.get("p")
         if not isinstance(filename, str) or asset.get("e") == 1 or filename.startswith("data:"):
             continue
@@ -109,8 +111,8 @@ def write_archive(docs, out):
         _check_id(anim_id)
         if not isinstance(doc, dict):
             raise ValueError("%s is not a Lottie animation" % anim_id)
-        for asset in doc.get("assets", []):
-            if isinstance(asset.get("p"), str) and asset.get("e") != 1 and not asset["p"].startswith("data:"):
+        for asset in doc.get("assets") or []:
+            if isinstance(asset, dict) and isinstance(asset.get("p"), str) and asset.get("e") != 1 and not asset["p"].startswith("data:"):
                 raise ValueError(
                     "%s references the external image %r; embed it as a data URI first" % (anim_id, asset["p"])
                 )
@@ -152,20 +154,19 @@ def main(argv=None):
                 out, len(docs), "" if len(docs) == 1 else "s", size, out.stat().st_size))
             return 0
         animations = read_archive(args.input)
-    except (OSError, ValueError, BadZipFile) as error:
+        for anim_id, doc in animations.items():
+            fr = doc.get("fr") or 0
+            seconds = (doc.get("op", 0) - doc.get("ip", 0)) / fr if fr else 0
+            line = "%s  %sx%s  %.2f s  %d layers" % (anim_id, doc.get("w"), doc.get("h"), seconds, len(doc.get("layers", [])))
+            if args.command == "unpack":
+                target = Path(args.out) / (anim_id + ".json")
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(json.dumps(doc, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+                line += "  -> %s" % target
+            print(line)
+    except (OSError, ValueError, TypeError, BadZipFile, RecursionError) as error:
         print("dotlottie: %s" % error, file=sys.stderr)
         return 2
-
-    for anim_id, doc in animations.items():
-        fr = doc.get("fr") or 0
-        seconds = (doc.get("op", 0) - doc.get("ip", 0)) / fr if fr else 0
-        line = "%s  %sx%s  %.2f s  %d layers" % (anim_id, doc.get("w"), doc.get("h"), seconds, len(doc.get("layers", [])))
-        if args.command == "unpack":
-            target = Path(args.out) / (anim_id + ".json")
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(json.dumps(doc, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
-            line += "  -> %s" % target
-        print(line)
     return 0
 
 
