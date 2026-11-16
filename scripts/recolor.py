@@ -145,9 +145,11 @@ def main(argv=None):
     parser.add_argument("-o", "--out", help="output path (default: overwrite the input)")
     args = parser.parse_args(argv)
 
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from dotlottie import read_lottie, write_archive, BadZipFile
     try:
-        doc = json.loads(Path(args.input).read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
+        doc = read_lottie(args.input)  # .json, or the first animation of a .lottie
+    except (OSError, ValueError, BadZipFile) as error:
         print("recolor: cannot read %s: %s" % (args.input, error), file=sys.stderr)
         return 2
 
@@ -171,7 +173,10 @@ def main(argv=None):
 
     found = recolor(doc, mapping)
     out = Path(args.out or args.input)
-    out.write_text(json.dumps(doc, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    if out.suffix.lower() == ".lottie":
+        write_archive({out.stem: doc}, out)
+    else:
+        out.write_text(json.dumps(doc, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     missing = sorted(set(mapping) - found)
     print("recolor: %d colour%s replaced -> %s" % (len(found), "" if len(found) == 1 else "s", out))
     if missing:

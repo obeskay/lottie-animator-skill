@@ -5,7 +5,8 @@ Dependency-free. Python 3.8+.
 
 Usage:
     python3 scripts/lottie_lint.py animation.json
-    python3 scripts/lottie_lint.py examples/            # every .json inside
+    python3 scripts/lottie_lint.py examples/            # every .json and .lottie inside
+    python3 scripts/lottie_lint.py downloaded.lottie    # the first animation of a dotLottie
     python3 scripts/lottie_lint.py a.json --json        # machine-readable
     python3 scripts/lottie_lint.py a.json --strict      # warnings fail the run
 
@@ -16,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import zipfile
 from pathlib import Path
 
 ERROR = "error"
@@ -1056,7 +1058,7 @@ def collect_paths(args):
     for arg in args:
         path = Path(arg)
         if path.is_dir():
-            paths.extend(sorted(path.rglob("*.json")))
+            paths.extend(sorted(p for p in path.rglob("*") if p.suffix.lower() in (".json", ".lottie")))
         else:
             paths.append(path)
     return paths
@@ -1064,7 +1066,12 @@ def collect_paths(args):
 
 def lint_file(path, loop=None, allow_static=False):
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        if path.suffix.lower() == ".lottie":
+            sys.path.insert(0, str(Path(__file__).resolve().parent))
+            from dotlottie import read_lottie
+            data = read_lottie(path)
+        else:
+            data = json.loads(path.read_text(encoding="utf-8"))
     except OSError as exc:
         return [Finding("IO001", ERROR, str(path), "cannot read file: %s" % exc)], {}
     except json.JSONDecodeError as exc:
@@ -1074,6 +1081,8 @@ def lint_file(path, loop=None, allow_static=False):
                 "invalid JSON: %s" % exc.msg,
             )
         ], {}
+    except (ValueError, zipfile.BadZipFile) as exc:
+        return [Finding("IO003", ERROR, str(path), "unreadable .lottie: %s" % exc)], {}
     linter = Linter(data, loop=loop, source_name=path.name, allow_static=allow_static)
     return linter.run(), linter.stats
 
