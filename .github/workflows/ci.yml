@@ -21,7 +21,8 @@ concurrency:
 jobs:
   test:
     name: Tests and lint (Python ${{ matrix.python }})
-    runs-on: ubuntu-latest
+    # ponytail: ubuntu-latest (26.04) has no Python 3.8/3.9 build; move on when 3.8 support is dropped
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
