@@ -2,25 +2,62 @@
 
 # Lottie Animator
 
-**Motion that is looked at before it ships.**
+**Lottie that an agent writes, lints and looks at before it calls it done.**
 
-A Claude Code skill for Lottie. Twenty-two recipes that re-skin in nine palettes, a
-converter that does the bezier arithmetic, a linter for the defects that render blank,
-and a renderer that makes the agent look at every frame it calls done.
+An agent skill and MCP server for Lottie. Twenty-two recipes that re-skin in nine
+palettes, SVG to Lottie, `.lottie` packing, a linter for the defects that render blank,
+and a renderer that shows the agent every frame it ships.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.gif">
   <img src="assets/hero.gif" alt="Eight of the examples, each on its own palette, rendered by the skill's own renderer">
 </picture>
 
-[Gallery](#gallery) · [Palettes](#palettes) · [What to ask for](#what-to-ask-for) · [Tools](#tools) · [Install](#install) · [Live page](https://obeskay.github.io/lottie-animator-skill/)
+**[Open the live gallery](https://obeskay.github.io/lottie-animator-skill/)** ·
+[Quick start](#quick-start) · [Gallery](#gallery) · [Palettes](#palettes) ·
+[Tools](#tools) · [MCP](#use-it-from-any-mcp-client)
 
 ![Lottie](https://img.shields.io/badge/Lottie-5.12-C8522B?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-134-6F8163?style=flat-square)
+![dotLottie](https://img.shields.io/badge/.lottie-v2-C8522B?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-143-6F8163?style=flat-square)
 ![Dependencies](https://img.shields.io/badge/python%20deps-none-8A8178?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-1E1B18?style=flat-square)
 
 </div>
+
+## Quick start
+
+In Claude Code:
+
+```bash
+/plugin marketplace add obeskay/lottie-animator-skill
+/plugin install lottie-animator
+```
+
+Then ask for *"a success animation for our checkout, in the forest palette"*. Any other
+agent can use the same tools [over MCP](#use-it-from-any-mcp-client).
+
+The tools also run on their own. Python 3.8+ with no dependencies; the last line needs
+Node and Chrome:
+
+```bash
+git clone https://github.com/obeskay/lottie-animator-skill && cd lottie-animator-skill
+python3 examples/heart-like.py --palette dusk -o heart.json   # a recipe, re-skinned
+python3 scripts/lottie_lint.py heart.json                     # PASS, or the defect and its fix
+python3 scripts/dotlottie.py pack heart.json                  # heart.lottie, about a third the size
+npm install && node scripts/render.mjs heart.json --onion     # frames, filmstrip, onion skin
+```
+
+## What to ask for
+
+| Say to your agent | What it does |
+|---|---|
+| *"A success animation for our checkout, in the forest palette"* | Starts from `success-check`, re-skins it, lints, renders, and shows you the filmstrip |
+| *"Animate this SVG logo with a quiet entrance"* | Converts the SVG, cascades its parts, reads the onion skin to check the easing |
+| *"A loader that works in dark mode"* | `spinner-arc` in `night`, with the loop seam checked frame against frame |
+| *"Make this LottieFiles animation match our brand colours"* | `recolor.py --list`, then maps each colour by its role |
+| *"Why does this Lottie render blank?"* | Lints it, names the defect (say `KF012`), fixes it, renders the proof |
+| *"Ship it as a .lottie for the iOS app"* | Lints, packs a dotLottie v2 archive, and reports the size it saved |
 
 ## Why
 
@@ -34,16 +71,6 @@ motion drifts to all four by default.
 This skill answers both. The tools catch the silent failures and render every file, so
 the agent has to look at what it made; the recipes, the motion tokens and the palettes
 make the first draft quiet, precise and on-palette instead of generic.
-
-## What to ask for
-
-| Say to Claude Code | What it does |
-|---|---|
-| *"A success animation for our checkout, in the forest palette"* | Starts from `success-check`, re-skins it, lints, renders, and shows you the filmstrip |
-| *"Animate this SVG logo with a quiet entrance"* | Converts the SVG, cascades its parts, reads the onion skin to check the easing |
-| *"A loader that works in dark mode"* | `spinner-arc` in `night`, with the loop seam checked frame against frame |
-| *"Make this LottieFiles animation match our brand colours"* | `recolor.py --list`, then maps each colour by its role |
-| *"Why does this Lottie render blank?"* | Lints it, names the defect (say `KF012`), fixes it, renders the proof |
 
 ## Gallery
 
@@ -286,6 +313,45 @@ python3 scripts/recolor.py downloaded.json --list
 python3 scripts/recolor.py downloaded.json --map "#FF5A5F=#C8522B" --map "#222222=#1E1B18" -o ours.json
 ```
 
+### `dotlottie.py` — `.lottie` in and out
+
+Packs one or more JSON files into a dotLottie v2 archive, the zipped format the dotLottie
+players load, usually a third of the size. Unpacks version 1 and 2 archives into plain
+JSON with their images folded in. The linter and `recolor.py` read `.lottie` directly.
+
+```bash
+python3 scripts/dotlottie.py pack loader.json success.json -o ui.lottie
+python3 scripts/dotlottie.py unpack downloaded.lottie -o out/
+python3 scripts/lottie_lint.py downloaded.lottie --strict
+```
+
+## Use it from any MCP client
+
+Cursor, Codex, Windsurf, Claude Desktop and every other MCP client get the same tools
+from `scripts/mcp_server.py`: a stdio server in standard-library Python that runs the
+scripts above, so an agent there lints, converts and renders exactly as the skill does.
+
+```bash
+claude mcp add lottie-animator -- python3 "$PWD/scripts/mcp_server.py"
+```
+
+Or in any client's JSON config:
+
+```json
+{ "mcpServers": { "lottie-animator": {
+    "command": "python3", "args": ["/path/to/lottie-animator-skill/scripts/mcp_server.py"] } } }
+```
+
+| Tool | Does |
+|---|---|
+| `lint` | Findings with codes and fixes for a `.json`, a `.lottie` or a folder |
+| `render` | Renders in real lottie-web and returns the filmstrip and onion skin as images |
+| `svg_to_lottie` | SVG to named shape layers, each anchored at its own centre |
+| `list_colors` · `recolor` | Every colour with its uses, then a role-by-role remap |
+| `pack_dotlottie` · `unpack_dotlottie` | JSON to `.lottie` and back |
+
+`render` needs Node, Chrome and `npm install` in the clone; the rest needs only Python.
+
 ## How the skill works
 
 ```
@@ -308,6 +374,13 @@ References live beside the skill:
 [techniques](skills/lottie-animator/references/professional-techniques.md) ·
 [GSAP](skills/lottie-animator/references/lottie-gsap-integration.md)
 
+## What it does not do
+
+It does not import After Effects projects, evaluate expressions, author dotLottie
+themes or state machines, or generate motion from a text prompt without an agent in the
+loop. Recipes are a starting point: a brief that needs a different motion gets new
+keyframes, written with the same tokens and checked the same way.
+
 ## Install
 
 ### As a Claude Code plugin
@@ -326,7 +399,7 @@ renderer. Copied without them, the skill degrades to guidance only and says so.
 ## Development
 
 ```bash
-python3 -m unittest discover -s tests -v   # 134 tests, stdlib only
+python3 -m unittest discover -s tests -v   # 143 tests, stdlib only
 python3 scripts/lottie_lint.py examples/ --strict
 npm install && node scripts/render.mjs examples/success-check.json
 node scripts/make-gifs.mjs                  # every GIF, the hero, the palette board

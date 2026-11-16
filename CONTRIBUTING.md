@@ -57,6 +57,8 @@ lottie-animator-skill/
 │   ├── lottie_lint.py    # Structural and motion linting
 │   ├── render.mjs        # Headless render, filmstrip, onion skin
 │   ├── recolor.py        # List and map the colours of any Lottie
+│   ├── dotlottie.py      # Pack and unpack .lottie archives
+│   ├── mcp_server.py     # The tools over MCP (stdio)
 │   └── make-gifs.mjs     # README GIFs and boards, in the same player
 ├── skills/
 │   └── lottie-animator/

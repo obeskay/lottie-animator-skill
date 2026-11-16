@@ -135,6 +135,9 @@ for masses, never a thin line on the ground.
   `python3 scripts/recolor.py in.json --list` prints every colour with its uses and
   layers; then `--map "#FF5A5F=#C8522B" -o out.json` for each role. It covers static and
   animated paint, gradient stops, and solid layers.
+- **A `.lottie` (dotLottie):** `lottie_lint.py` and `recolor.py` read it directly;
+  `python3 scripts/dotlottie.py unpack in.lottie -o out/` before rendering, and
+  `dotlottie.py pack a.json -o a.lottie` when the host ships dotLottie.
 - **Dark mode:** render on every ground the host uses. Ink drawn on a ground of the
   same value is not low contrast, it is invisible, and only the render shows it.
 

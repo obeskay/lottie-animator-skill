@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.2.0 — 2026-11-16
+
+### Added
+
+- **`.lottie` files.** `scripts/dotlottie.py` packs one or more Lottie JSON files into a
+  dotLottie v2 archive and unpacks version 1 and 2 archives, folding their images into
+  the JSON. `lottie_lint.py` and `recolor.py` read `.lottie` directly, and `recolor.py`
+  writes one when `-o` ends in `.lottie`. An archive it writes was loaded and drawn by
+  the dotlottie-web player; an animation id that would climb out of the output folder
+  is refused.
+- **An MCP server.** `scripts/mcp_server.py` serves `lint`, `render`, `svg_to_lottie`,
+  `list_colors`, `recolor`, `pack_dotlottie` and `unpack_dotlottie` over stdio, so
+  agents outside Claude Code get the same tools. `render` returns the filmstrip and the
+  onion skin as images. Standard library only; checked against the official MCP client.
+- **README:** a quick start that runs from a fresh clone, the live gallery as the front
+  door, and what the skill does not do. The suite is at 143 stdlib-only unit tests.
+
 ## 2.1.1 — 2026-09-27
 
 ### Fixed
@@ -10,7 +27,7 @@
   precomps, as exported files often do, failed as a static image (`MQ001`). Layers in
   `assets[].layers` now get the same checks, a `refId` there that names no asset
   included (`AS006`), except the composition range, which a
-  precomp takes from the layers that use it. The suite is at 134 stdlib-only unit tests.
+  precomp takes from the layers that use it. The suite was at 134 unit tests, all stdlib.
 - **`render.mjs` sampled a file whose `ip` is not 0 that many frames late.** lottie-web's
   `goToAndStop` counts from the first frame and the renderer passed frames on the
   composition's clock, so the samples past the end came out as `EMPTY FRAME`: a valid
