@@ -146,15 +146,24 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from dotlottie import read_lottie, write_archive, BadZipFile
-    try:
-        doc = read_lottie(args.input)  # .json, or the first animation of a .lottie
+    from dotlottie import read_archive, write_archive, BadZipFile
+    source = Path(args.input)
+    try:  # a .lottie may hold several animations: every one is listed and recoloured
+        if source.suffix.lower() == ".lottie":
+            docs = read_archive(source)
+        else:
+            docs = {source.stem: json.loads(source.read_text(encoding="utf-8"))}
     except (OSError, ValueError, BadZipFile) as error:
         print("recolor: cannot read %s: %s" % (args.input, error), file=sys.stderr)
         return 2
 
     if args.list or not args.map:
-        usage = inventory(doc)
+        usage = {}
+        for doc in docs.values():
+            for colour, entry in inventory(doc).items():
+                total = usage.setdefault(colour, {"count": 0, "layers": set()})
+                total["count"] += entry["count"]
+                total["layers"] |= set(entry["layers"])
         for colour, entry in sorted(usage.items(), key=lambda item: -item[1]["count"]):
             layers = ", ".join(sorted(entry["layers"]))
             print("%s  %3d use%s  %s" % (colour, entry["count"], " " if entry["count"] == 1 else "s", layers))
@@ -171,12 +180,20 @@ def main(argv=None):
         print("recolor: %s" % error, file=sys.stderr)
         return 2
 
-    found = recolor(doc, mapping)
+    found = set()
+    for doc in docs.values():
+        found |= recolor(doc, mapping)
     out = Path(args.out or args.input)
-    if out.suffix.lower() == ".lottie":
-        write_archive({out.stem: doc}, out)
-    else:
-        out.write_text(json.dumps(doc, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    try:
+        if out.suffix.lower() == ".lottie":
+            write_archive(docs if source.suffix.lower() == ".lottie" else {out.stem: next(iter(docs.values()))}, out)
+        elif len(docs) > 1:
+            raise ValueError("%s holds %d animations; write a .lottie, or unpack it first" % (source, len(docs)))
+        else:
+            out.write_text(json.dumps(next(iter(docs.values())), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    except (OSError, ValueError) as error:
+        print("recolor: %s" % error, file=sys.stderr)
+        return 2
     missing = sorted(set(mapping) - found)
     print("recolor: %d colour%s replaced -> %s" % (len(found), "" if len(found) == 1 else "s", out))
     if missing:

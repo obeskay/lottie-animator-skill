@@ -97,6 +97,7 @@ TOOLS = {
             "at": {"type": "string", "description": "timeline percentages, e.g. 0,25,50,75,100", "optional": True},
             "onion": {"type": "boolean", "description": "also stack frames to read easing and arcs", "optional": True},
         }),
+        # ponytail: each render keeps its temp folder so the agent can open the frames; the OS clears tmp
         "argv": lambda a: ["node", str(HERE / "render.mjs"), a["path"], "--out", tempfile.mkdtemp(prefix="lottie-render-"),
                            *(["--at", a["at"]] if a.get("at") else []),
                            *(["--onion"] if a.get("onion") else [])],
@@ -110,9 +111,9 @@ def call(name, args):
         argv = tool["argv"](args)
     except (KeyError, TypeError, AttributeError) as error:
         return {"content": [{"type": "text", "text": "bad arguments: %s" % error}], "isError": True}
-    try:
-        done = subprocess.run(argv, capture_output=True, text=True, timeout=300)
-    except (OSError, subprocess.TimeoutExpired) as error:
+    try:  # stdin is the protocol stream: the child must never read it
+        done = subprocess.run(argv, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=300)
+    except (OSError, ValueError, TypeError, subprocess.TimeoutExpired) as error:
         return {"content": [{"type": "text", "text": str(error)}], "isError": True}
     text = (done.stdout + done.stderr).strip() or "(no output)"
     # exit 1 is a verdict about the file (lint findings, a colour not found), not a tool failure
@@ -125,8 +126,16 @@ def call(name, args):
     return {"content": content, "isError": done.returncode >= 2}
 
 
+class RpcError(Exception):
+    def __init__(self, code, message):
+        super().__init__(message)
+        self.code = code
+
+
 def handle(message):
     method, params = message.get("method"), message.get("params") or {}
+    if not isinstance(method, str) or not isinstance(params, dict):
+        raise RpcError(-32600, "invalid request")
     if method == "initialize":
         asked = params.get("protocolVersion")
         return {
@@ -139,10 +148,13 @@ def handle(message):
     if method == "tools/list":
         return {"tools": [{"name": n, "description": t["description"], "inputSchema": t["inputSchema"]} for n, t in TOOLS.items()]}
     if method == "tools/call":
-        if params.get("name") not in TOOLS:
-            raise LookupError("unknown tool %r" % params.get("name"))
-        return call(params["name"], params.get("arguments") or {})
-    raise LookupError("method not found: %s" % method)
+        name, arguments = params.get("name"), params.get("arguments") or {}
+        if not isinstance(name, str) or name not in TOOLS:
+            raise RpcError(-32602, "unknown tool %r" % (name,))
+        if not isinstance(arguments, dict):
+            raise RpcError(-32602, "arguments must be an object")
+        return call(name, arguments)
+    raise RpcError(-32601, "method not found: %s" % method)
 
 
 def main():
@@ -163,8 +175,10 @@ def main():
                 continue
             try:
                 reply = {"jsonrpc": "2.0", "id": message["id"], "result": handle(message)}
-            except LookupError as error:
-                reply = {"jsonrpc": "2.0", "id": message["id"], "error": {"code": -32601, "message": str(error)}}
+            except RpcError as error:
+                reply = {"jsonrpc": "2.0", "id": message["id"], "error": {"code": error.code, "message": str(error)}}
+            except Exception as error:  # one bad request must never take the server down
+                reply = {"jsonrpc": "2.0", "id": message["id"], "error": {"code": -32603, "message": "internal error: %s" % error}}
         sys.stdout.write(json.dumps(reply) + "\n")
         sys.stdout.flush()
 

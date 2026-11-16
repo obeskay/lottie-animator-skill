@@ -68,6 +68,19 @@ class DotLottieTest(unittest.TestCase):
         out = self.dir / "set.lottie"
         write_archive({"one": self.doc, "two": self.doc}, out)
         self.assertEqual(list(read_archive(out)), ["one", "two"])
+        # recolouring the archive in place keeps both animations and changes both
+        first = run(RECOLOR, out, "--list").stdout.split()[0]
+        self.assertEqual(run(RECOLOR, out, "--map", "%s=#123456" % first).returncode, 0)
+        both = read_archive(out)
+        self.assertEqual(list(both), ["one", "two"])
+        self.assertEqual(both["one"], both["two"])
+        self.assertIn("#123456", run(RECOLOR, out, "--list").stdout)
+        # one of them cannot be written to a single JSON
+        self.assertEqual(run(RECOLOR, out, "--map", "#123456=#654321", "-o", self.dir / "x.json").returncode, 2)
+        # two inputs with the same name would overwrite each other
+        (self.dir / "b").mkdir()
+        (self.dir / "b" / "success-check.json").write_text(json.dumps(self.doc))
+        self.assertEqual(run(DOT, "pack", CHECK, self.dir / "b" / "success-check.json", "-o", self.dir / "dup.lottie").returncode, 2)
 
     def test_ids_that_climb_out_of_the_folder_are_refused(self):
         archive = self.dir / "evil.lottie"

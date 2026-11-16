@@ -2,7 +2,7 @@
 """Pack Lottie JSON into a .lottie archive, and get it back out.
 
 A .lottie (dotLottie) file is a zip: a manifest plus one or more Lottie JSON
-animations, usually a third of the size of the JSON. Players such as
+animations, often a quarter of the size of the JSON. Players such as
 dotlottie-web, dotlottie-ios and dotlottie-android load it directly.
 
     python3 scripts/dotlottie.py pack success-check.json -o success.lottie
@@ -37,8 +37,8 @@ IMAGE_DIRS = ("i/", "images/")
 
 def _check_id(anim_id):
     # ids become file names on unpack, so nothing that can climb out of the folder
-    if not re.fullmatch(r"[A-Za-z0-9_.-]+", anim_id) or anim_id.strip(".") == "":
-        raise ValueError("animation id %r: use letters, digits, '.', '_' or '-'" % anim_id)
+    if not anim_id or re.search(r"[/\\\x00]", anim_id) or anim_id.strip(".") == "":
+        raise ValueError("animation id %r cannot be a file name" % anim_id)
     return anim_id
 
 
@@ -47,10 +47,10 @@ def _animation_ids(zf):
     try:
         manifest = json.loads(zf.read("manifest.json"))
         ids = [entry["id"] for entry in manifest.get("animations", [])]
-    except (KeyError, ValueError, TypeError):
+    except (KeyError, ValueError, TypeError, AttributeError):
         ids = []
-    if not ids:  # no usable manifest: take whatever animations are there
-        ids = [Path(n).stem for n in names if n.startswith(ANIMATION_DIRS) and n.endswith(".json")]
+    if not ids:  # no usable manifest: take whatever animations sit directly in a/ or animations/
+        ids = [Path(n).stem for n in names if n.startswith(ANIMATION_DIRS) and n.endswith(".json") and n.count("/") == 1]
     return [_check_id(str(i)) for i in ids]
 
 
@@ -67,7 +67,7 @@ def _inline_images(zf, doc):
         filename = asset.get("p")
         if not isinstance(filename, str) or asset.get("e") == 1 or filename.startswith("data:"):
             continue
-        folder = (asset.get("u") or "").strip("/")
+        folder = str(asset.get("u") or "").strip("/")
         candidates = [folder + "/" + filename if folder else filename]
         candidates += [d + filename for d in IMAGE_DIRS]
         data = _read_member(zf, candidates)
@@ -86,7 +86,10 @@ def read_archive(path):
             raw = _read_member(zf, [d + anim_id + ".json" for d in ANIMATION_DIRS])
             if raw is None:
                 raise ValueError("manifest lists %r but the archive has no JSON for it" % anim_id)
-            animations[anim_id] = _inline_images(zf, json.loads(raw))
+            doc = json.loads(raw)
+            if not isinstance(doc, dict):
+                raise ValueError("%r is not a Lottie animation" % anim_id)
+            animations[anim_id] = _inline_images(zf, doc)
     if not animations:
         raise ValueError("no animations inside %s" % path)
     return animations
@@ -104,6 +107,8 @@ def write_archive(docs, out):
     """docs: {id: Lottie dict}. Writes a version 2 .lottie."""
     for anim_id, doc in docs.items():
         _check_id(anim_id)
+        if not isinstance(doc, dict):
+            raise ValueError("%s is not a Lottie animation" % anim_id)
         for asset in doc.get("assets", []):
             if isinstance(asset.get("p"), str) and asset.get("e") != 1 and not asset["p"].startswith("data:"):
                 raise ValueError(
@@ -137,6 +142,8 @@ def main(argv=None):
         if args.command == "pack":
             docs = {}
             for name in args.inputs:
+                if Path(name).stem in docs:
+                    raise ValueError("two inputs are named %s; animation ids must differ" % Path(name).stem)
                 docs[Path(name).stem] = json.loads(Path(name).read_text(encoding="utf-8"))
             out = Path(args.out or Path(args.inputs[0]).with_suffix(".lottie"))
             write_archive(docs, out)

@@ -44,7 +44,7 @@ Node and Chrome:
 git clone https://github.com/obeskay/lottie-animator-skill && cd lottie-animator-skill
 python3 examples/heart-like.py --palette dusk -o heart.json   # a recipe, re-skinned
 python3 scripts/lottie_lint.py heart.json                     # PASS, or the defect and its fix
-python3 scripts/dotlottie.py pack heart.json                  # heart.lottie, about a third the size
+python3 scripts/dotlottie.py pack heart.json                  # heart.lottie, about a quarter the size
 npm install && node scripts/render.mjs heart.json --onion     # frames, filmstrip, onion skin
 ```
 
@@ -316,7 +316,7 @@ python3 scripts/recolor.py downloaded.json --map "#FF5A5F=#C8522B" --map "#22222
 ### `dotlottie.py` — `.lottie` in and out
 
 Packs one or more JSON files into a dotLottie v2 archive, the zipped format the dotLottie
-players load, usually a third of the size. Unpacks version 1 and 2 archives into plain
+players load, often a quarter of the size. Unpacks version 1 and 2 archives into plain
 JSON with their images folded in. The linter and `recolor.py` read `.lottie` directly.
 
 ```bash

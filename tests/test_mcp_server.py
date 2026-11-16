@@ -40,9 +40,13 @@ class McpServerTest(unittest.TestCase):
                 call(6, "lint", path=str(REPO / "examples" / "nope.json")),
                 call(7, "recolor", path=packed),
                 {"jsonrpc": "2.0", "id": 8, "method": "resources/list"},
+                call(9, "lint", path=5),  # a wrong type must not take the server down
+                {"jsonrpc": "2.0", "id": 10, "method": "tools/call", "params": ["lint"]},
+                call(11, "no_such_tool"),
+                {"jsonrpc": "2.0", "id": 12, "method": "ping"},  # still alive after all of that
             )
         by_id = {r["id"]: r for r in replies}
-        self.assertEqual(sorted(by_id), [1, 2, 3, 4, 5, 6, 7, 8], "the notification must not be answered")
+        self.assertEqual(sorted(by_id), list(range(1, 13)), "the notification must not be answered")
         self.assertEqual(by_id[1]["result"]["protocolVersion"], "2025-06-18")  # echoed back
         names = {t["name"] for t in by_id[2]["result"]["tools"]}
         self.assertEqual(names, {"lint", "svg_to_lottie", "list_colors", "recolor", "pack_dotlottie", "unpack_dotlottie", "render"})
@@ -55,6 +59,10 @@ class McpServerTest(unittest.TestCase):
         self.assertIn("exit 1", by_id[6]["result"]["content"][0]["text"])  # a verdict, not a crash
         self.assertTrue(by_id[7]["result"]["isError"])  # recolor without a map
         self.assertEqual(by_id[8]["error"]["code"], -32601)
+        self.assertTrue(by_id[9]["result"]["isError"])
+        self.assertEqual(by_id[10]["error"]["code"], -32600)
+        self.assertEqual(by_id[11]["error"]["code"], -32602)
+        self.assertEqual(by_id[12]["result"], {})
 
     def test_garbage_gets_a_parse_error(self):
         done = subprocess.run([sys.executable, str(SERVER)], input="{nope\n", capture_output=True, text=True, timeout=30)
